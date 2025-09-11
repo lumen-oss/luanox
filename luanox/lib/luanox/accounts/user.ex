@@ -32,6 +32,7 @@ defmodule LuaNox.Accounts.User do
     |> validate_required([:username])
     |> unique_constraint([:provider, :username])
     |> validate_provider()
+
     # |> validate_aka()
   end
 

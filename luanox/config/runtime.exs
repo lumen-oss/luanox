@@ -53,7 +53,7 @@ if config_env() == :prod do
       You can generate one by calling: mix phx.gen.secret
       """
 
-  host = System.get_env("LUANOX_HOST") || throw "LUANOX_HOST not set"
+  host = System.get_env("LUANOX_HOST") || throw("LUANOX_HOST not set")
   port = String.to_integer(System.get_env("LUANOX_PORT") || "4000")
 
   config :luanox, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")

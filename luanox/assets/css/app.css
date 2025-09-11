@@ -1,22 +1,79 @@
-/* See the Tailwind configuration guide for advanced usage
-   https://tailwindcss.com/docs/configuration */
-
 @import "tailwindcss" source(none);
 @source "../css";
 @source "../js";
 @source "../../lib/luanox_web";
 
-/* daisyUI Tailwind Plugin. You can update this file by fetching the latest version with:
-   curl -sLO https://github.com/saadeghi/daisyui/releases/latest/download/daisyui.js
-   Make sure to look at the daisyUI changelog: https://daisyui.com/docs/changelog/ */
+.hero-accent {
+  background: linear-gradient(
+    135deg,
+    oklch(var(--color-base-100)) 0%,
+    oklch(var(--color-primary) / 0.03) 50%,
+    oklch(var(--color-base-100)) 100%
+  );
+}
+
+.donation-gradient {
+  background: oklch(var(--color-primary) / 0.05);
+  position: relative;
+  backdrop-filter: blur(8px) saturate(120%);
+}
+
+.donation-gradient::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(circle at 20% 30%, oklch(var(--color-primary) / 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, oklch(var(--color-secondary) / 0.02) 0%, transparent 50%),
+    radial-gradient(circle at 40% 80%, oklch(var(--color-primary) / 0.025) 0%, transparent 40%);
+  pointer-events: none;
+}
+
+.donation-section .bg-white\/10 {
+  background: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(16px) saturate(120%) brightness(105%) !important;
+  
+  box-shadow: 
+    0 0 80px -20px oklch(var(--color-primary) / 0.4),
+    0 0 40px -10px oklch(var(--color-secondary) / 0.3),
+    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    0 16px 16px -8px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.donation-section .border-white\/20 {
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  border-width: 1px !important;
+}
+
+@keyframes gentle-pulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: brightness(100%);
+  }
+  50% {
+    transform: scale(1.005);
+    filter: brightness(105%);
+  }
+}
+
+.trust-badge {
+  background: linear-gradient(
+    135deg,
+    oklch(var(--color-success) / 0.15) 0%,
+    oklch(var(--color-success) / 0.1) 100%
+  );
+  border: 1px solid oklch(var(--color-success) / 0.3);
+  color: oklch(var(--color-success));
+  box-shadow: 0 4px 12px oklch(var(--color-success) / 0.2);
+  backdrop-filter: blur(8px);
+}
+
 @plugin "../vendor/daisyui" {
   themes: false;
 }
 
-/* daisyUI theme plugin. You can update this file by fetching the latest version with:
-  curl -sLO https://github.com/saadeghi/daisyui/releases/latest/download/daisyui-theme.js */
-
-/* Default dark and light themes are based off sweetie.nvim colorscheme */
 @plugin "../vendor/daisyui-theme" {
   name: "dark";
   default: true;
@@ -96,15 +153,12 @@
   --color-dark-grey: var(--color-dark-grey);
 }
 
-/* Add variants based on LiveView classes */
 @custom-variant phx-click-loading ([".phx-click-loading&", ".phx-click-loading &"]);
 @custom-variant phx-submit-loading ([".phx-submit-loading&", ".phx-submit-loading &"]);
 @custom-variant phx-change-loading ([".phx-change-loading&", ".phx-change-loading &"]);
 
-/* Make LiveView wrapper divs transparent for layout */
 [data-phx-root-id] { display: contents }
 
-/* Flop Phoenix pagination styling with DaisyUI */
 .flop-pagination {
   @apply flex justify-center items-center gap-1;
 }
@@ -113,13 +167,11 @@
   @apply flex items-center gap-1 p-1 bg-base-200 rounded-md border border-base-300 shadow-sm backdrop-blur-sm;
 }
 
-/* Direct children of nav (Previous/Next buttons and ul) */
 .flop-pagination nav > a,
 .flop-pagination nav > span {
   @apply min-w-10 max-w-20 h-10 flex items-center justify-center text-sm font-medium rounded-sm transition-all duration-200 border border-transparent select-none px-3;
 }
 
-/* Page list styling */
 .flop-pagination nav ul {
   @apply flex items-center gap-1 list-none m-0 p-0;
 }
@@ -128,25 +180,21 @@
   @apply flex;
 }
 
-/* Page links inside list items */
 .flop-pagination nav ul li a,
 .flop-pagination nav ul li span {
   @apply min-w-10 h-10 flex items-center justify-center text-sm font-medium rounded-sm transition-all duration-200 border border-transparent select-none;
 }
 
-/* Regular page links */
 .flop-pagination nav a:not([aria-current]):not([disabled]),
 .flop-pagination nav ul li a:not([aria-current]):not([disabled]) {
   @apply text-base-content/70 hover:text-base-content hover:bg-base-100 hover:border-base-300 hover:shadow-sm hover:scale-105 active:scale-95;
 }
 
-/* Current page */
 .flop-pagination nav a[aria-current="page"],
 .flop-pagination nav ul li a[aria-current="page"] {
   @apply bg-primary text-primary-content border-primary shadow-md font-semibold scale-105;
 }
 
-/* Disabled links */
 .flop-pagination nav a[disabled],
 .flop-pagination nav span[disabled],
 .flop-pagination nav ul li a[disabled],
@@ -154,24 +202,20 @@
   @apply text-base-content/30 cursor-not-allowed opacity-50;
 }
 
-/* Previous/Next buttons */
 .flop-pagination nav > a[rel="prev"],
 .flop-pagination nav > a[rel="next"] {
   @apply px-3 text-base-content/60 hover:text-base-content hover:bg-base-100 hover:border-base-300;
 }
 
-/* Ellipsis styling */
 .flop-pagination nav ul li span:not([disabled]) {
   @apply text-base-content/50 cursor-default;
 }
 
-/* Focus states for accessibility */
 .flop-pagination nav a:focus-visible,
 .flop-pagination nav ul li a:focus-visible {
   @apply outline-2 outline-offset-2 outline-primary;
 }
 
-/* Responsive adjustments */
 @media (max-width: 640px) {
   .flop-pagination nav {
     @apply gap-0.5 p-1.5;
@@ -196,7 +240,6 @@
     @apply px-1 w-14;
   }
   
-  /* Hide scale effects on mobile to prevent layout shifts */
   .flop-pagination nav a:hover {
     @apply scale-100;
   }
@@ -206,4 +249,48 @@
   }
 }
 
-/* This file is for your main application CSS */
+#donation-modal {
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+#donation-modal.hidden {
+  animation: modalFadeOut 0.2s ease-in;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalFadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+#donation-modal .relative.z-10 > div {
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.btn-primary:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 25px oklch(var(--color-primary) / 0.4);
+}
