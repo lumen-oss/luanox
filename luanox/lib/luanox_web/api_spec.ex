@@ -27,7 +27,7 @@ defmodule LuaNoxWeb.ApiSpec do
         version: "1.0.0",
         contact: %Contact{
           name: "LuaNox Support",
-          url: "https://github.com/nvim-neorocks/luanox"
+          url: "https://github.com/lumen-oss/luanox"
         },
         license: %License{
           name: "MIT",

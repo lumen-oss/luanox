@@ -113,7 +113,7 @@ defmodule LuaNoxWeb.NavBar do
         <li>
           <.link
             class="btn btn-ghost text-grey hover:text-info"
-            href="https://nvim-neorocks.github.io"
+            href="https://lumen-oss.github.io"
           >
             <.icon name={:book_2} type={:outline} />
             <span class="mt-px">Docs</span>
