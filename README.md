@@ -17,7 +17,7 @@
 <p align="center">
   <a href="#star2-key-features">Key Features</a> •
   <a href="#gear-how-to-use">How To Use</a> •
-  <a href="#bulb-you-may-also-like">Related Projects</a> •
+  <a href="#bulb-you-may-also-like">Related Projects</a>
 </p>
 
 ## :star2: Key Features
