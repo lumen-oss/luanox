@@ -6,7 +6,7 @@ defmodule LuaNox.Constants do
   @doc """
   The Luanox organization name.
   """
-  @luanox_org "The Neorocks Team"
+  @luanox_org "Lumen Labs"
   @license "AGPL-3.0"
 
   def luanox_org, do: @luanox_org
