@@ -269,10 +269,8 @@ defmodule LuaNox.Packages do
            |> Multi.run(:copy_rockspec, fn _repo, %{release: release} ->
              case File.cp(
                     rockspec.path,
-                    Application.app_dir(
-                      :luanox,
-                      "priv/static/releases/#{package_name}-#{version}.rockspec"
-                    )
+                    Application.get_env(:luanox, :rockspec_storage) <> "/" <>
+                      "#{package_name}-#{version}.rockspec"
                   ) do
                :ok ->
                  {:ok, release}

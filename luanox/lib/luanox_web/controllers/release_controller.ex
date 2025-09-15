@@ -130,7 +130,7 @@ defmodule LuaNoxWeb.ReleaseController do
 
       %Release{} = release ->
         full_file_path =
-          Application.app_dir(:luanox, "priv/static/releases/#{release.rockspec_path}")
+          Application.get_env(:luanox, :rockspec_storage) <> "/#{release.rockspec_path}"
 
         Packages.increment_release_download_count(release)
 
