@@ -24,6 +24,9 @@ config :ueberauth, Ueberauth.Strategy.Github.OAuth,
   client_id: System.get_env("GITHUB_CLIENT_ID"),
   client_secret: System.get_env("GITHUB_CLIENT_SECRET")
 
+config :luanox,
+  rockspec_storage: Application.app_dir(:luanox, "priv/static/releases")
+
 if config_env() == :prod do
   database_url =
     "ecto://#{System.get_env("POSTGRES_USER")}:#{System.get_env("POSTGRES_PASSWORD")}@" <>
@@ -75,6 +78,10 @@ if config_env() == :prod do
     issuer: "luanox",
     secret_key: System.get_env("GUARDIAN_SECRET_KEY"),
     verify_issuer: true
+
+  config :luanox,
+    rockspec_verification_endpoint: "http://#{System.get_env("LUANOX_ROCKSPEC_VERIFIER_HOST")}:#{System.get_env("LUANOX_ROCKSPEC_VERIFIER_PORT")}/verify",
+    rockspec_storage: "/srv/rockspecs"
 
   # ## SSL Support
   #
