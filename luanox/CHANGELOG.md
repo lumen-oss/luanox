@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.1](https://github.com/lumen-oss/luanox/compare/v0.1.0...v0.1.1) (2025-09-16)
+
+
+### Bug Fixes
+
+* restrict allowed package names ([2b6237f](https://github.com/lumen-oss/luanox/commit/2b6237f3baaa1d905c491fca29f8301835721c46))
+* rockspec uploads in production ([9423b91](https://github.com/lumen-oss/luanox/commit/9423b916239e5fd78f0a5abafcbd8cbe2d420dfd))
+
 ## 0.1.0 (2025-09-16)
 
 
