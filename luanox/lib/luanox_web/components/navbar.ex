@@ -97,6 +97,15 @@ defmodule LuaNoxWeb.NavBar do
             <span class="mt-px">Donate</span>
           </.link>
         </li>
+        <li>
+          <.link
+            class="btn btn-ghost text-grey hover:text-info"
+            href="https://github.com/lumen-oss/luanox"
+          >
+            <.icon name={:brand_github} type={:outline} />
+            <span class="mt-px">Source</span>
+          </.link>
+        </li>
         <.account_dropdown current_scope={@current_scope} />
       </ul>
     </div>
@@ -126,6 +135,15 @@ defmodule LuaNoxWeb.NavBar do
           >
             <.icon name={:heart} type={:outline} />
             <span class="mt-px">Donate</span>
+          </.link>
+        </li>
+        <li>
+          <.link
+            class="btn btn-ghost text-grey hover:text-info"
+            href="https://github.com/lumen-oss/luanox"
+          >
+            <.icon name={:brand_github} type={:outline} />
+            <span class="mt-px">Source</span>
           </.link>
         </li>
         <hr class="border-l border-dark-grey h-auto" />
