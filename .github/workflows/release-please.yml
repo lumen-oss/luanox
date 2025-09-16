@@ -18,4 +18,4 @@ jobs:
         with:
           token: ${{ secrets.PAT }}
           release-type: elixir
-          path: luanox/
+          path: luanox
