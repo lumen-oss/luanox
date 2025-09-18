@@ -81,6 +81,14 @@ defmodule LuaNoxWeb.Router do
     get "/swaggerui", OpenApiSpex.Plug.SwaggerUI, path: "/api/openapi"
   end
 
+  # Luarocks compatibility routes
+  scope "/api", LuaNoxWeb do
+    pipe_through :api
+
+    get "/tool-version", LuarocksApiController, :tool_version
+    get "/1/:api_key/status", LuarocksApiController, :status
+  end
+
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:luanox, :dev_routes) do
     # If you want to use the LiveDashboard in production, you should put
