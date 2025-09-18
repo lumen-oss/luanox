@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.2.0](https://github.com/lumen-oss/luanox/compare/v0.1.1...v0.2.0) (2025-09-18)
+
+
+### Features
+
+* add LiveView pages transition ([77a526b](https://github.com/lumen-oss/luanox/commit/77a526bc8e54b22adc5dfca7461ce1d562e6561f))
+* improve mobile navbar UI/UX ([84f99dd](https://github.com/lumen-oss/luanox/commit/84f99dd213e67047a866486b90fd6170249c9d29))
+* **navbar:** add source button ([#81](https://github.com/lumen-oss/luanox/issues/81)) ([4c203d8](https://github.com/lumen-oss/luanox/commit/4c203d80e873f4cdb39daf2fa762b72b423f80e8))
+* **navbar:** backdrop overlay, close on outside click, scroll lock, animations ([fb65e23](https://github.com/lumen-oss/luanox/commit/fb65e23be862fef4fd9099033cc90da5b2f1c4e4))
+
+
+### Bug Fixes
+
+* **home:** make hero banner stay on top of the actions in mobile ([c9e1a59](https://github.com/lumen-oss/luanox/commit/c9e1a59720c5c61e849565ed8ee8011d4f3e23ef))
+* make the "Back to packages" link link to the package page ([662cc47](https://github.com/lumen-oss/luanox/commit/662cc47e10287be0e7640b00abce286c775388cd))
+* move lux hyperlink to static line ([6ae6f59](https://github.com/lumen-oss/luanox/commit/6ae6f599c325b74849aac36ce3b490774c3ba4ab))
+* use navigate for in-site live navigation links ([8ee97ff](https://github.com/lumen-oss/luanox/commit/8ee97ffa80cf8e824d05dd4c1971a4c726cbaf8a)), closes [#71](https://github.com/lumen-oss/luanox/issues/71)
+* use p sigil for route verification ([0aa839f](https://github.com/lumen-oss/luanox/commit/0aa839f7734769a0951bddfacefd289c198e8361))
+
 ## [0.1.1](https://github.com/lumen-oss/luanox/compare/v0.1.0...v0.1.1) (2025-09-16)
 
 
