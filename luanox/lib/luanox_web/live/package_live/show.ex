@@ -8,7 +8,7 @@ defmodule LuaNoxWeb.PackageLive.Show do
         {:ok,
          socket
          |> put_flash(:error, "Package not found")
-         |> redirect(to: ~p"/")}
+         |> redirect(to: ~p"/packages")}
 
       package ->
         {:ok,
