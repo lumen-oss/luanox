@@ -7,7 +7,15 @@ defmodule LuaNoxWeb.NavBar do
 
   def navbar(%{current_scope: _} = assigns) do
     ~H"""
-    <nav class="navbar bg-base-300 shadow-sm px-4 md:text-lg relative">
+    <!-- Mobile menu backdrop overlay -->
+    <div
+      id="mobile-menu-backdrop"
+      class="hidden fixed inset-0 bg-black/50 z-40 md:hidden opacity-0"
+      phx-click={close_mobile_menu()}
+    >
+    </div>
+
+    <nav class="navbar bg-base-300 shadow-sm px-4 md:text-lg relative z-50">
       <div class="navbar-start flex-1">
         <.link class="flex items-center text-xl" navigate={~p"/"}>
           <.logo class="h-6 md:h-8 w-auto mr-2" />
@@ -20,11 +28,7 @@ defmodule LuaNoxWeb.NavBar do
         <LuaNoxWeb.Layouts.theme_toggle />
         <button
           class="md:hidden btn btn-ghost rounded-field text-grey hover:text-base-content p-2 min-h-[44px] min-w-[44px]"
-          phx-click={
-            JS.toggle(to: "#mobile-menu")
-            |> JS.toggle_class("hidden", to: "#menu-icon")
-            |> JS.toggle_class("hidden", to: "#close-icon")
-          }
+          phx-click={toggle_mobile_menu()}
         >
           <.icon id="menu-icon" name={:menu_deep} type={:outline} class="size-6" />
           <.icon id="close-icon" name={:x} type={:outline} class="hidden hover:text-error size-6" />
@@ -116,7 +120,7 @@ defmodule LuaNoxWeb.NavBar do
     ~H"""
     <div
       id="mobile-menu"
-      class="hidden absolute top-full left-0 right-0 bg-base-300 rounded-b-lg shadow-lg border-t border-base-content/10 z-50"
+      class="hidden absolute top-full left-0 right-0 bg-base-300 rounded-b-lg shadow-xl border-t border-base-content/10 z-50 opacity-0 scale-95"
     >
       <div class="px-4 py-3">
         <ul class="menu menu-vertical w-full space-y-1">
@@ -124,6 +128,7 @@ defmodule LuaNoxWeb.NavBar do
             <.link
               class="btn btn-ghost justify-start text-grey hover:text-info w-full min-h-[48px] px-4"
               href="https://lumen-oss.github.io"
+              phx-click={close_mobile_menu()}
             >
               <.icon name={:book_2} type={:outline} class="size-5" />
               <span class="ml-3">Documentation</span>
@@ -133,6 +138,7 @@ defmodule LuaNoxWeb.NavBar do
             <.link
               class="btn btn-ghost justify-start text-grey hover:text-info w-full min-h-[48px] px-4"
               navigate={~p"/donate"}
+              phx-click={close_mobile_menu()}
             >
               <.icon name={:heart} type={:outline} class="size-5" />
               <span class="ml-3">Donate</span>
@@ -142,6 +148,7 @@ defmodule LuaNoxWeb.NavBar do
             <.link
               class="btn btn-ghost justify-start text-grey hover:text-info w-full min-h-[48px] px-4"
               href="https://github.com/lumen-oss/luanox"
+              phx-click={close_mobile_menu()}
             >
               <.icon name={:brand_github} type={:outline} class="size-5" />
               <span class="ml-3">Source Code</span>
@@ -155,5 +162,36 @@ defmodule LuaNoxWeb.NavBar do
       </div>
     </div>
     """
+  end
+
+  defp toggle_mobile_menu do
+    # Scale + fade for the animations, overflow-hidden to prevent scrolling when open
+    JS.toggle(
+      to: "#mobile-menu",
+      in: {"ease-out duration-200", "opacity-0 scale-95", "opacity-100 scale-100"},
+      out: {"ease-in duration-150", "opacity-100 scale-100", "opacity-0 scale-95"}
+    )
+    |> JS.toggle(
+      to: "#mobile-menu-backdrop",
+      in: {"ease-out duration-200", "opacity-0", "opacity-100"},
+      out: {"ease-in duration-150", "opacity-100", "opacity-0"}
+    )
+    |> JS.toggle_class("hidden", to: "#menu-icon")
+    |> JS.toggle_class("hidden", to: "#close-icon")
+    |> JS.toggle_class("overflow-hidden", to: "body")
+  end
+
+  defp close_mobile_menu do
+    JS.hide(
+      to: "#mobile-menu",
+      transition: {"ease-in duration-150", "opacity-100 scale-100", "opacity-0 scale-95"}
+    )
+    |> JS.hide(
+      to: "#mobile-menu-backdrop",
+      transition: {"ease-in duration-150", "opacity-100", "opacity-0"}
+    )
+    |> JS.remove_class("hidden", to: "#menu-icon")
+    |> JS.add_class("hidden", to: "#close-icon")
+    |> JS.remove_class("overflow-hidden", to: "body")
   end
 end
