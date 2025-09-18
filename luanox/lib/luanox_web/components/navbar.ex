@@ -61,14 +61,14 @@ defmodule LuaNoxWeb.NavBar do
         class="menu dropdown-content bg-base-100 rounded-box z-1 mt-4 w-52 p-2 shadow-sm"
       >
         <li>
-          <.link href={~p"/settings"}>Settings</.link>
+          <.link navigate={~p"/settings"}>Settings</.link>
         </li>
         <li>
-          <.link href={~p"/keys"}>API keys</.link>
+          <.link navigate={~p"/keys"}>API keys</.link>
         </li>
         <hr class="text-dark-grey mt-1 mb-1" />
         <li>
-          <.link href={~p"/logout"} method="delete">Log out</.link>
+          <.link navigate={~p"/logout"} method="delete">Log out</.link>
         </li>
       </ul>
     </div>

@@ -105,7 +105,7 @@ defmodule LuaNoxWeb.PackageBox do
               Browse our complete collection of Lua packages and find the perfect tools for your project.
             </p>
             <.link
-              href="/packages"
+              navigate="/packages"
               class="bg-primary text-primary-content border border-primary hover:bg-primary/90 px-8 py-3 font-medium transition-colors inline-flex items-center"
             >
               <.icon name={:folder} type={:outline} class="w-5 h-5 mr-2" /> View All Packages
