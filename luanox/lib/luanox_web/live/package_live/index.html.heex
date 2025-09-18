@@ -5,7 +5,7 @@
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
         <div class="mb-4 lg:mb-6">
           <.link
-            href={~p"/"}
+            navigate={~p"/"}
             class="text-sm text-base-content/60 hover:text-primary transition-colors"
           >
             ← Back to home
@@ -115,7 +115,7 @@
               <p class="text-base-content/60 mb-4">
                 We couldn't find any packages matching "{@params["search"]}". Try adjusting your search terms.
               </p>
-              <.link href={~p"/packages"} class="btn btn-primary">
+              <.link navigate={~p"/packages"} class="btn btn-primary">
                 View All Packages
               </.link>
             <% else %>
