@@ -72,7 +72,7 @@ defmodule LuaNoxWeb.NavBar do
         </li>
         <hr class="text-base-300 mt-1 mb-1" />
         <li>
-          <.link navigate={~p"/logout"} method="delete">Log out</.link>
+          <.link href={~p"/logout"} method="delete">Log out</.link>
         </li>
       </ul>
     </div>
