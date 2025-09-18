@@ -4,12 +4,10 @@
 @source "../../lib/luanox_web";
 
 .hero-accent {
-  background: linear-gradient(
-    135deg,
-    oklch(var(--color-base-100)) 0%,
-    oklch(var(--color-primary) / 0.03) 50%,
-    oklch(var(--color-base-100)) 100%
-  );
+  background: linear-gradient(135deg,
+      oklch(var(--color-base-100)) 0%,
+      oklch(var(--color-primary) / 0.03) 50%,
+      oklch(var(--color-base-100)) 100%);
 }
 
 .donation-gradient {
@@ -22,7 +20,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: 
+  background:
     radial-gradient(circle at 20% 30%, oklch(var(--color-primary) / 0.03) 0%, transparent 50%),
     radial-gradient(circle at 80% 70%, oklch(var(--color-secondary) / 0.02) 0%, transparent 50%),
     radial-gradient(circle at 40% 80%, oklch(var(--color-primary) / 0.025) 0%, transparent 40%);
@@ -32,8 +30,8 @@
 .donation-section .bg-white\/10 {
   background: rgba(255, 255, 255, 0.08) !important;
   backdrop-filter: blur(16px) saturate(120%) brightness(105%) !important;
-  
-  box-shadow: 
+
+  box-shadow:
     0 0 80px -20px oklch(var(--color-primary) / 0.4),
     0 0 40px -10px oklch(var(--color-secondary) / 0.3),
     0 25px 50px -12px rgba(0, 0, 0, 0.25),
@@ -48,10 +46,13 @@
 }
 
 @keyframes gentle-pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
     filter: brightness(100%);
   }
+
   50% {
     transform: scale(1.005);
     filter: brightness(105%);
@@ -59,11 +60,9 @@
 }
 
 .trust-badge {
-  background: linear-gradient(
-    135deg,
-    oklch(var(--color-success) / 0.15) 0%,
-    oklch(var(--color-success) / 0.1) 100%
-  );
+  background: linear-gradient(135deg,
+      oklch(var(--color-success) / 0.15) 0%,
+      oklch(var(--color-success) / 0.1) 100%);
   border: 1px solid oklch(var(--color-success) / 0.3);
   color: oklch(var(--color-success));
   box-shadow: 0 4px 12px oklch(var(--color-success) / 0.2);
@@ -156,8 +155,11 @@
 @custom-variant phx-click-loading ([".phx-click-loading&", ".phx-click-loading &"]);
 @custom-variant phx-submit-loading ([".phx-submit-loading&", ".phx-submit-loading &"]);
 @custom-variant phx-change-loading ([".phx-change-loading&", ".phx-change-loading &"]);
+@custom-variant phx-page-loading ([".phx-page-loading&", ".phx-page-loading &"]);
 
-[data-phx-root-id] { display: contents }
+[data-phx-root-id] {
+  display: contents
+}
 
 .flop-pagination {
   @apply flex justify-center items-center gap-1;
@@ -167,8 +169,8 @@
   @apply flex items-center gap-1 p-1 bg-base-200 rounded-md border border-base-300 shadow-sm backdrop-blur-sm;
 }
 
-.flop-pagination nav > a,
-.flop-pagination nav > span {
+.flop-pagination nav>a,
+.flop-pagination nav>span {
   @apply min-w-10 max-w-20 h-10 flex items-center justify-center text-sm font-medium rounded-sm transition-all duration-200 border border-transparent select-none px-3;
 }
 
@@ -202,8 +204,8 @@
   @apply text-base-content/30 cursor-not-allowed opacity-50;
 }
 
-.flop-pagination nav > a[rel="prev"],
-.flop-pagination nav > a[rel="next"] {
+.flop-pagination nav>a[rel="prev"],
+.flop-pagination nav>a[rel="next"] {
   @apply px-3 text-base-content/60 hover:text-base-content hover:bg-base-100 hover:border-base-300;
 }
 
@@ -220,30 +222,30 @@
   .flop-pagination nav {
     @apply gap-0.5 p-1.5;
   }
-  
-  .flop-pagination nav > a,
-  .flop-pagination nav > span {
+
+  .flop-pagination nav>a,
+  .flop-pagination nav>span {
     @apply w-14 h-9 text-xs px-1;
   }
-  
+
   .flop-pagination nav ul {
     @apply gap-0.5;
   }
-  
+
   .flop-pagination nav ul li a,
   .flop-pagination nav ul li span {
     @apply w-9 h-9 text-xs px-0;
   }
-  
-  .flop-pagination nav > a[rel="prev"],
-  .flop-pagination nav > a[rel="next"] {
+
+  .flop-pagination nav>a[rel="prev"],
+  .flop-pagination nav>a[rel="next"] {
     @apply px-1 w-14;
   }
-  
+
   .flop-pagination nav a:hover {
     @apply scale-100;
   }
-  
+
   .flop-pagination nav ul li a[aria-current="page"] {
     @apply scale-100;
   }
@@ -261,6 +263,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -270,12 +273,13 @@
   from {
     opacity: 1;
   }
+
   to {
     opacity: 0;
   }
 }
 
-#donation-modal .relative.z-10 > div {
+#donation-modal .relative.z-10>div {
   animation: modalSlideIn 0.3s ease-out;
 }
 
@@ -284,6 +288,7 @@
     opacity: 0;
     transform: scale(0.95) translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
