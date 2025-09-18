@@ -264,13 +264,19 @@ defmodule LuaNox.Packages do
              :release,
              package
              |> Ecto.build_assoc(:releases)
-             |> Release.changeset(%{attrs | "rockspec" => File.read!(rockspec.path)})
+             |> Release.changeset(%{attrs | "rockspec" => File.read!(Path.expand(rockspec.path))})
            )
            |> Multi.run(:copy_rockspec, fn _repo, %{release: release} ->
+             safe_package_name = Path.basename(package_name)
+             safe_version = Path.basename(version)
+             destination_path =
+               Application.get_env(:luanox, :rockspec_storage)
+               |> Path.join("#{safe_package_name}-#{safe_version}.rockspec")
+               |> Path.expand()
+
              case File.cp(
-                    rockspec.path,
-                    Application.get_env(:luanox, :rockspec_storage) <> "/" <>
-                      "#{package_name}-#{version}.rockspec"
+                    Path.expand(rockspec.path),
+                    destination_path
                   ) do
                :ok ->
                  {:ok, release}
