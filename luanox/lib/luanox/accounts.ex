@@ -31,15 +31,31 @@ defmodule LuaNox.Accounts do
   end
 
   def get_user_by_auth(%Ueberauth.Auth{} = auth) do
-    if auth.info.email do
-      get_user_by_email(auth.info.email)
-    else
-      nil
+    # First, try to find user by provider + username
+    # This handles cases where GitHub users don't have public emails
+    provider = to_string(auth.provider)
+
+    # Goddamn GitHub naming conventions calling the account name "nickname", and the account nickname "name".
+    # NOTE: this might need refactoring later once we add support for more providers.
+    username = auth.info.nickname
+
+    case Repo.get_by(User, provider: provider, username: username) do
+      %User{} = user ->
+        user
+
+      nil ->
+        # Fallback to email-based lookup for legacy compatibility
+        # NOTE: I'm unsure whether we should keep this fallback or not, but it's here for now.
+        if auth.info.email do
+          get_user_by_email(auth.info.email)
+        else
+          nil
+        end
     end
   end
 
   def user_count do
-    Repo.one(from u in User, select: count(u.id))
+    Repo.one(from(u in User, select: count(u.id)))
   end
 
   @doc """
