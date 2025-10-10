@@ -3,25 +3,27 @@ defmodule LuaNoxWeb.UserLive.Keys do
 
   alias Phoenix.LiveView.JS
 
-  on_mount {LuaNoxWeb.UserAuth, :require_sudo_mode}
+  on_mount({LuaNoxWeb.UserAuth, :require_sudo_mode})
 
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <div class="bg-base-100 border-b border-base-300">
         <div class="max-w-4xl mx-auto px-4 lg:px-8 py-6 lg:py-8">
-          <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
-            <div class="w-16 h-16 sm:w-20 sm:h-20 bg-primary/10 border-2 border-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
-              <.icon name={:key} type={:outline} class="w-10 h-10 sm:w-12 sm:h-12 text-primary" />
-            </div>
+          <div class="flex flex-col md:flex-row justify-between items-center gap-4 sm:gap-6">
+            <div class="flex items-center gap-4 sm:gap-6">
+              <div class="w-16 h-16 sm:w-20 sm:h-20 bg-primary/10 border-2 border-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
+                <.icon name={:key} type={:outline} class="w-10 h-10 sm:w-12 sm:h-12 text-primary" />
+              </div>
 
-            <div class="space-y-1 flex-1">
-              <h1 class="text-2xl sm:text-3xl font-bold text-base-content">
-                API Keys
-              </h1>
-              <p class="text-sm sm:text-base text-base-content/70">
-                Generate and manage API keys for programmatic access to your packages
-              </p>
+              <div class="space-y-1 flex-1">
+                <h1 class="text-2xl sm:text-3xl font-bold text-base-content">
+                  API Keys
+                </h1>
+                <p class="text-sm sm:text-base text-base-content/70">
+                  Generate and manage API keys for programmatic access to your packages
+                </p>
+              </div>
             </div>
 
             <div class="w-full sm:w-auto">
