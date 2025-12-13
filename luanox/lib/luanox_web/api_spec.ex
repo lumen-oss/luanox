@@ -38,6 +38,7 @@ defmodule LuaNoxWeb.ApiSpec do
       components: %OpenApiSpex.Components{
         schemas: %{
           "Package" => LuaNoxWeb.Schemas.Package.schema(),
+          "PackageMapValue" => LuaNoxWeb.Schemas.Package.schema_map_value(),
           "PackageInput" => LuaNoxWeb.Schemas.PackageInput.schema(),
           "Release" => LuaNoxWeb.Schemas.Release.schema(),
           "ReleaseInput" => LuaNoxWeb.Schemas.ReleaseInput.schema(),

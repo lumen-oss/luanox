@@ -30,7 +30,7 @@ defmodule LuaNoxWeb.PackageController do
              data: %OpenApiSpex.Schema{
                type: :object,
                additionalProperties: %OpenApiSpex.Reference{
-                 "$ref": "#/components/schemas/Package"
+                 "$ref": "#/components/schemas/PackageMapValue"
                }
              }
            }
@@ -53,11 +53,22 @@ defmodule LuaNoxWeb.PackageController do
     description: "Create a new package in the repository",
     request_body:
       {"Package data", "application/json",
-       %OpenApiSpex.Reference{"$ref": "#/components/schemas/PackageInput"}},
+       %OpenApiSpex.Schema{
+         type: :object,
+         properties: %{
+           package: %OpenApiSpex.Reference{"$ref": "#/components/schemas/PackageInput"}
+         },
+         required: [:package]
+       }},
     responses: %{
       201 =>
         {"Package created successfully", "application/json",
-         %OpenApiSpex.Reference{"$ref": "#/components/schemas/Package"}},
+         %OpenApiSpex.Schema{
+           type: :object,
+           properties: %{
+             data: %OpenApiSpex.Reference{"$ref": "#/components/schemas/Package"}
+           }
+         }},
       422 =>
         {"Validation errors", "application/json",
          %OpenApiSpex.Reference{"$ref": "#/components/schemas/ValidationError"}},
@@ -95,7 +106,12 @@ defmodule LuaNoxWeb.PackageController do
     responses: %{
       200 =>
         {"Package details", "application/json",
-         %OpenApiSpex.Reference{"$ref": "#/components/schemas/Package"}},
+         %OpenApiSpex.Schema{
+           type: :object,
+           properties: %{
+             data: %OpenApiSpex.Reference{"$ref": "#/components/schemas/Package"}
+           }
+         }},
       404 =>
         {"Package not found", "application/json",
          %OpenApiSpex.Reference{"$ref": "#/components/schemas/Error"}}
@@ -107,9 +123,9 @@ defmodule LuaNoxWeb.PackageController do
     render(conn, :show, package: package)
   end
 
-  operation(:update,
-    summary: "Update a package",
-    description: "Update package information",
+  operation(:download,
+    summary: "Download package release",
+    description: "Download the latest release of a package",
     parameters: [
       name: [
         in: :path,
@@ -119,40 +135,19 @@ defmodule LuaNoxWeb.PackageController do
         example: "lua-cjson"
       ]
     ],
-    request_body:
-      {"Updated package data", "application/json",
-       %OpenApiSpex.Reference{"$ref": "#/components/schemas/PackageInput"}},
     responses: %{
       200 =>
-        {"Package updated successfully", "application/json",
-         %OpenApiSpex.Reference{"$ref": "#/components/schemas/Package"}},
+        {"Rockspec file", "application/octet-stream",
+         %OpenApiSpex.Schema{type: :string, format: :binary}},
       404 =>
-        {"Package not found", "application/json",
-         %OpenApiSpex.Reference{"$ref": "#/components/schemas/Error"}},
-      422 =>
-        {"Validation errors", "application/json",
-         %OpenApiSpex.Reference{"$ref": "#/components/schemas/ValidationError"}},
-      401 =>
-        {"Authentication required", "application/json",
+        {"Package or release not found", "application/json",
          %OpenApiSpex.Reference{"$ref": "#/components/schemas/Error"}}
-    },
-    security: [%{"ApiKeyAuth" => []}]
+    }
   )
 
-  def update(conn, %{"name" => name, "package" => package_params}) do
-    package = Packages.get_package!(name)
-
-    with {:ok, %Package{} = package} <-
-           Packages.update_package(conn.assigns.current_scope, package, package_params) do
-      render(conn, :show, package: package)
-    else
-      {:error, _} = ret -> ret
-    end
-  end
-
-  operation(:download,
-    summary: "Download package release",
-    description: "Download the latest release or a specific version of a package",
+  operation(:download_version,
+    summary: "Download package release version",
+    description: "Download a specific version of a package",
     parameters: [
       name: [
         in: :path,
@@ -163,9 +158,9 @@ defmodule LuaNoxWeb.PackageController do
       ],
       version: [
         in: :path,
-        description: "Specific version to download (optional)",
+        description: "Specific version to download",
         type: :string,
-        required: false,
+        required: true,
         example: "2.1.0"
       ]
     ],
@@ -179,7 +174,7 @@ defmodule LuaNoxWeb.PackageController do
     }
   )
 
-  def download(conn, %{"name" => name, "version" => version}) do
+  def download_version(conn, %{"name" => name, "version" => version}) do
     case Packages.get_package(name) do
       nil ->
         {:error, :not_found}

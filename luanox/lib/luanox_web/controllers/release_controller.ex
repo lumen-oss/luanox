@@ -54,7 +54,12 @@ defmodule LuaNoxWeb.ReleaseController do
     responses: %{
       201 =>
         {"Release created successfully", "application/json",
-         %OpenApiSpex.Reference{"$ref": "#/components/schemas/Release"}},
+         %OpenApiSpex.Schema{
+           type: :object,
+           properties: %{
+             data: %OpenApiSpex.Reference{"$ref": "#/components/schemas/Release"}
+           }
+         }},
       404 =>
         {"Package not found", "application/json",
          %OpenApiSpex.Reference{"$ref": "#/components/schemas/Error"}},
