@@ -16,7 +16,7 @@ defmodule LuaNoxWeb.PackageBox do
               {@name}
             </h2>
             <div class="bg-primary/10 text-primary border border-primary/20 px-2 py-1 text-xs font-mono">
-              v{@version}
+              v{to_string(@version)}
             </div>
           </div>
 

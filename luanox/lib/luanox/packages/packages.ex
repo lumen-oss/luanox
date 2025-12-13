@@ -38,9 +38,16 @@ defmodule LuaNox.Packages do
   Returns a paginated list of packages using Flop.
   """
   def list_packages_paginated(flop_params \\ %{}) do
-    Package
-    |> preload(:releases)
-    |> Flop.validate_and_run(flop_params, for: Package)
+    case Package
+         |> preload(:releases)
+         |> Flop.validate_and_run(flop_params, for: Package) do
+      {:ok, {packages, meta}} ->
+        sorted_packages = Enum.map(packages, &sort_releases/1)
+        {:ok, {sorted_packages, meta}}
+
+      error ->
+        error
+    end
   end
 
   @doc """
@@ -51,6 +58,7 @@ defmodule LuaNox.Packages do
     |> where([p], ilike(p.name, ^"%#{query}%"))
     |> preload(:releases)
     |> Repo.all()
+    |> Enum.map(&sort_releases/1)
   end
 
   def list_packages(:fuzzy, query) when is_binary(query) do
@@ -63,7 +71,9 @@ defmodule LuaNox.Packages do
   Raises `Ecto.NoResultsError` if the Package does not exist.
   """
   def get_package!(name) do
-    Repo.get_by!(Package, name: name) |> Repo.preload(:releases)
+    Repo.get_by!(Package, name: name)
+    |> Repo.preload(:releases)
+    |> sort_releases()
   end
 
   def get_package(name) do
@@ -74,6 +84,7 @@ defmodule LuaNox.Packages do
       package ->
         package
         |> Repo.preload(:releases)
+        |> sort_releases()
     end
   end
 
@@ -83,7 +94,9 @@ defmodule LuaNox.Packages do
   Raises `Ecto.NoResultsError` if the Package does not exist.
   """
   def get_package_by_id!(id) do
-    Repo.get_by!(Package, id: id) |> Repo.preload(:releases)
+    Repo.get_by!(Package, id: id)
+    |> Repo.preload(:releases)
+    |> sort_releases()
   end
 
   def get_package_by_id(id) do
@@ -94,6 +107,7 @@ defmodule LuaNox.Packages do
       package ->
         package
         |> Repo.preload(:releases)
+        |> sort_releases()
     end
   end
 
@@ -215,6 +229,7 @@ defmodule LuaNox.Packages do
   def list_releases(%Package{} = package) do
     Repo.get(Package, package)
     |> Repo.preload(:releases)
+    |> sort_releases()
     |> Map.get(:releases)
   end
 
@@ -338,5 +353,13 @@ defmodule LuaNox.Packages do
     release_scope = Scope.for_release(release)
 
     release_scope == scope && Scope.package_permitted?(scope, release.package)
+  end
+
+  defp sort_releases(package) do
+    update_in(package.releases, fn releases ->
+      Enum.sort(releases, fn r1, r2 ->
+        Version.compare(r1.version, r2.version) != :gt
+      end)
+    end)
   end
 end

@@ -94,7 +94,12 @@
           <%= for package <- @packages do %>
             <.package
               name={package.name}
-              version={(List.last(package.releases) || %{version: "0.1.0"}) |> Map.get(:version)}
+              version={
+                to_string(
+                  (List.last(package.releases) || %{version: "0.1.0"})
+                  |> Map.get(:version)
+                )
+              }
               download_count={Enum.sum(for r <- package.releases, do: r.download_count)}
               description={package.summary || ""}
             />
