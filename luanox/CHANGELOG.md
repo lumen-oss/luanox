@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/lumen-oss/luanox/compare/v0.2.0...v0.3.0) (2025-12-13)
+
+
+### Features
+
+* parse versions as true semver internally (with sorting in the UI) ([fd6d2dd](https://github.com/lumen-oss/luanox/commit/fd6d2dde7b4e778ef2c378c30eb1f2481a0efa1e))
+
 ## [0.2.0](https://github.com/lumen-oss/luanox/compare/v0.1.1...v0.2.0) (2025-12-01)
 
 
