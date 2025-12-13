@@ -66,7 +66,7 @@ defmodule LuaNoxWeb.Router do
     post "/revoke", RevokedKeyController, :create
 
     get "/download/:name", PackageController, :download
-    get "/download/:name/:version", PackageController, :download
+    get "/download/:name/:version", PackageController, :download_version
   end
 
   scope "/api" do

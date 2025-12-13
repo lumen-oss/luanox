@@ -35,7 +35,9 @@ defmodule LuaNoxWeb.UserLive.Settings do
               <div class="text-center">
                 <div class="avatar avatar-placeholder mb-4">
                   <div class="w-20 bg-primary/10 border-2 border-primary/20 rounded-full">
-                    <span class="text-3xl font-bold text-primary">{String.first(@current_scope.user.username)}</span>
+                    <span class="text-3xl font-bold text-primary">
+                      {String.first(@current_scope.user.username)}
+                    </span>
                   </div>
                 </div>
                 <h3 class="text-lg font-semibold text-base-content mb-1">

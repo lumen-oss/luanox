@@ -20,7 +20,10 @@ defmodule LuaNoxWeb.Layouts do
         <.navbar current_scope={@current_scope} />
       </header>
 
-      <main class="grow transition-all duration-500 ease-in-out opacity-0 phx-page-loading:opacity-0" phx-mounted={JS.remove_class("opacity-0")}>
+      <main
+        class="grow transition-all duration-500 ease-in-out opacity-0 phx-page-loading:opacity-0"
+        phx-mounted={JS.remove_class("opacity-0")}
+      >
         <div class="mx-auto">
           {render_slot(@inner_block)}
         </div>

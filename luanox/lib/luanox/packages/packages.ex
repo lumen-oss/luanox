@@ -269,6 +269,7 @@ defmodule LuaNox.Packages do
            |> Multi.run(:copy_rockspec, fn _repo, %{release: release} ->
              safe_package_name = Path.basename(package_name)
              safe_version = Path.basename(version)
+
              destination_path =
                Application.get_env(:luanox, :rockspec_storage)
                |> Path.join("#{safe_package_name}-#{safe_version}.rockspec")

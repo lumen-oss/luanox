@@ -22,7 +22,7 @@ defmodule LuaNoxWeb.NavBar do
           <span class="font-semibold">Luanox</span>
         </.link>
       </div>
-
+      
     <!-- Global menu items (always there no matters if mobile or desktop) -->
       <div class="flex items-center space-x-2 md:space-x-6">
         <LuaNoxWeb.Layouts.theme_toggle />
@@ -45,14 +45,21 @@ defmodule LuaNoxWeb.NavBar do
     ~H"""
     <div class="dropdown dropdown-end max-sm:w-full">
       <%= if @current_scope do %>
-        <div tabindex="0" role="button" class="btn btn-ghost btn-block justify-start text-grey hover:text-info rounded-field max-sm:px-1">
+        <div
+          tabindex="0"
+          role="button"
+          class="btn btn-ghost btn-block justify-start text-grey hover:text-info rounded-field max-sm:px-1"
+        >
           <.icon name={:user_circle} type={:outline} />
           <span class="mt-px">
             {User.unique_username(@current_scope.user) |> String.slice(0..20)}
           </span>
         </div>
       <% else %>
-        <.link class="btn btn-ghost btn-block justify-start text-grey hover:text-info rounded-field max-sm:px-1" navigate={~p"/login"}>
+        <.link
+          class="btn btn-ghost btn-block justify-start text-grey hover:text-info rounded-field max-sm:px-1"
+          navigate={~p"/login"}
+        >
           <.icon name={:user_circle} type={:outline} />
           <span class="mt-px">
             Log In
