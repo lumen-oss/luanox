@@ -13,7 +13,10 @@ in
         filename = [ ".env.dev" ".env.prod" ];
     };
 
-    languages.elixir.enable = true;
+    languages.elixir = {
+        enable = true;
+        lsp.package = pkgs.beamPackages.expert;
+    };
 
     languages.nix.enable = true;
 

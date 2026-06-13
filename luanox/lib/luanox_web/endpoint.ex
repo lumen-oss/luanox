@@ -28,6 +28,10 @@ defmodule LuaNoxWeb.Endpoint do
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
+  if Mix.env() == :dev do
+    plug Tidewave
+  end
+
   if code_reloading? do
     socket "/phoenix/live_reload/socket", Phoenix.LiveReloader.Socket
     plug Phoenix.LiveReloader

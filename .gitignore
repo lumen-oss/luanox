@@ -16,3 +16,5 @@ devenv.local.nix
 
 # push script
 push.sh
+
+/.expert
