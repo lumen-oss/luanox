@@ -13,5 +13,6 @@ defmodule LuanoxRockspecVerifierWeb.Router do
     pipe_through :api
 
     post "/verify", VerifyController, :verify
+    post "/parse", VerifyController, :parse
   end
 end

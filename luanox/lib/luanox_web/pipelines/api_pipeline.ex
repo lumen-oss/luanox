@@ -6,6 +6,6 @@ defmodule LuaNoxWeb.Pipelines.ApiPipeline do
 
   @claims %{iss: "luanox", aud: "luanox", typ: "access"}
 
-  plug Guardian.Plug.VerifyHeader, claims: @claims, scheme: "Bearer"
+  plug LuaNoxWeb.Pipelines.VerifyToken, claims: @claims
   plug Guardian.Plug.LoadResource, allow_blank: true
 end

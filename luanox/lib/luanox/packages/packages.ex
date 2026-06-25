@@ -60,15 +60,15 @@ defmodule LuaNox.Packages do
     cache_key = "search:#{String.downcase(query)}"
 
     case Cachex.fetch(:search_cache, cache_key, fn _key ->
-             results =
-               Package
-               |> where([p], ilike(p.name, ^"%#{query}%"))
-               |> preload(:releases)
-               |> Repo.all()
-               |> Enum.map(&sort_releases/1)
+           results =
+             Package
+             |> where([p], ilike(p.name, ^"%#{query}%"))
+             |> preload(:releases)
+             |> Repo.all()
+             |> Enum.map(&sort_releases/1)
 
-             {:commit, results, ttl: :timer.minutes(5)}
-           end) do
+           {:commit, results, ttl: :timer.minutes(5)}
+         end) do
       {:ok, results} ->
         paginate(results, page, page_size)
 
@@ -294,6 +294,22 @@ defmodule LuaNox.Packages do
   end
 
   @doc """
+  Returns packages owned by the given user, matching by name (case-insensitive).
+  """
+  def get_package_by_user_and_name(%User{id: user_id}, name) when is_binary(name) do
+    name_lower = String.downcase(name)
+
+    Package
+    |> where([p], p.user_id == ^user_id and ilike(p.name, ^name_lower))
+    |> preload(:releases)
+    |> Repo.one()
+    |> case do
+      nil -> nil
+      package -> sort_releases(package)
+    end
+  end
+
+  @doc """
   Creates a release.
   """
   def add_release(
@@ -387,7 +403,7 @@ defmodule LuaNox.Packages do
     release_scope == scope && Scope.package_permitted?(scope, release.package)
   end
 
-  defp sort_releases(package) do
+  defp sort_releases(package = %Package{}) do
     update_in(package.releases, fn releases ->
       Enum.sort(releases, fn r1, r2 ->
         Version.compare(r1.version, r2.version) != :gt
