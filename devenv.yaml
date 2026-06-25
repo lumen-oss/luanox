@@ -8,3 +8,5 @@ inputs:
   #   url: github:cachix/devenv-nixpkgs/rolling
   nixpkgs:
     url: github:nixos/nixpkgs/nixpkgs-unstable
+
+strict_ports: true

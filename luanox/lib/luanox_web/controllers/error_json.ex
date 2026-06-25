@@ -21,6 +21,14 @@ defmodule LuaNoxWeb.ErrorJSON do
     %{errors: %{detail: "The provided rockspec file is invalid"}}
   end
 
+  def render("rate_limit_exceeded.json", %{retry_after: retry_after}) do
+    %{
+      errors: %{
+        detail: "Rate limit exceeded. Try again in #{div(retry_after, 1000)} seconds."
+      }
+    }
+  end
+
   # By default, Phoenix returns the status message from
   # the template name. For example, "404.json" becomes
   # "Not Found".

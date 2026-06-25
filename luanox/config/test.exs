@@ -9,9 +9,10 @@ config :bcrypt_elixir, :log_rounds, 1
 # to provide built-in test partitioning in CI environment.
 # Run `mix help test` for more information.
 config :luanox, LuaNox.Repo,
-  username: "postgres",
-  password: "postgres",
+  username: System.get_env("DATABASE_USER"),
+  password: System.get_env("DATABASE_PASS"),
   hostname: "localhost",
+  port: System.get_env("DATABASE_PORT"),
   database: "luanox_test#{System.get_env("MIX_TEST_PARTITION")}",
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: System.schedulers_online() * 2

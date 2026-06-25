@@ -52,17 +52,49 @@ defmodule LuaNox.Packages do
 
   @doc """
   Returns the list of packages with a given search query.
+  Results are cached for 5 minutes to avoid repeated expensive queries.
   """
-  def list_packages(:exact, query) when is_binary(query) do
-    Package
-    |> where([p], ilike(p.name, ^"%#{query}%"))
-    |> preload(:releases)
-    |> Repo.all()
-    |> Enum.map(&sort_releases/1)
+  def list_packages(:exact, query, opts) when is_binary(query) do
+    page = Keyword.get(opts, :page, 1)
+    page_size = Keyword.get(opts, :page_size, 20) |> min(50)
+    cache_key = "search:#{String.downcase(query)}"
+
+    case Cachex.fetch(:search_cache, cache_key, fn _key ->
+             results =
+               Package
+               |> where([p], ilike(p.name, ^"%#{query}%"))
+               |> preload(:releases)
+               |> Repo.all()
+               |> Enum.map(&sort_releases/1)
+
+             {:commit, results, ttl: :timer.minutes(5)}
+           end) do
+      {:ok, results} ->
+        paginate(results, page, page_size)
+
+      {:commit, results} ->
+        paginate(results, page, page_size)
+
+      _ ->
+        paginate([], page, page_size)
+    end
   end
 
-  def list_packages(:fuzzy, query) when is_binary(query) do
+  def list_packages(:fuzzy, _query, _opts) do
     raise "Not yet implemented"
+  end
+
+  defp paginate(results, page, page_size) do
+    offset = (page - 1) * page_size
+    page_results = results |> Enum.drop(offset) |> Enum.take(page_size)
+
+    %{
+      packages: page_results,
+      total_count: length(results),
+      page: page,
+      page_size: page_size,
+      total_pages: ceil(length(results) / page_size)
+    }
   end
 
   @doc """

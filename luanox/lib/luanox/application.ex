@@ -12,9 +12,9 @@ defmodule LuaNox.Application do
       LuaNox.Repo,
       {DNSCluster, query: Application.get_env(:luanox, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: LuaNox.PubSub},
-      # Start a worker by calling: LuaNox.Worker.start_link(arg)
-      # {LuaNox.Worker, arg},
-      # Start to serve requests, typically the last entry
+      {LuaNoxWeb.RateLimit,
+       clean_period: :timer.minutes(5)},
+      {Cachex, name: :search_cache, limit: 1_000},
       LuaNoxWeb.Endpoint
     ]
 
