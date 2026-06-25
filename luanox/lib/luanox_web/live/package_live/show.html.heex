@@ -62,7 +62,7 @@
                 /> Description
               </h2>
               <div class="prose prose-sm max-w-none text-base-content/80">
-                {String.replace(@package.description, "\n", "<br>") |> raw()}
+                <.markdown content={@package.description} />
               </div>
             </div>
           <% end %>

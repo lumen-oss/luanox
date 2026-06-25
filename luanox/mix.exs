@@ -41,6 +41,8 @@ defmodule LuaNox.MixProject do
       {:floki, ">= 0.30.0", only: :test},
       {:gettext, "~> 0.26"},
       {:jason, "~> 1.2"},
+      {:mdex, "~> 0.13"},
+      {:phoenix_html_sanitizer, "~> 1.2"},
       {:phoenix, "~> 1.8.0-rc.0", override: true},
       {:phoenix_ecto, "~> 4.5"},
       {:phoenix_html, "~> 4.1"},
