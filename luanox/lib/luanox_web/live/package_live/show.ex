@@ -1,6 +1,7 @@
 defmodule LuaNoxWeb.PackageLive.Show do
   alias LuaNox.Packages
   use LuaNoxWeb, :live_view
+  import LuaNoxWeb.Markdown, only: [markdown: 1]
 
   def mount(%{"name" => name}, _session, socket) do
     case Packages.get_package(name) do
