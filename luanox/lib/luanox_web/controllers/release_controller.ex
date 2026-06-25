@@ -130,12 +130,16 @@ defmodule LuaNoxWeb.ReleaseController do
 
   def show(conn, %{"id" => id}) do
     case Packages.get_release(id) do
-      nil ->
+      _ ->
         {:error, :not_found}
 
-      %Release{} = release ->
+      %Release{ rockspec_path: rockspec_path } = release
+      when is_binary(rockspec_path) ->
+        safe_rockspec_path = Path.basename(rockspec_path)
         full_file_path =
-          Application.get_env(:luanox, :rockspec_storage) <> "/#{release.rockspec_path}"
+          Application.get_env(:luanox, :rockspec_storage)
+          |> Path.join("/#{safe_rockspec_path}")
+          |> Path.expand()
 
         Packages.increment_release_download_count(release)
 
