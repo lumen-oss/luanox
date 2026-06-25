@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_QLhLdgbnMN
 createdAt: 2025-05-20T15:44:25.586738487
-updatedAt: 2025-05-27T16:30:28.172060313
+updatedAt: 2026-06-29T20:49:50.085379910
 workspaceId: wk_mMzjgebEKx
 folderId: null
 authentication:
@@ -15,7 +15,7 @@ headers: []
 method: GET
 name: Get Release
 sortPriority: 3500.0
-url: http://localhost:4000/api/releases/
+url: http://localhost:4000/api/releases/160
 urlParameters:
 - enabled: false
   name: package

@@ -28,12 +28,15 @@ defmodule LuaNox.Packages.Release do
       if valid_format?(version) do
         []
       else
-        [version: "must be in format X.Y.Z-W"]
+        [version: "must be a valid semver version string"]
       end
     end)
   end
 
   defp valid_format?(%Version{pre: [pre]}) when is_integer(pre), do: true
+  # sometimes the prerelease can have custom string values
+  # TODO(vhyrro): ensure this does not break any ordering logic
+  defp valid_format?(%Version{pre: [pre]}) when is_binary(pre), do: true
   defp valid_format?(_), do: false
 
   defp validate_rockspec(changeset, package) do

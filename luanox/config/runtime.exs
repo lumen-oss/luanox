@@ -82,6 +82,8 @@ if config_env() == :prod do
   config :luanox,
     rockspec_verification_endpoint:
       "http://#{System.get_env("LUANOX_ROCKSPEC_VERIFIER_HOST")}:#{System.get_env("LUANOX_ROCKSPEC_VERIFIER_PORT")}/verify",
+    rockspec_parse_endpoint:
+      "http://#{System.get_env("LUANOX_ROCKSPEC_VERIFIER_HOST")}:#{System.get_env("LUANOX_ROCKSPEC_VERIFIER_PORT")}/parse",
     rockspec_storage: "/srv/rockspecs"
 
   # ## SSL Support

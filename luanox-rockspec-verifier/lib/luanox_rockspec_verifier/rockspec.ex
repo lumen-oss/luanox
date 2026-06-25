@@ -58,4 +58,46 @@ defmodule LuanoxRockspecVerifier.Rockspec do
           false
       end
   end
+
+  @doc """
+  Less secure endpoint for extracting data out of a package (luarocks legacy support).
+  """
+  def parse(rockspec_text) do
+    sandboxed_state = :luerl_sandbox.init()
+
+    case :luerl_sandbox.run(rockspec_text, %{max_reductions: 500}, sandboxed_state) do
+      {:ok, _, state} ->
+        package = get_field(state, "package")
+        version = get_field(state, "version")
+        summary = get_field(state, "summary")
+        description = get_field(state, "description")
+
+        case {package, version} do
+          {nil, _} ->
+            {:error}
+
+          {_, nil} ->
+            {:error}
+
+          {pkg, ver} ->
+            {:ok,
+             %{
+               package: pkg,
+               version: ver,
+               summary: summary,
+               description: description
+             }}
+        end
+
+      {:error, _} ->
+        {:error}
+    end
+  end
+
+  defp get_field(state, field) do
+    case Luerl.get_table_keys_dec(state, [field]) do
+      {:ok, value, _} when is_binary(value) -> value
+      _ -> nil
+    end
+  end
 end
