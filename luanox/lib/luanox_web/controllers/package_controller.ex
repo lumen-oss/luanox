@@ -19,6 +19,18 @@ defmodule LuaNoxWeb.PackageController do
         type: :string,
         required: true,
         example: "json"
+      ],
+      page: [
+        in: :query,
+        description: "Page number (1-indexed)",
+        type: :integer,
+        example: 1
+      ],
+      page_size: [
+        in: :query,
+        description: "Results per page (max 50)",
+        type: :integer,
+        example: 20
       ]
     ],
     responses: %{
@@ -28,25 +40,78 @@ defmodule LuaNoxWeb.PackageController do
            type: :object,
            properties: %{
              data: %OpenApiSpex.Schema{
+               type: :array,
+               items: %OpenApiSpex.Reference{"$ref": "#/components/schemas/Package"}
+             },
+             meta: %OpenApiSpex.Schema{
                type: :object,
-               additionalProperties: %OpenApiSpex.Reference{
-                 "$ref": "#/components/schemas/PackageMapValue"
+               properties: %{
+                 total_count: %OpenApiSpex.Schema{type: :integer},
+                 page: %OpenApiSpex.Schema{type: :integer},
+                 page_size: %OpenApiSpex.Schema{type: :integer},
+                 total_pages: %OpenApiSpex.Schema{type: :integer}
                }
              }
            }
          }},
       400 =>
         {"Missing query parameter", "application/json",
-         %OpenApiSpex.Reference{"$ref": "#/components/schemas/Error"}}
+         %OpenApiSpex.Reference{"$ref": "#/components/schemas/Error"}},
+      429 =>
+        {"Rate limit exceeded", "application/json",
+         %OpenApiSpex.Schema{
+           type: :object,
+           properties: %{
+             error: %OpenApiSpex.Schema{type: :string, example: "rate_limit_exceeded"},
+             retry_after_ms: %OpenApiSpex.Schema{type: :integer}
+           }
+         }}
     }
   )
 
-  def index(conn, %{"query" => query}) when is_binary(query) do
-    packages = Packages.list_packages(:exact, query)
-    render(conn, :index, packages: packages)
+  def index(conn, %{"query" => query} = params) when is_binary(query) do
+    key = build_search_key(conn)
+
+    case LuaNoxWeb.RateLimit.hit(:search, key) do
+      {:allow, _count} ->
+        page =
+          case Map.get(params, "page", "1") |> Integer.parse() do
+            {n, _} when n > 0 -> n
+            _ -> 1
+          end
+
+        page_size =
+          case Map.get(params, "page_size", "20") |> Integer.parse() do
+            {n, _} when n > 0 -> n |> min(50)
+            _ -> 20
+          end
+
+        %{packages: packages, total_count: total, page: p, page_size: ps, total_pages: tp} =
+          Packages.list_packages(:exact, query, page: page, page_size: page_size)
+
+        conn
+        |> put_resp_header("x-total-count", to_string(total))
+        |> render(:index,
+          packages: packages,
+          total_count: total,
+          page: p,
+          page_size: ps,
+          total_pages: tp
+        )
+
+      {:deny, retry_after} ->
+        {:error, :rate_limit_exceeded, retry_after}
+    end
   end
 
   def index(_conn, _params), do: {:error, :no_query_string}
+
+  defp build_search_key(conn) do
+    case conn.assigns do
+      %{current_scope: %{user: %{id: id}}} -> "user:search:#{id}"
+      _ -> "ip:search:#{conn.remote_ip}"
+    end
+  end
 
   operation(:create,
     summary: "Create a new package",

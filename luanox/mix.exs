@@ -61,7 +61,9 @@ defmodule LuaNox.MixProject do
       {:open_api_spex, "~> 3.6"},
       {:flop, "~> 0.26"},
       {:flop_phoenix, "~> 0.25"},
-      {:tidewave, "~> 0.5", only: :dev}
+      {:tidewave, "~> 0.5", only: :dev},
+      {:hammer, "~> 7.0"},
+      {:cachex, "~> 3.6"}
     ]
   end
 

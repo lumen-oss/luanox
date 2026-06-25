@@ -43,6 +43,14 @@ defmodule LuaNoxWeb.FallbackController do
     |> render(:invalid_rockspec)
   end
 
+  def call(conn, {:error, :rate_limit_exceeded, retry_after}) do
+    conn
+    |> put_status(:too_many_requests)
+    |> put_resp_header("retry-after", to_string(div(retry_after, 1000)))
+    |> put_view(json: LuaNoxWeb.ErrorJSON)
+    |> render(:rate_limit_exceeded, retry_after: retry_after)
+  end
+
   # For guardian errors in the plug pipeline
   def auth_error(conn, {type, err}, _opts) do
     conn

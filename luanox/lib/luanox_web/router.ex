@@ -19,6 +19,7 @@ defmodule LuaNoxWeb.Router do
     plug Pipelines.ApiPipeline
     plug :fetch_current_api_token_for_user
     plug OpenApiSpex.Plug.PutApiSpec, module: LuaNoxWeb.ApiSpec
+    plug LuaNoxWeb.Plugs.RateLimiter, tier: :general
   end
 
   scope "/", LuaNoxWeb do
@@ -62,9 +63,8 @@ defmodule LuaNoxWeb.Router do
       except: [:new, :edit, :update, :delete],
       param: "name"
 
-    resources "/releases", ReleaseController, except: [:new, :edit, :update, :delete]
+    resources "/releases", ReleaseController, except: [:new, :edit, :update, :delete, :create]
     post "/revoke", RevokedKeyController, :create
-
     get "/download/:name", PackageController, :download
     get "/download/:name/:version", PackageController, :download_version
   end
