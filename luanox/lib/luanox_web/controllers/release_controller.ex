@@ -130,12 +130,10 @@ defmodule LuaNoxWeb.ReleaseController do
 
   def show(conn, %{"id" => id}) do
     case Packages.get_release(id) do
-      _ ->
-        {:error, :not_found}
-
-      %Release{ rockspec_path: rockspec_path } = release
+      %Release{rockspec_path: rockspec_path} = release
       when is_binary(rockspec_path) ->
         safe_rockspec_path = Path.basename(rockspec_path)
+
         full_file_path =
           Application.get_env(:luanox, :rockspec_storage)
           |> Path.join("/#{safe_rockspec_path}")
@@ -150,6 +148,9 @@ defmodule LuaNoxWeb.ReleaseController do
         )
         |> put_resp_content_type(MIME.from_path(full_file_path) || "application/octet-stream")
         |> send_file(200, full_file_path)
+
+      _ ->
+        {:error, :not_found}
     end
   end
 end

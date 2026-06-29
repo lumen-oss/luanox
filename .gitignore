@@ -18,3 +18,5 @@ devenv.local.nix
 push.sh
 
 /.expert
+
+/prod.tar

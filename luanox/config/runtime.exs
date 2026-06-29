@@ -25,7 +25,7 @@ config :ueberauth, Ueberauth.Strategy.Github.OAuth,
   client_secret: System.get_env("GITHUB_CLIENT_SECRET")
 
 config :luanox,
-  rockspec_storage: Application.app_dir(:luanox, "priv/static/releases")
+  rockspec_storage: Application.app_dir(:luanox, "priv/static/releases") |> Path.expand()
 
 if config_env() == :prod do
   database_url =
