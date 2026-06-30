@@ -34,24 +34,10 @@ defmodule LuaNoxWeb.Plugs.RateLimiter do
     end
   end
 
-  defp build_key(conn, :general) do
+  defp build_key(conn, tier) do
     case extract_user_id(conn) do
-      nil -> "ip:#{ip_to_string(conn.remote_ip)}"
-      user_id -> "user:general:#{user_id}"
-    end
-  end
-
-  defp build_key(conn, :search) do
-    case extract_user_id(conn) do
-      nil -> "ip:search:#{ip_to_string(conn.remote_ip)}"
-      user_id -> "user:search:#{user_id}"
-    end
-  end
-
-  defp build_key(conn, :write) do
-    case extract_user_id(conn) do
-      nil -> "ip:write:#{ip_to_string(conn.remote_ip)}"
-      user_id -> "user:write:#{user_id}"
+      nil -> "ip:#{tier}:#{ip_to_string(conn.remote_ip)}"
+      user_id -> "user:#{tier}:#{user_id}"
     end
   end
 

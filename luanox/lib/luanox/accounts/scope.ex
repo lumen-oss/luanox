@@ -21,7 +21,7 @@ defmodule LuaNox.Accounts.Scope do
   alias LuaNox.Packages.Package
   alias LuaNox.Accounts.User
 
-  defstruct user: nil, package_whitelist: nil, write_restricted: false
+  defstruct user: nil, package_whitelist: nil, write_restricted: false, require_tfa: true
 
   @doc """
   Creates a scope for the given user.
@@ -29,7 +29,7 @@ defmodule LuaNox.Accounts.Scope do
   Returns nil if no user is given.
   """
   def for_user(%User{} = user) do
-    %__MODULE__{user: user, package_whitelist: nil, write_restricted: false}
+    %__MODULE__{user: user, package_whitelist: nil, write_restricted: false, require_tfa: true}
   end
 
   def for_user(nil), do: nil
@@ -49,16 +49,19 @@ defmodule LuaNox.Accounts.Scope do
   def for_jwt(%{
         user: %User{} = user,
         package_whitelist: package_whitelist,
-        write_restricted: write_restricted
+        write_restricted: write_restricted,
+        require_tfa: require_tfa
       }) do
     # TODO(vhyrro): we should move this out to resource_from_claims, not the job of this function
     # JOSE encodes nil as JSON null which decodes back as :null atom
     whitelist = if package_whitelist == :null, do: nil, else: package_whitelist
     restricted = if write_restricted == :null, do: false, else: write_restricted
+    require_tfa = if require_tfa == :null, do: true, else: require_tfa
 
     for_user(user)
     |> Map.put(:package_whitelist, whitelist)
     |> Map.put(:write_restricted, restricted)
+    |> Map.put(:require_tfa, require_tfa)
   end
 
   def package_permitted?(%__MODULE__{package_whitelist: nil}, _package), do: true

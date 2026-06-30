@@ -170,6 +170,24 @@ defmodule LuaNoxWeb.UserLive.Keys do
                 <.icon name={:clock} type={:outline} class="w-3 h-3" />
                 Select how long this key should remain valid
               </div>
+
+              <div class="form-control">
+                <label class="label min-w-full justify-between cursor-pointer">
+                  <span class="label-text">
+                    <div class="flex items-center gap-2">
+                      <.icon name={:shield_check} type={:outline} class="w-4 h-4" /> Require 2FA
+                    </div>
+                    <div class="text-xs mt-1">Require TOTP code for uploads with this key</div>
+                  </span>
+                  <input
+                    type="checkbox"
+                    name="require_tfa"
+                    value="true"
+                    class="toggle toggle-primary"
+                    checked={@require_tfa}
+                  />
+                </label>
+              </div>
             </div>
 
             <div class="modal-action">
@@ -230,26 +248,31 @@ defmodule LuaNoxWeb.UserLive.Keys do
      socket
      |> assign(:generated_key, nil)
      |> assign(:read_only, false)
-     |> assign(:ttl_weeks, Application.get_env(:luanox, :key_ttl_weeks_default, 4))}
+     |> assign(:ttl_weeks, Application.get_env(:luanox, :key_ttl_weeks_default, 4))
+     |> assign(:require_tfa, true)}
   end
 
-  def handle_event("generate_key", %{"read_only" => read_only, "ttl_weeks" => ttl_weeks}, socket) do
+  def handle_event(
+        "generate_key",
+        %{"read_only" => read_only, "ttl_weeks" => ttl_weeks} = params,
+        socket
+      ) do
     user = socket.assigns.current_scope.user
     true = user != nil
 
-    # Convert form values to proper types
     read_only = read_only == "true"
     ttl_weeks = String.to_integer(ttl_weeks)
     # Ensure TTL is within allowed range (1-4 weeks)
     ttl_weeks = max(1, min(Application.get_env(:luanox, :key_ttl_weeks_max, 4), ttl_weeks))
+    require_tfa = Map.get(params, "require_tfa") == "true"
 
     # Never allow unbounded TTL as it will not only be a security risk but also
     # cause us to have to store a potentially infinite amount of revoked tokens in our database.
-    # with bounded TTLs we can sweep the database for revoked tokens every 24h or so.
+    # With bounded TTLs we can sweep the database for revoked tokens every 24h or so.
     {:ok, token, _claims} =
       LuaNox.Guardian.encode_and_sign(
         user,
-        %{allowed_packages: nil, write_restriction: read_only},
+        %{allowed_packages: nil, write_restriction: read_only, require_tfa: require_tfa},
         ttl: {ttl_weeks, :weeks}
       )
 
@@ -257,7 +280,8 @@ defmodule LuaNoxWeb.UserLive.Keys do
      socket
      |> assign(:generated_key, token)
      |> assign(:read_only, read_only)
-     |> assign(:ttl_weeks, ttl_weeks)}
+     |> assign(:ttl_weeks, ttl_weeks)
+     |> assign(:require_tfa, require_tfa)}
   end
 
   def handle_event("revoke_key", %{"revoked_key" => revoked_key}, socket) do

@@ -1,6 +1,8 @@
 defmodule LuaNoxWeb.UserLive.Settings do
   use LuaNoxWeb, :live_view
 
+  alias LuaNox.Accounts.TOTP
+
   on_mount({LuaNoxWeb.UserAuth, :require_sudo_mode})
 
   def mount(_params, _session, socket) do
@@ -10,7 +12,12 @@ defmodule LuaNoxWeb.UserLive.Settings do
      socket
      |> assign(:email_form, nil)
      |> assign(:username_form, nil)
-     |> assign(:bio_count, bio_count)}
+     |> assign(:bio_count, bio_count)
+     |> assign(:backup_codes, nil)
+     |> assign(
+       :backup_codes_remaining,
+       TOTP.backup_codes_remaining(socket.assigns.current_scope.user)
+     )}
   end
 
   def render(assigns) do
@@ -23,7 +30,9 @@ defmodule LuaNoxWeb.UserLive.Settings do
               <.icon name={:user} type={:outline} class="w-10 h-10 sm:w-12 sm:h-12 text-primary" />
             </div>
             <div>
-              <h1 class="text-2xl sm:text-3xl lg:text-4xl font-semibold text-base-content">Settings</h1>
+              <h1 class="text-2xl sm:text-3xl lg:text-4xl font-semibold text-base-content">
+                Settings
+              </h1>
               <p class="text-sm sm:text-base text-base-content/70">
                 Manage your profile and account preferences
               </p>
@@ -228,6 +237,78 @@ defmodule LuaNoxWeb.UserLive.Settings do
               </div>
             </div>
 
+            <%!-- Two-Factor Authentication Section --%>
+            <div class="collapse collapse-arrow bg-base-200 border border-base-300 !rounded-none">
+              <input type="checkbox" />
+              <div class="collapse-title flex items-center gap-3 px-4 sm:px-6">
+                <.icon name={:shield_check} type={:outline} class="w-5 h-5 text-primary" />
+                <div>
+                  <h2 class="font-semibold text-base-content">Two-Factor Authentication</h2>
+                  <p class="text-sm text-base-content/60">Authenticator app and backup codes</p>
+                </div>
+              </div>
+              <div class="collapse-content px-4 sm:px-6">
+                <div class="space-y-6 pt-2">
+                  <div class="flex items-center justify-between gap-3">
+                    <div>
+                      <p class="text-sm font-medium text-base-content">Authenticator app</p>
+                      <p class="text-xs text-base-content/60">
+                        Required for uploads made with a 2FA key
+                      </p>
+                    </div>
+                    <span class="badge badge-success badge-sm">Enabled</span>
+                  </div>
+
+                  <div class="flex items-center justify-between gap-3">
+                    <div>
+                      <p class="text-sm font-medium text-base-content">Backup codes</p>
+                      <p class="text-xs text-base-content/60">
+                        {if @backup_codes_remaining == 0,
+                          do: "No backup codes left - generate a new set",
+                          else: "#{@backup_codes_remaining} of 10 codes remaining"}
+                      </p>
+                    </div>
+                    <span class={[
+                      "badge badge-sm",
+                      @backup_codes_remaining == 0 && "badge-error",
+                      @backup_codes_remaining > 0 && "badge-success"
+                    ]}>
+                      {@backup_codes_remaining}
+                    </span>
+                  </div>
+
+                  <div
+                    :if={@backup_codes}
+                    class="bg-warning/10 border border-warning/30 p-4 space-y-3"
+                  >
+                    <p class="text-sm font-medium text-warning">
+                      Save these backup codes now. They are shown only once and each can be used once.
+                    </p>
+                    <ul
+                      phx-no-format
+                      class="grid grid-cols-2 gap-x-4 gap-y-1 font-mono text-sm select-all"
+                    >
+                      <li :for={code <- @backup_codes}>{TOTP.format_backup_code(code)}</li>
+                    </ul>
+                  </div>
+
+                  <div class="flex flex-col sm:flex-row gap-2">
+                    <button
+                      class="btn btn-neutral btn-sm"
+                      onclick="regenerate_backup_codes_modal.showModal()"
+                    >
+                      <.icon name={:refresh} type={:outline} class="w-4 h-4" />
+                      Regenerate Backup Codes
+                    </button>
+                    <button class="btn btn-error btn-sm" onclick="remove_tfa_modal.showModal()">
+                      <.icon name={:trash} type={:outline} class="w-4 h-4" />
+                      Remove Two-Factor Authentication
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <%!-- Advanced Section --%>
             <div class="collapse collapse-arrow bg-base-200 border border-base-300">
               <input type="checkbox" />
@@ -290,6 +371,77 @@ defmodule LuaNoxWeb.UserLive.Settings do
           <button>close</button>
         </form>
       </dialog>
+
+      <dialog id="regenerate_backup_codes_modal" class="modal">
+        <div class="modal-box">
+          <h3 class="text-lg font-bold text-base-content mb-4">Regenerate backup codes?</h3>
+          <p class="text-sm text-base-content/80 mb-6">
+            This invalidates every existing backup code. Enter a code from your authenticator app, or one of your current backup codes, to continue.
+          </p>
+          <.form
+            for={%{}}
+            id="regenerate_backup_codes_form"
+            phx-submit="regenerate_backup_codes"
+            class="space-y-4"
+          >
+            <.input
+              name="code"
+              type="text"
+              label="Verification Code"
+              value=""
+              placeholder="6-digit code or backup code"
+              required
+              autocomplete="one-time-code"
+            />
+            <div class="modal-action">
+              <button
+                type="button"
+                class="btn btn-neutral mr-3"
+                onclick="regenerate_backup_codes_modal.close()"
+              >
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary">
+                <.icon name={:refresh} type={:outline} class="w-4 h-4" /> Regenerate Codes
+              </button>
+            </div>
+          </.form>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+          <button>close</button>
+        </form>
+      </dialog>
+
+      <dialog id="remove_tfa_modal" class="modal">
+        <div class="modal-box">
+          <h3 class="text-lg font-bold text-base-content mb-4">Remove two-factor authentication?</h3>
+          <p class="text-sm text-base-content/80 mb-6">
+            Your authenticator secret and all backup codes will be deleted, and you will be asked to set two-factor authentication up again. Enter a code from your authenticator app, or one of your backup codes, to continue.
+          </p>
+          <.form for={%{}} id="remove_tfa_form" phx-submit="remove_tfa" class="space-y-4">
+            <.input
+              name="code"
+              type="text"
+              label="Verification Code"
+              value=""
+              placeholder="6-digit code or backup code"
+              required
+              autocomplete="one-time-code"
+            />
+            <div class="modal-action">
+              <button type="button" class="btn btn-neutral mr-3" onclick="remove_tfa_modal.close()">
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-error">
+                <.icon name={:trash} type={:outline} class="w-4 h-4" /> Remove
+              </button>
+            </div>
+          </.form>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+          <button>close</button>
+        </form>
+      </dialog>
     </Layouts.app>
     """
   end
@@ -320,9 +472,63 @@ defmodule LuaNoxWeb.UserLive.Settings do
     end
   end
 
+  def handle_event("regenerate_backup_codes", %{"code" => code}, socket) do
+    user = socket.assigns.current_scope.user
+
+    cond do
+      throttle_exceeded?(user) ->
+        {:noreply, put_flash(socket, :error, "Too many attempts. Please try again later.")}
+
+      TOTP.verify(user, code) != :ok ->
+        {:noreply, put_flash(socket, :error, "Invalid verification code.")}
+
+      true ->
+        codes = TOTP.generate_backup_codes(user)
+
+        {:noreply,
+         socket
+         |> assign(:backup_codes, codes)
+         |> assign(:backup_codes_remaining, TOTP.backup_codes_remaining(user))
+         |> put_flash(:info, "New backup codes generated. Save them now.")}
+    end
+  end
+
+  def handle_event("regenerate_backup_codes", _params, socket) do
+    {:noreply, put_flash(socket, :error, "Enter a verification code to continue.")}
+  end
+
+  def handle_event("remove_tfa", %{"code" => code}, socket) do
+    user = socket.assigns.current_scope.user
+
+    cond do
+      throttle_exceeded?(user) ->
+        {:noreply, put_flash(socket, :error, "Too many attempts. Please try again later.")}
+
+      TOTP.verify(user, code) != :ok ->
+        {:noreply, put_flash(socket, :error, "Invalid verification code.")}
+
+      true ->
+        :ok = TOTP.disable(user)
+
+        {:noreply,
+         socket
+         |> put_flash(
+           :info,
+           "Two-factor authentication removed. Set it up again to protect your account."
+         )
+         |> push_navigate(to: ~p"/setup-totp")}
+    end
+  end
+
+  def handle_event("remove_tfa", _params, socket) do
+    {:noreply, put_flash(socket, :error, "Enter a verification code to continue.")}
+  end
+
   def handle_event(_event, _params, socket), do: {:noreply, socket}
 
   defp member_since_date(%DateTime{} = date), do: Calendar.strftime(date, "%B %Y")
   defp member_since_date(%NaiveDateTime{} = date), do: Calendar.strftime(date, "%B %Y")
   defp member_since_date(_), do: "Unknown"
+
+  defp throttle_exceeded?(user), do: LuaNoxWeb.RateLimit.totp_exceeded?(user.id)
 end

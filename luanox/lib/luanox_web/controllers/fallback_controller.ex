@@ -51,6 +51,20 @@ defmodule LuaNoxWeb.FallbackController do
     |> render(:rate_limit_exceeded, retry_after: retry_after)
   end
 
+  def call(conn, {:error, :tfa_required}) do
+    conn
+    |> put_status(:forbidden)
+    |> put_view(json: LuaNoxWeb.ErrorJSON)
+    |> render(:tfa_required)
+  end
+
+  def call(conn, {:error, :tfa_invalid}) do
+    conn
+    |> put_status(:unauthorized)
+    |> put_view(json: LuaNoxWeb.ErrorJSON)
+    |> render(:tfa_invalid)
+  end
+
   # For guardian errors in the plug pipeline
   def auth_error(conn, {type, err}, _opts) do
     conn

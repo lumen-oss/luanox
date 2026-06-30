@@ -27,6 +27,19 @@ defmodule LuaNoxWeb.LuaRocksApiController do
     |> json(%{errors: ["Invalid key"]})
   end
 
+  defp check_tfa(%{require_tfa: false}, _params), do: :ok
+
+  defp check_tfa(scope, params) do
+    if LuaNoxWeb.RateLimit.totp_exceeded?(scope.user.id) do
+      {:error, :tfa_required}
+    else
+      case LuaNox.Accounts.TOTP.verify(scope.user, params["tfa_code"]) do
+        :ok -> :ok
+        :error -> {:error, :tfa_required}
+      end
+    end
+  end
+
   # Luarocks always expects 1.0.0 here - stub.
   def tool_version(conn, _params) do
     json(conn, %{version: "1.0.0"})
@@ -73,17 +86,10 @@ defmodule LuaNoxWeb.LuaRocksApiController do
     |> json(%{errors: ["Missing required parameters: package, version"]})
   end
 
-  def verify_tfa(conn, _params) do
-    with_auth(conn, fn conn, _scope ->
-      conn
-      |> put_status(:bad_request)
-      |> json(%{errors: ["Two-factor authentication is not enabled on this account"]})
-    end)
-  end
-
   def upload(conn, %{"rockspec_file" => %Plug.Upload{} = file}) do
     with_auth(conn, fn conn, scope ->
-      with {:ok, rockspec_text} <- File.read(file.path),
+      with :ok <- check_tfa(scope, conn.params),
+           {:ok, rockspec_text} <- File.read(file.path),
            {:ok, spec} <- parse_rockspec(rockspec_text),
            {:ok, package, release, is_new} <- upload(scope, spec, rockspec_text) do
         json(conn, %{
@@ -98,6 +104,9 @@ defmodule LuaNoxWeb.LuaRocksApiController do
           is_new: is_new
         })
       else
+        {:error, :tfa_required} ->
+          {:error, :tfa_required}
+
         {:error, :invalid_rockspec} ->
           conn
           |> put_status(:bad_request)

@@ -34,6 +34,16 @@ config :luanox, LuaNox.Guardian,
   issuer: "luanox",
   secret_key: "6edg497dRRnjrb4vVkC3tKtjUa8murczurc66WajBraegP3Bf9Hl3+c74ldwhg8H"
 
+config :luanox, LuaNox.Vault,
+  ciphers: [
+    default: {
+      Cloak.Ciphers.AES.GCM,
+      tag: "AES.GCM.V1",
+      key: :crypto.hash(:sha256, "luanox dev vault key"),
+      iv_length: 12
+    }
+  ]
+
 # ## SSL Support
 #
 # In order to use HTTPS in development, a self-signed

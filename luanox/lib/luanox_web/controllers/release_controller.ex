@@ -84,6 +84,28 @@ defmodule LuaNoxWeb.ReleaseController do
           "rockspec" => %Plug.Upload{} = rockspec
         } = release_params
       ) do
+    scope = conn.assigns.current_scope
+
+    if scope.require_tfa do
+      cond do
+        LuaNoxWeb.RateLimit.totp_exceeded?(scope.user.id) ->
+          {:error, :tfa_required}
+
+        release_params["tfa_code"] in [nil, ""] ->
+          {:error, :tfa_required}
+
+        LuaNox.Accounts.TOTP.verify(scope.user, release_params["tfa_code"]) == :ok ->
+          create_release(conn, package_name, release_params, rockspec)
+
+        true ->
+          {:error, :tfa_invalid}
+      end
+    else
+      create_release(conn, package_name, release_params, rockspec)
+    end
+  end
+
+  defp create_release(conn, package_name, release_params, rockspec) do
     if Path.extname(rockspec.filename) == ".rockspec" do
       case Packages.get_package(package_name) do
         nil ->
