@@ -39,6 +39,8 @@ config :phoenix, :plug_init_mode, :runtime
 # Configure rockspec storage for tests
 config :luanox, :rockspec_storage, Path.join(System.tmp_dir!(), "luanox_test_rockspecs")
 
+config :luanox, :rockspec_parse_endpoint, "http://127.0.0.1:1/parse"
+
 config :luanox,
   rockspec_verification_endpoint:
     "http://localhost:#{System.get_env("LUANOX_ROCKSPEC_VERIFIER_PORT", "5000")}/verify"
@@ -47,6 +49,16 @@ config :luanox,
 config :luanox, LuaNox.Guardian,
   issuer: "luanox",
   secret_key: "6edg497dRRnjrb4vVkC3tKtjUa8murczurc66WajBraegP3Bf9Hl3+c74ldwhg8H"
+
+config :luanox, LuaNox.Vault,
+  ciphers: [
+    default: {
+      Cloak.Ciphers.AES.GCM,
+      tag: "AES.GCM.V1",
+      key: :crypto.hash(:sha256, "luanox test vault key"),
+      iv_length: 12
+    }
+  ]
 
 # Enable helpful, but potentially expensive runtime checks
 config :phoenix_live_view,

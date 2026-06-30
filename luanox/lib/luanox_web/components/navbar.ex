@@ -48,7 +48,10 @@ defmodule LuaNoxWeb.NavBar do
   defp account_dropdown(%{current_scope: current_scope} = assigns) do
     assigns =
       assigns
-      |> assign(:unique_username, if(current_scope, do: User.unique_username(current_scope.user), else: nil))
+      |> assign(
+        :unique_username,
+        if(current_scope, do: User.unique_username(current_scope.user), else: nil)
+      )
 
     ~H"""
     <div class="dropdown dropdown-end w-full sm:w-auto">

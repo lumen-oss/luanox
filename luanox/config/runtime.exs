@@ -79,6 +79,22 @@ if config_env() == :prod do
     secret_key: System.get_env("GUARDIAN_SECRET_KEY"),
     verify_issuer: true
 
+  cloak_key =
+    case System.get_env("CLOAK_KEY") do
+      nil -> :crypto.hash(:sha256, secret_key_base)
+      encoded -> Base.decode64!(encoded)
+    end
+
+  config :luanox, LuaNox.Vault,
+    ciphers: [
+      default: {
+        Cloak.Ciphers.AES.GCM,
+        tag: "AES.GCM.V1",
+        key: cloak_key,
+        iv_length: 12
+      }
+    ]
+
   config :luanox,
     rockspec_verification_endpoint:
       "http://#{System.get_env("LUANOX_ROCKSPEC_VERIFIER_HOST")}:#{System.get_env("LUANOX_ROCKSPEC_VERIFIER_PORT")}/verify",

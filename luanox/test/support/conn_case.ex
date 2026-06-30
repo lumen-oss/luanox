@@ -23,7 +23,13 @@ defmodule LuaNoxWeb.ConnCase do
     %{conn: log_in_user(conn, user, opts), user: user, scope: scope}
   end
 
+  # Two-factor authentication is mandatory, so a logged-in browser user is
+  # always enrolled. Enable a TOTP secret for the test user if it has none.
   def log_in_user(conn, user, opts \\ []) do
+    unless LuaNox.Accounts.User.has_totp?(user) do
+      :ok = LuaNox.Accounts.TOTP.enable(user)
+    end
+
     token = LuaNox.Accounts.generate_user_session_token(user)
     maybe_set_token_authenticated_at(token, opts[:token_authenticated_at])
 
@@ -36,7 +42,8 @@ defmodule LuaNoxWeb.ConnCase do
     {:ok, jwt, _claims} =
       LuaNox.Guardian.encode_and_sign(user, %{
         "allowed_packages" => nil,
-        "write_restriction" => false
+        "write_restriction" => false,
+        "require_tfa" => false
       })
 
     Plug.Conn.put_req_header(conn, "authorization", "Bearer #{jwt}")

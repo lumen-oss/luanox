@@ -1,7 +1,10 @@
 defmodule LuaNox.Accounts.User do
+  alias LuaNox.Accounts.TotpSecret
+  alias LuaNox.Repo
   alias Ueberauth.Auth
   use Ecto.Schema
   import Ecto.Changeset
+  import Ecto.Query
 
   schema "users" do
     field :email, :string
@@ -119,5 +122,9 @@ defmodule LuaNox.Accounts.User do
       message: "must have the @ sign and no spaces"
     )
     |> validate_length(:email, max: 160)
+  end
+
+  def has_totp?(%__MODULE__{} = user) do
+    Repo.exists?(from t in TotpSecret, where: t.user_id == ^user.id)
   end
 end

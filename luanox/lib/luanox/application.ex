@@ -9,6 +9,7 @@ defmodule LuaNox.Application do
   def start(_type, _args) do
     children = [
       LuaNoxWeb.Telemetry,
+      LuaNox.Vault,
       LuaNox.Repo,
       {DNSCluster, query: Application.get_env(:luanox, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: LuaNox.PubSub},

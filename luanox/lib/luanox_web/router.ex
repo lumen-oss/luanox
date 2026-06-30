@@ -14,6 +14,11 @@ defmodule LuaNoxWeb.Router do
     plug :protect_from_forgery
     plug :put_secure_browser_headers, %{"content-security-policy" => @csp}
     plug :fetch_current_scope_for_user
+    plug LuaNoxWeb.Plugs.RequireTotp
+  end
+
+  pipeline :totp_verification do
+    plug LuaNoxWeb.Plugs.RateLimiter, tier: :totp
   end
 
   pipeline :api do
@@ -35,9 +40,16 @@ defmodule LuaNoxWeb.Router do
       live "/donate", DonateLive
       live "/login", UserLive.Login, :new
       live "/provide-email", UserLive.ProvideEmail, :new
+      live "/setup-totp", UserLive.SetupTotp, :setup
 
       post "/complete-signup", UserOauth, :complete_signup
     end
+  end
+
+  scope "/", LuaNoxWeb do
+    pipe_through [:browser, :totp_verification]
+
+    post "/setup-totp/complete", UserOauth, :complete_totp_setup
   end
 
   # Authentication routes
@@ -65,7 +77,6 @@ defmodule LuaNoxWeb.Router do
     get "/api/tool_version", LuaRocksApiController, :tool_version
     get "/api/1/:key/status", LuaRocksApiController, :status
     get "/api/1/:key/check_rockspec", LuaRocksApiController, :check_rockspec
-    post "/api/1/:key/verify_tfa", LuaRocksApiController, :verify_tfa
     post "/api/1/:key/upload", LuaRocksApiController, :upload
     post "/api/1/:key/upload_rock/:version_id", LuaRocksApiController, :upload_rock
   end
