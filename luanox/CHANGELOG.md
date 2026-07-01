@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.3.0](https://github.com/lumen-oss/luanox/compare/v0.2.0...v0.3.0) (2026-07-01)
+
+
+### Features
+
+* fix tests and fixtures ([9a330c4](https://github.com/lumen-oss/luanox/commit/9a330c478f1efe7961c0a187cd8ff7bada42256a))
+* luarocks API compatibility ([de5f759](https://github.com/lumen-oss/luanox/commit/de5f759e9b03555be3d92634045f03c139e4678e))
+* parse versions as true semver internally (with sorting in the UI) ([fd6d2dd](https://github.com/lumen-oss/luanox/commit/fd6d2dde7b4e778ef2c378c30eb1f2481a0efa1e))
+* rate limiting for APIs ([548ede0](https://github.com/lumen-oss/luanox/commit/548ede095c9c85921f4ef2807107537368830374))
+* render descriptions as Markdown ([da4cf46](https://github.com/lumen-oss/luanox/commit/da4cf46874a116f60c1a3132e426f03f654592b4))
+
+
+### Bug Fixes
+
+* deny large rockspecs ([e868230](https://github.com/lumen-oss/luanox/commit/e8682305e789c164c321e89fa335623c2d83b64d))
+* proper path sanitization for rockspec paths ([49c3595](https://github.com/lumen-oss/luanox/commit/49c359512181cc819804083e08b0b81e084cebda))
+* use absolute filepath for rockspec locations so downloading works properly again ([2f51db8](https://github.com/lumen-oss/luanox/commit/2f51db8469229fabcbdf88e96987ac43184a3fca))
+
 ## [0.2.0](https://github.com/lumen-oss/luanox/compare/v0.1.1...v0.2.0) (2025-12-01)
 
 
