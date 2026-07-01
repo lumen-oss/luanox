@@ -36,6 +36,10 @@ in
             name = "luanox";
             inherit user pass;
           }
+          {
+            name = "luanox_test";
+            inherit user pass;
+          }
         ];
         listen_addresses = "127.0.0.1,localhost";
         port = lib.toIntBase10 config.env.DATABASE_PORT;
@@ -75,10 +79,10 @@ in
       mix phx.server
     '';
 
-    # enterTest = ''
-    #   cd ${config.env.DEVENV_ROOT}/luanox
-    #   mix test
-    #   cd ${config.env.DEVENV_ROOT}/luanox-rockspec-verifier
-    #   mix test
-    # '';
+    enterTest = ''
+      cd ${config.env.DEVENV_ROOT}/luanox
+      mix test
+      #cd ${config.env.DEVENV_ROOT}/luanox-rockspec-verifier
+      #mix test
+    '';
 }

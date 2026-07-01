@@ -1,19 +1,15 @@
 defmodule LuaNox.RevokedKeysFixtures do
-  @moduledoc """
-  This module defines test helpers for creating
-  entities via the `LuaNox.RevokedKeys` context.
-  """
+  def revoked_key_fixture(scope, jwt \\ nil) do
+    jwt =
+      jwt ||
+        case LuaNox.Guardian.encode_and_sign(scope.user, %{
+               "allowed_packages" => scope.package_whitelist,
+               "write_restriction" => scope.write_restricted
+             }) do
+          {:ok, jwt, _claims} -> jwt
+        end
 
-  @doc """
-  Generate a revoked_key.
-  """
-  def revoked_key_fixture(scope, attrs \\ %{}) do
-    attrs =
-      Enum.into(attrs, %{
-        hashed_revoked_key: "some hashed_revoked_key"
-      })
-
-    {:ok, revoked_key} = LuaNox.RevokedKeys.create_revoked_key(scope, attrs)
-    revoked_key
+    {:ok} = LuaNox.RevokedKeys.create_revoked_key(scope, %{revoked_key: jwt})
+    jwt
   end
 end
