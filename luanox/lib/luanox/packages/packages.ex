@@ -106,6 +106,9 @@ defmodule LuaNox.Packages do
       {:ok, results} ->
         paginate(results, page, page_size)
 
+      {:commit, results, _opts} ->
+        paginate(results, page, page_size)
+
       {:commit, results} ->
         paginate(results, page, page_size)
 
@@ -393,7 +396,7 @@ defmodule LuaNox.Packages do
           {:error, :file_copy_failed}
 
         {:error, _step, reason, _changes} ->
-          Logger.error("Failed to create release: #{reason}")
+          Logger.error("Failed to create release: #{inspect(reason)}")
           {:error, reason}
       end
     else

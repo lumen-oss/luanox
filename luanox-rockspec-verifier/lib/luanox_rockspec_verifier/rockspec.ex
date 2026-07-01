@@ -54,6 +54,9 @@ defmodule LuanoxRockspecVerifier.Rockspec do
             _ -> false
           end
 
+        {:error, _, _} ->
+          false
+
         {:error, _} ->
           false
       end
