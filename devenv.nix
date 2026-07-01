@@ -67,6 +67,13 @@ in
 
     processes.luanox.exec = ''
       cd ${config.env.DEVENV_ROOT}/luanox
+      # For some reason if there is an empty SSLKEYLOGFILE variable in the environment, Elixir's SSL breaks.
+      # Unsetting it if it's empty seems to fix the issue.
+      #
+      # See: https://github.com/sneako/finch/issues/376
+      if [ -n "''${SSLKEYLOGFILE+x}" ] && [ -z "$SSLKEYLOGFILE" ]; then
+        unset SSLKEYLOGFILE
+      fi
       mix phx.server
     '';
 
