@@ -41,7 +41,7 @@ config :luanox, :rockspec_storage, Path.join(System.tmp_dir!(), "luanox_test_roc
 
 config :luanox,
   rockspec_verification_endpoint:
-    "http://localhost:#{System.get_env("LUANOX_ROCKSPEC_VERIFIER_PORT", "4000")}/verify"
+    "http://localhost:#{System.get_env("LUANOX_ROCKSPEC_VERIFIER_PORT", "5000")}/verify"
 
 # Configure Guardian for tests
 config :luanox, LuaNox.Guardian,
