@@ -77,7 +77,7 @@ defmodule LuaNoxWeb.Router do
       except: [:new, :edit, :update, :delete],
       param: "name"
 
-    resources "/releases", ReleaseController, except: [:new, :edit, :update, :delete, :create]
+    resources "/releases", ReleaseController, except: [:new, :edit, :update, :delete]
     post "/revoke", RevokedKeyController, :create
     get "/download/:name", PackageController, :download
     get "/download/:name/:version", PackageController, :download_version
