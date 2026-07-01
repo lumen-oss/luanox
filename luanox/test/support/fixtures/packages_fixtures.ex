@@ -1,33 +1,43 @@
 defmodule LuaNox.PackagesFixtures do
-  @moduledoc """
-  This module defines test helpers for creating
-  entities via the `LuaNox.Packages` context.
-  """
-
-  @doc """
-  Generate a package.
-  """
   def package_fixture(scope, attrs \\ %{}) do
-    attrs =
-      Enum.into(attrs, %{
-        name: "some name"
-      })
+    unique = System.unique_integer([:positive])
 
-    {:ok, package} = LuaNox.Packages.create_package(scope, attrs)
-    package
+    attrs =
+      attrs
+      |> Enum.into(%{name: "pkg_#{unique}", summary: "Summary #{unique}", description: "Desc #{unique}"})
+      |> then(fn map -> Map.new(map, fn {k, v} -> {to_string(k), v} end) end)
+
+    %LuaNox.Packages.Package{}
+    |> LuaNox.Packages.Package.changeset(Map.merge(%{"name" => attrs["name"]}, attrs), scope)
+    |> LuaNox.Repo.insert!()
   end
 
-  @doc """
-  Generate a release.
-  """
-  def release_fixture(scope, attrs \\ %{}) do
-    attrs =
-      Enum.into(attrs, %{
-        rockspec: "some rockspec",
-        version: "some version"
-      })
+  def release_fixture(scope, package \\ nil, attrs \\ %{}) do
+    package = package || package_fixture(scope)
+    unique = System.unique_integer([:positive])
 
-    {:ok, release} = LuaNox.Packages.create_release(scope, attrs)
-    release
+    version = attrs[:version] || "1.0.#{unique}"
+    rockspec_content = attrs[:rockspec] || "return { }"
+
+    safe_name = Path.basename(package.name)
+    safe_version = Path.basename(to_string(version))
+
+    storage_path =
+      Application.get_env(:luanox, :rockspec_storage)
+      |> Path.join("#{safe_name}-#{safe_version}.rockspec")
+      |> Path.expand()
+
+    File.mkdir_p!(Path.dirname(storage_path))
+    File.write!(storage_path, rockspec_content)
+
+    # Insert directly to bypass external HTTP validation in changeset
+    %LuaNox.Packages.Release{}
+    |> Ecto.Changeset.change(%{
+      version: version,
+      rockspec_path: "#{safe_name}-#{safe_version}.rockspec",
+      package_id: package.id,
+      download_count: 0
+    })
+    |> LuaNox.Repo.insert!()
   end
 end

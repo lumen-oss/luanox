@@ -109,7 +109,7 @@ defmodule LuaNoxWeb.PackageController do
   defp build_search_key(conn) do
     case conn.assigns do
       %{current_scope: %{user: %{id: id}}} -> "user:search:#{id}"
-      _ -> "ip:search:#{conn.remote_ip}"
+      _ -> "ip:search:#{conn.remote_ip |> :inet.ntoa()}"
     end
   end
 
@@ -184,8 +184,10 @@ defmodule LuaNoxWeb.PackageController do
   )
 
   def show(conn, %{"name" => name}) do
-    package = Packages.get_package!(name)
-    render(conn, :show, package: package)
+    case Packages.get_package(name) do
+      nil -> {:error, :not_found}
+      package -> render(conn, :show, package: package)
+    end
   end
 
   operation(:download,

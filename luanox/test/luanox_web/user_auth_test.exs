@@ -80,7 +80,7 @@ defmodule LuaNoxWeb.UserAuthTest do
         |> assign(:current_scope, Scope.for_user(user))
         |> UserAuth.log_in_user(user)
 
-      assert redirected_to(conn) == "/users/settings"
+      assert redirected_to(conn) == ~p"/settings"
     end
 
     test "writes a cookie if remember_me was set in previous session", %{conn: conn, user: user} do
@@ -323,7 +323,7 @@ defmodule LuaNoxWeb.UserAuthTest do
       conn = conn |> fetch_flash() |> UserAuth.require_authenticated_user([])
       assert conn.halted
 
-      assert redirected_to(conn) == ~p"/users/log-in"
+      assert redirected_to(conn) == ~p"/login"
 
       assert Phoenix.Flash.get(conn.assigns.flash, :error) ==
                "You must log in to access this page."

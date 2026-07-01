@@ -39,6 +39,7 @@ defmodule LuaNox.MixProject do
       {:ecto_sql, "~> 3.10"},
       {:esbuild, "~> 0.9", runtime: Mix.env() == :dev},
       {:floki, ">= 0.30.0", only: :test},
+      {:lazy_html, ">= 0.1.0", only: :test},
       {:gettext, "~> 0.26"},
       {:jason, "~> 1.2"},
       {:mdex, "~> 0.13"},

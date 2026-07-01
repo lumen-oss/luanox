@@ -51,19 +51,14 @@ defmodule LuaNox.Accounts.Scope do
         package_whitelist: package_whitelist,
         write_restricted: write_restricted
       }) do
-    # NOTE(vhyrro): there appears to be an odd issue where
-    # deserializing `null` from JSON gives `:null` (might be a recent addition? didn't happen earlier),
-    # so we handle that case here
-    package_whitelist =
-      case package_whitelist do
-        :null -> nil
-        list when is_list(list) -> list
-        _ -> nil
-      end
+    # TODO(vhyrro): we should move this out to resource_from_claims, not the job of this function
+    # JOSE encodes nil as JSON null which decodes back as :null atom
+    whitelist = if package_whitelist == :null, do: nil, else: package_whitelist
+    restricted = if write_restricted == :null, do: false, else: write_restricted
 
     for_user(user)
-    |> Map.put(:package_whitelist, package_whitelist)
-    |> Map.put(:write_restricted, write_restricted)
+    |> Map.put(:package_whitelist, whitelist)
+    |> Map.put(:write_restricted, restricted)
   end
 
   def package_permitted?(%__MODULE__{package_whitelist: nil}, _package), do: true

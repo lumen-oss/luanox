@@ -6,7 +6,7 @@ config :luanox, LuaNox.Repo,
   password: System.get_env("DATABASE_PASS"),
   hostname: "localhost",
   database: "luanox",
-  port: System.get_env("DATABASE_PORT"),
+  port: System.get_env("PGPORT", System.get_env("DATABASE_PORT")),
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10

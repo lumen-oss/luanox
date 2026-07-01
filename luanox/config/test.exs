@@ -12,8 +12,8 @@ config :luanox, LuaNox.Repo,
   username: System.get_env("DATABASE_USER"),
   password: System.get_env("DATABASE_PASS"),
   hostname: "localhost",
-  port: System.get_env("DATABASE_PORT"),
-  database: "luanox_test#{System.get_env("MIX_TEST_PARTITION")}",
+  port: System.get_env("PGPORT", System.get_env("DATABASE_PORT")),
+  database: "luanox_test",
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: System.schedulers_online() * 2
 
@@ -35,6 +35,18 @@ config :logger, level: :warning
 
 # Initialize plugs at runtime for faster test compilation
 config :phoenix, :plug_init_mode, :runtime
+
+# Configure rockspec storage for tests
+config :luanox, :rockspec_storage, Path.join(System.tmp_dir!(), "luanox_test_rockspecs")
+
+config :luanox,
+  rockspec_verification_endpoint:
+    "http://localhost:#{System.get_env("LUANOX_ROCKSPEC_VERIFIER_PORT", "4000")}/verify"
+
+# Configure Guardian for tests
+config :luanox, LuaNox.Guardian,
+  issuer: "luanox",
+  secret_key: "6edg497dRRnjrb4vVkC3tKtjUa8murczurc66WajBraegP3Bf9Hl3+c74ldwhg8H"
 
 # Enable helpful, but potentially expensive runtime checks
 config :phoenix_live_view,

@@ -259,7 +259,7 @@ defmodule LuaNox.Packages do
 
   """
   def list_releases(%Package{} = package) do
-    Repo.get(Package, package)
+    Repo.get(Package, package.id)
     |> Repo.preload(:releases)
     |> sort_releases()
     |> Map.get(:releases)
