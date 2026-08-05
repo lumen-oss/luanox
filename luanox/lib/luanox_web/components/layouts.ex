@@ -152,7 +152,7 @@ defmodule LuaNoxWeb.Layouts do
       </div>
       <ul
         tabindex="0"
-        class="dropdown-content bg-base-100 rounded-box z-1 w-30 p-2 text-md shadow-2xl"
+        class="dropdown-content bg-base-200 rounded-box z-1 w-30 p-2 text-md shadow-2xl"
       >
         <li>
           <input

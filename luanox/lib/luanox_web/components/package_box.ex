@@ -25,7 +25,7 @@ defmodule LuaNoxWeb.PackageBox do
           </p>
 
           <div class="flex items-center justify-between pt-3 border-t border-base-300">
-            <div class="flex items-center space-x-2 text-xs text-base-content/60">
+            <div class="flex items-center space-x-2 text-xs text-base-content/70">
               <.icon name={:download} type={:outline} class="w-3 h-3" />
               <span>{@download_count} downloads</span>
             </div>

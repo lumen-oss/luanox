@@ -127,7 +127,7 @@ defmodule LuaNoxWeb.NavBar do
     ~H"""
     <div
       id="mobile-menu"
-      class="hidden absolute top-full left-0 right-0 bg-base-300 rounded-b-lg shadow-xl border-t border-base-content/10 z-50 opacity-0 scale-95"
+      class="hidden absolute top-full left-0 right-0 bg-base-200 rounded-b-lg shadow-xl border-t border-base-content/10 z-50 opacity-0 scale-95"
     >
       <div class="px-4 py-3">
         <ul class="menu menu-vertical w-full space-y-1">

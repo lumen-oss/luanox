@@ -43,22 +43,22 @@ defmodule LuaNoxWeb.UserLive.Settings do
                 <h3 class="text-lg font-semibold text-base-content mb-1">
                   {@current_scope.user.username}
                 </h3>
-                <p class="text-sm text-base-content/60 mb-4">
+                <p class="text-sm text-base-content/70 mb-4">
                   {@current_scope.user.email}
                 </p>
               </div>
 
               <div class="border-t border-base-300 pt-4 space-y-3">
                 <div class="flex justify-between items-center">
-                  <span class="text-sm text-base-content/60">Member since</span>
+                  <span class="text-sm text-base-content/70">Member since</span>
                   <span class="text-sm font-medium">August 2025</span>
                 </div>
                 <div class="flex justify-between items-center">
-                  <span class="text-sm text-base-content/60">Auth provider</span>
+                  <span class="text-sm text-base-content/70">Auth provider</span>
                   <span class="text-sm font-medium text-primary">GitHub</span>
                 </div>
                 <div class="flex justify-between items-center">
-                  <span class="text-sm text-base-content/60">Account type</span>
+                  <span class="text-sm text-base-content/70">Account type</span>
                   <span class="text-sm font-medium text-secondary">Standard</span>
                 </div>
               </div>
@@ -74,7 +74,7 @@ defmodule LuaNoxWeb.UserLive.Settings do
                 <.icon name={:user_circle} type={:outline} class="w-5 h-5 text-primary" />
                 <div>
                   <h2 class="font-semibold text-base-content">Account</h2>
-                  <p class="text-sm text-base-content/60">Personal information</p>
+                  <p class="text-sm text-base-content/70">Personal information</p>
                 </div>
               </div>
               <div class="collapse-content px-4 sm:px-6">
@@ -147,7 +147,7 @@ defmodule LuaNoxWeb.UserLive.Settings do
                 <.icon name={:bell} type={:outline} class="w-5 h-5 text-primary" />
                 <div>
                   <h2 class="font-semibold text-base-content">Notifications</h2>
-                  <p class="text-sm text-base-content/60">Email and push preferences</p>
+                  <p class="text-sm text-base-content/70">Email and push preferences</p>
                 </div>
               </div>
               <div class="collapse-content px-4 sm:px-6">
@@ -155,14 +155,14 @@ defmodule LuaNoxWeb.UserLive.Settings do
                   <div class="flex items-center justify-between py-2">
                     <div>
                       <p class="text-sm font-medium text-base-content">Email Notifications</p>
-                      <p class="text-xs text-base-content/60">Receive updates about your packages</p>
+                      <p class="text-xs text-base-content/70">Receive updates about your packages</p>
                     </div>
                     <input type="checkbox" class="toggle toggle-primary" checked />
                   </div>
                   <div class="flex items-center justify-between py-2">
                     <div>
                       <p class="text-sm font-medium text-base-content">Package Updates</p>
-                      <p class="text-xs text-base-content/60">Get notified about new releases</p>
+                      <p class="text-xs text-base-content/70">Get notified about new releases</p>
                     </div>
                     <input type="checkbox" class="toggle toggle-primary" checked />
                   </div>
@@ -177,7 +177,7 @@ defmodule LuaNoxWeb.UserLive.Settings do
                 <.icon name={:settings} type={:outline} class="w-5 h-5 text-primary" />
                 <div>
                   <h2 class="font-semibold text-base-content">Advanced Settings</h2>
-                  <p class="text-sm text-base-content/60">Account management</p>
+                  <p class="text-sm text-base-content/70">Account management</p>
                 </div>
               </div>
               <div class="collapse-content px-4 sm:px-6">
@@ -188,7 +188,7 @@ defmodule LuaNoxWeb.UserLive.Settings do
                         <.icon name={:brand_github} type={:outline} class="w-5 h-5 text-success" />
                         <div>
                           <p class="text-sm font-medium text-base-content">GitHub Account</p>
-                          <p class="text-xs text-base-content/60">Authentication provider</p>
+                          <p class="text-xs text-base-content/70">Authentication provider</p>
                         </div>
                       </div>
                       <span class="badge badge-success badge-sm">Connected</span>

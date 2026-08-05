@@ -63,7 +63,7 @@ defmodule LuaNoxWeb.UserLive.Keys do
                 <.icon name={:check} type={:outline} class="w-5 h-5 text-success" />
                 <h2 class="text-lg font-semibold text-base-content">Your New API Key</h2>
               </div>
-              <div class="flex items-center gap-3 text-xs text-base-content/60">
+              <div class="flex items-center gap-3 text-xs text-base-content/70">
                 <div class="flex items-center gap-1">
                   <.icon name={:clock} type={:outline} class="w-3 h-3" />
                   <span phx-no-format>Expires in {if @ttl_weeks == 1, do: "1 week", else: "#{@ttl_weeks} weeks"}</span>
@@ -116,7 +116,7 @@ defmodule LuaNoxWeb.UserLive.Keys do
               >
                 <.icon name={:ban} type={:outline} class="w-4 h-4" /> Revoke API Key</button>
 
-              <p phx-no-format class="text-xs text-base-content/60">Enter a key to revoke its access immediately</p>
+              <p phx-no-format class="text-xs text-base-content/70">Enter a key to revoke its access immediately</p>
             </div>
           </div>
         </div>
@@ -166,7 +166,7 @@ defmodule LuaNoxWeb.UserLive.Keys do
                   {"4 weeks (maximum)", 4}
                 ]}
               />
-              <div class="flex items-center gap-1 text-xs text-base-content/60 mt-1">
+              <div class="flex items-center gap-1 text-xs text-base-content/70 mt-1">
                 <.icon name={:clock} type={:outline} class="w-3 h-3" />
                 Select how long this key should remain valid
               </div>

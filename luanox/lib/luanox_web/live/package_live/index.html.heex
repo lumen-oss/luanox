@@ -6,7 +6,7 @@
         <div class="mb-4 lg:mb-6">
           <.link
             navigate={~p"/"}
-            class="text-sm text-base-content/60 hover:text-primary transition-colors"
+            class="text-sm text-base-content/70 hover:text-primary transition-colors"
           >
             ← Back to home
           </.link>
@@ -61,7 +61,7 @@
             
 <!-- Results Info -->
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mt-4 pt-4 border-t border-base-300">
-              <div class="text-sm text-base-content/60">
+              <div class="text-sm text-base-content/70">
                 Showing {length(@packages)} of {@meta.total_count} packages
                 <%= if @params["search"] && @params["search"] != "" do %>
                   for "<span class="font-medium text-base-content">{@params["search"]}</span>"
@@ -118,7 +118,7 @@
               <h3 class="text-lg font-semibold text-base-content mb-2">
                 No packages found
               </h3>
-              <p class="text-base-content/60 mb-4">
+              <p class="text-base-content/70 mb-4">
                 We couldn't find any packages matching "{@params["search"]}". Try adjusting your search terms.
               </p>
               <.link navigate={~p"/packages"} class="btn btn-primary">
@@ -128,7 +128,7 @@
               <h3 class="text-lg font-semibold text-base-content mb-2">
                 No packages available
               </h3>
-              <p class="text-base-content/60">
+              <p class="text-base-content/70">
                 There are currently no packages available. Check back later!
               </p>
             <% end %>
