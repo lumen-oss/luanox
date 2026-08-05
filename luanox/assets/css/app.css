@@ -3,7 +3,7 @@
 @source "../js";
 @source "../../lib/luanox_web";
 
-.hero-accent {
+.hero-glow {
   background: linear-gradient(135deg,
       oklch(var(--color-base-100)) 0%,
       oklch(var(--color-primary) / 0.03) 50%,
@@ -82,12 +82,12 @@
   --color-base-200: oklch(0.25 0.027 284.66);
   --color-base-300: oklch(0.20 0.018 285.09);
   --color-base-content: oklch(88% 0.011 261.79);
-  --color-primary: oklch(0.72 0.1145 300.05);
+  --color-primary: oklch(0.70 0.115 258);
   --color-primary-content: oklch(0.29 0.029 284.46);
   --color-secondary: oklch(0.73 0.1552 317.44);
   --color-secondary-content: oklch(0.29 0.029 284.46);
-  --color-accent: oklch(43% 0.097 242.98);
-  --color-accent-content: oklch(88% 0.011 261.79);
+  --color-accent: oklch(0.72 0.1145 300.05);
+  --color-accent-content: oklch(0.29 0.029 284.46);
   --color-neutral: oklch(14% 0.005 285.823);
   --color-neutral-content: oklch(88% 0.011 261.79);
   --color-info: oklch(0.72 0.1285 260.2);
@@ -99,8 +99,7 @@
   --color-error: oklch(0.63 0.1557 31.79);
   --color-error-content: oklch(0.29 0.029 284.46);
   --color-grey: oklch(0.61 0.0355 265.98);
-  --color-dark-grey: oklch(0.58 0.0227 250.53);
-  --radius-selector: 0.5rem;
+    --radius-selector: 0.5rem;
   --radius-field: 0.25rem;
   --radius-box: 0.5rem;
   --size-selector: 0.25rem;
@@ -119,11 +118,11 @@
   --color-base-200: oklch(0.85 0.0193 285.98);
   --color-base-300: oklch(0.8 0.0266 285.78);
   --color-base-content: oklch(0.24 0.0056 285.98);
-  --color-primary: oklch(0.58 0.2689 298.34);
+  --color-primary: oklch(0.50 0.16 252);
   --color-primary-content: oklch(0.9 0.0135 286.12);
   --color-secondary: oklch(0.48 0.1979 343.02);
   --color-secondary-content: oklch(0.9 0.0135 286.12);
-  --color-accent: oklch(0.43 0.0974 242.98);
+  --color-accent: oklch(0.58 0.2689 298.34);
   --color-accent-content: oklch(0.9 0.0135 286.12);
   --color-neutral: oklch(14% 0.005 285.823);
   --color-neutral-content: oklch(0.8 0.0266 285.78);
@@ -136,8 +135,7 @@
   --color-error: oklch(0.49 0.187 27.67);
   --color-error-content: oklch(0.9 0.0135 286.12);
   --color-grey: oklch(0.64 0.0476 284.98);
-  --color-dark-grey: oklch(0.59 0.0563 284.53);
-  --radius-selector: 0.5rem;
+    --radius-selector: 0.5rem;
   --radius-field: 0.25rem;
   --radius-box: 0.5rem;
   --size-selector: 0.25rem;
@@ -149,7 +147,6 @@
 
 @theme {
   --color-grey: var(--color-grey);
-  --color-dark-grey: var(--color-dark-grey);
 }
 
 @custom-variant phx-click-loading ([".phx-click-loading&", ".phx-click-loading &"]);
