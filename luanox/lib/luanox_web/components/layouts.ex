@@ -92,61 +92,61 @@ defmodule LuaNoxWeb.Layouts do
   """
   def theme_toggle(assigns) do
     ~H"""
-    <div class="dropdown dropdown-end md:dropdown-center">
-      <div tabindex="0" role="button" class="btn btn-ghost btn-square" aria-label="Theme">
+    <details id="theme-dropdown" class="dropdown dropdown-end md:dropdown-center">
+      <summary class="btn btn-ghost btn-square list-none" aria-label="Theme">
         <span class="relative inline-flex size-5">
           <.icon
             name={:device_desktop_cog}
             type={:outline}
-            class="size-5 [[data-theme]_&]:hidden"
+            class="size-5 in-data-theme:hidden"
           />
           <.icon
             name={:sun}
             type={:outline}
-            class="size-5 hidden [[data-theme=light]_&]:inline"
+            class="size-5 hidden in-data-[theme=light]:inline"
           />
           <.icon
             name={:moon_stars}
             type={:outline}
-            class="size-5 hidden [[data-theme=dark]_&]:inline"
+            class="size-5 hidden in-data-[theme=dark]:inline"
           />
         </span>
-      </div>
-      <ul tabindex="0" class="dropdown-content menu bg-base-200 border border-base-300 rounded-box z-50 shadow-2xl mt-2 p-2 w-48 text-sm">
+      </summary>
+      <ul class="dropdown-content menu bg-base-200 border border-base-300 rounded-box z-50 shadow-2xl mt-2 p-2 w-48 text-sm">
         <li>
           <button
-            phx-click={JS.dispatch("phx:set-theme", detail: %{theme: "system"})}
+            phx-click={JS.dispatch("phx:set-theme", detail: %{theme: "system"}) |> JS.remove_attribute("open", to: "#theme-dropdown")}
             aria-label="System"
           >
             <span class="relative inline-flex size-5">
               <.icon name={:device_desktop_cog} type={:outline} class="size-4" />
             </span>
             System
-            <.icon name={:check} type={:outline} class="ml-auto size-4 [[data-theme]_&]:hidden" />
+            <.icon name={:check} type={:outline} class="ml-auto size-4 in-data-theme:hidden" />
           </button>
         </li>
         <li>
           <button
-            phx-click={JS.dispatch("phx:set-theme", detail: %{theme: "light"})}
+            phx-click={JS.dispatch("phx:set-theme", detail: %{theme: "light"}) |> JS.remove_attribute("open", to: "#theme-dropdown")}
             aria-label="Light"
           >
             <.icon name={:sun} type={:outline} class="size-4" />
             Light
-            <.icon name={:check} type={:outline} class="ml-auto size-4 hidden [[data-theme=light]_&]:inline" />
+            <.icon name={:check} type={:outline} class="ml-auto size-4 hidden in-data-[theme=light]:inline" />
           </button>
         </li>
         <li>
           <button
-            phx-click={JS.dispatch("phx:set-theme", detail: %{theme: "dark"})}
+            phx-click={JS.dispatch("phx:set-theme", detail: %{theme: "dark"}) |> JS.remove_attribute("open", to: "#theme-dropdown")}
             aria-label="Dark"
           >
             <.icon name={:moon_stars} type={:outline} class="size-4" />
             Dark
-            <.icon name={:check} type={:outline} class="ml-auto size-4 hidden [[data-theme=dark]_&]:inline" />
+            <.icon name={:check} type={:outline} class="ml-auto size-4 hidden in-data-[theme=dark]:inline" />
           </button>
         </li>
       </ul>
-    </div>
+    </details>
     """
   end
 end
