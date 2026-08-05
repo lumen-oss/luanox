@@ -83,7 +83,7 @@ defmodule LuaNoxWeb.UserLive.ProvideEmail do
                 autocomplete="email"
                 class="input min-w-full"
               />
-              <p class="text-sm text-base-content/60">
+              <p class="text-sm text-base-content/70">
                 This email will be used for account notifications and recovery.
               </p>
 
