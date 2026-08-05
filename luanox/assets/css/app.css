@@ -294,7 +294,4 @@
   }
 }
 
-.btn-primary:hover {
-  transform: scale(1.05);
-  box-shadow: 0 10px 25px oklch(var(--color-primary) / 0.4);
-}
+
