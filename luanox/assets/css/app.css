@@ -3,6 +3,8 @@
 @source "../js";
 @source "../../lib/luanox_web";
 
+@plugin "@tailwindcss/typography";
+
 .hero-glow {
   background: linear-gradient(135deg,
       oklch(var(--color-base-100)) 0%,
