@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@tailwindcss/typography": "^0.5.20",
     "typed.js": "^2.1.0"
   }
 }
