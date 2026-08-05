@@ -27,7 +27,11 @@ defmodule LuaNoxWeb.NavBar do
       <div class="flex items-center space-x-2 md:space-x-6">
         <LuaNoxWeb.Layouts.theme_toggle />
         <button
+          id="mobile-menu-toggle"
           class="md:hidden btn btn-ghost rounded-field text-grey hover:text-base-content p-2 min-h-[44px] min-w-[44px]"
+          aria-expanded="false"
+          aria-controls="mobile-menu"
+          aria-label="Menu"
           phx-click={toggle_mobile_menu()}
         >
           <.icon id="menu-icon" name={:menu_deep} type={:outline} class="size-6" />
@@ -128,6 +132,10 @@ defmodule LuaNoxWeb.NavBar do
     <div
       id="mobile-menu"
       class="hidden absolute top-full left-0 right-0 bg-base-200 rounded-b-lg shadow-xl border-t border-base-content/10 z-50 opacity-0 scale-95"
+      role="navigation"
+      aria-label="Mobile navigation"
+      phx-window-keydown={close_mobile_menu()}
+      phx-key="Escape"
     >
       <div class="px-4 py-3">
         <ul class="menu menu-vertical w-full space-y-1">
@@ -186,6 +194,7 @@ defmodule LuaNoxWeb.NavBar do
     |> JS.toggle_class("hidden", to: "#menu-icon")
     |> JS.toggle_class("hidden", to: "#close-icon")
     |> JS.toggle_class("overflow-hidden", to: "body")
+    |> JS.toggle_attribute({"aria-expanded", "true", "false"})
   end
 
   defp close_mobile_menu do
@@ -200,5 +209,6 @@ defmodule LuaNoxWeb.NavBar do
     |> JS.remove_class("hidden", to: "#menu-icon")
     |> JS.add_class("hidden", to: "#close-icon")
     |> JS.remove_class("overflow-hidden", to: "body")
+    |> JS.set_attribute({"aria-expanded", "false"}, to: "#mobile-menu-toggle")
   end
 end
