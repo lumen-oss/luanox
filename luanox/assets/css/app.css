@@ -5,6 +5,16 @@
 
 @plugin "@tailwindcss/typography";
 
+.prose a {
+  color: oklch(var(--color-primary));
+  text-decoration-color: oklch(var(--color-primary) / 0.3);
+}
+
+.prose a:hover {
+  color: oklch(var(--color-primary) / 0.85);
+  text-decoration-color: oklch(var(--color-primary) / 0.5);
+}
+
 .hero-glow {
   background: linear-gradient(135deg,
       oklch(var(--color-base-100)) 0%,
