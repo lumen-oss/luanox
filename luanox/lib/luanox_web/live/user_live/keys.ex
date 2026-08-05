@@ -40,7 +40,7 @@ defmodule LuaNoxWeb.UserLive.Keys do
 
       <div class="max-w-4xl mx-auto px-4 lg:px-8 py-6 lg:py-8">
         <div class="space-y-6">
-          <div class="bg-base-200 border border-base-300 p-6 shadow-sm">
+          <div class="bg-base-200 border border-base-300 p-6">
             <div class="flex items-center gap-3 mb-4">
               <.icon name={:info_circle} type={:outline} class="w-5 h-5 text-primary" />
               <h2 class="text-lg font-semibold text-base-content">About API Keys</h2>
@@ -80,7 +80,7 @@ defmodule LuaNoxWeb.UserLive.Keys do
                 <code
                   phx-no-format
                   id="generated-key"
-                  class="flex-1 text-sm font-mono px-3 py-2 rounded border border-success/20 break-all"
+                  class="flex-1 text-sm font-mono px-3 py-2 rounded bg-base-100 border border-success/20 break-all"
                 >{@generated_key}</code>
                 <button
                   class="btn btn-neutral btn-sm gap-2"
@@ -98,7 +98,7 @@ defmodule LuaNoxWeb.UserLive.Keys do
             </div>
           </div>
 
-          <div class="bg-base-200 border border-base-300 p-6 shadow-sm">
+          <div class="bg-base-200 border border-base-300 p-6">
             <div class="flex items-center gap-3 mb-4">
               <.icon name={:adjustments} type={:outline} class="w-5 h-5 text-secondary" />
               <h2 class="text-lg font-semibold text-base-content">Key Management</h2>
