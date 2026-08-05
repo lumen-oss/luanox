@@ -92,97 +92,58 @@ defmodule LuaNoxWeb.Layouts do
   """
   def theme_toggle(assigns) do
     ~H"""
-    <div class="hidden md:flex relative items-center bg-gradient-to-r from-base-200/80 to-base-300/80 backdrop-blur-sm border border-base-content/20">
-      <div class="absolute w-[33.33%] h-full bg-gradient-to-r from-primary/20 to-primary/30 border border-primary/30 left-0 [[data-theme=light]_&]:left-[33.33%] [[data-theme=dark]_&]:left-[66.67%] transition-all duration-300 ease-out" />
-
-      <button
-        phx-click={JS.dispatch("phx:set-theme", detail: %{theme: "system"})}
-        class="relative z-10 px-3 py-2 transition-all duration-200 hover:bg-base-content/10 group"
-      >
-        <.icon
-          name={:device_desktop_cog}
-          type={:outline}
-          class="size-4 opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-200"
-        />
-      </button>
-
-      <button
-        phx-click={JS.dispatch("phx:set-theme", detail: %{theme: "light"})}
-        class="relative z-10 px-3 py-2 transition-all duration-200 hover:bg-base-content/10 group"
-      >
-        <.icon
-          name={:sun}
-          type={:outline}
-          class="size-4 opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-200"
-        />
-      </button>
-
-      <button
-        phx-click={JS.dispatch("phx:set-theme", detail: %{theme: "dark"})}
-        class="relative z-10 px-3 py-2 transition-all duration-200 hover:bg-base-content/10 group"
-      >
-        <.icon
-          name={:moon_stars}
-          type={:outline}
-          class="size-4 opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-200"
-        />
-      </button>
-    </div>
-
-    <div class="md:hidden dropdown dropdown-center">
-      <div tabindex="0" role="button" class="btn btn-ghost">
-        <.icon
-          id="drop-system"
-          name={:device_mobile_cog}
-          type={:outline}
-          class="size-5 [[data-theme=light]_&]:hidden [[data-theme=dark]_&]:hidden"
-        />
-        <.icon
-          id="drop-light"
-          name={:sun}
-          type={:outline}
-          class="hidden [[data-theme=light]_&]:inline size-5"
-        />
-        <.icon
-          id="drop-dark"
-          name={:moon_stars}
-          type={:outline}
-          class="hidden [[data-theme=dark]_&]:inline size-5"
-        />
+    <div class="dropdown dropdown-end md:dropdown-center">
+      <div tabindex="0" role="button" class="btn btn-ghost btn-square" aria-label="Theme">
+        <span class="relative inline-flex size-5">
+          <.icon
+            name={:device_desktop_cog}
+            type={:outline}
+            class="size-5 [[data-theme]_&]:hidden"
+          />
+          <.icon
+            name={:sun}
+            type={:outline}
+            class="size-5 hidden [[data-theme=light]_&]:inline"
+          />
+          <.icon
+            name={:moon_stars}
+            type={:outline}
+            class="size-5 hidden [[data-theme=dark]_&]:inline"
+          />
+        </span>
       </div>
-      <ul
-        tabindex="0"
-        class="dropdown-content bg-base-200 rounded-box z-1 w-30 p-2 text-md shadow-2xl"
-      >
+      <ul tabindex="0" class="dropdown-content menu bg-base-200 border border-base-300 rounded-box z-50 shadow-2xl mt-2 p-2 w-48 text-sm">
         <li>
-          <input
-            type="radio"
-            name="theme-dropdown"
-            class="theme-controller w-full btn btn-sm btn-block btn-ghost justify-start hover:bg-info"
-            aria-label="System"
-            value="system"
+          <button
             phx-click={JS.dispatch("phx:set-theme", detail: %{theme: "system"})}
-          />
+            aria-label="System"
+          >
+            <span class="relative inline-flex size-5">
+              <.icon name={:device_desktop_cog} type={:outline} class="size-4" />
+            </span>
+            System
+            <.icon name={:check} type={:outline} class="ml-auto size-4 [[data-theme]_&]:hidden" />
+          </button>
         </li>
         <li>
-          <input
-            type="radio"
-            name="theme-dropdown"
-            class="theme-controller w-full btn btn-sm btn-block btn-ghost justify-start hover:bg-info"
-            aria-label="Dark"
-            value="dark"
-            phx-click={JS.dispatch("phx:set-theme", detail: %{theme: "dark"})}
-          />
-        </li>
-        <li>
-          <input
-            type="radio"
-            name="theme-dropdown"
-            class="theme-controller w-full btn btn-sm btn-block btn-ghost justify-start hover:bg-info"
-            aria-label="Light"
-            value="light"
+          <button
             phx-click={JS.dispatch("phx:set-theme", detail: %{theme: "light"})}
-          />
+            aria-label="Light"
+          >
+            <.icon name={:sun} type={:outline} class="size-4" />
+            Light
+            <.icon name={:check} type={:outline} class="ml-auto size-4 hidden [[data-theme=light]_&]:inline" />
+          </button>
+        </li>
+        <li>
+          <button
+            phx-click={JS.dispatch("phx:set-theme", detail: %{theme: "dark"})}
+            aria-label="Dark"
+          >
+            <.icon name={:moon_stars} type={:outline} class="size-4" />
+            Dark
+            <.icon name={:check} type={:outline} class="ml-auto size-4 hidden [[data-theme=dark]_&]:inline" />
+          </button>
         </li>
       </ul>
     </div>
