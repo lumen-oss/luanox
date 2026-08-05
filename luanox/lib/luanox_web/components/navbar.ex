@@ -48,7 +48,7 @@ defmodule LuaNoxWeb.NavBar do
         <div
           tabindex="0"
           role="button"
-          class="btn btn-ghost btn-block justify-start text-grey hover:text-info rounded-field max-sm:px-1"
+          class="btn btn-ghost btn-block justify-start text-grey hover:text-primary rounded-field max-sm:px-1"
         >
           <.icon name={:user_circle} type={:outline} />
           <span class="mt-px">
@@ -57,7 +57,7 @@ defmodule LuaNoxWeb.NavBar do
         </div>
       <% else %>
         <.link
-          class="btn btn-ghost btn-block justify-start text-grey hover:text-info rounded-field max-sm:px-1"
+          class="btn btn-ghost btn-block justify-start text-grey hover:text-primary rounded-field max-sm:px-1"
           navigate={~p"/login"}
         >
           <.icon name={:user_circle} type={:outline} />
@@ -92,7 +92,7 @@ defmodule LuaNoxWeb.NavBar do
       <ul class="menu menu-horizontal px-1 space-x-2">
         <li>
           <.link
-            class="btn btn-ghost text-grey hover:text-info"
+            class="btn btn-ghost text-grey hover:text-primary"
             href="https://lumen-oss.github.io"
           >
             <.icon name={:book_2} type={:outline} />
@@ -101,7 +101,7 @@ defmodule LuaNoxWeb.NavBar do
         </li>
         <li>
           <.link
-            class="btn btn-ghost text-grey hover:text-info"
+            class="btn btn-ghost text-grey hover:text-primary"
             navigate={~p"/donate"}
           >
             <.icon name={:heart} type={:outline} />
@@ -110,7 +110,7 @@ defmodule LuaNoxWeb.NavBar do
         </li>
         <li>
           <.link
-            class="btn btn-ghost text-grey hover:text-info"
+            class="btn btn-ghost text-grey hover:text-primary"
             href="https://github.com/lumen-oss/luanox"
           >
             <.icon name={:brand_github} type={:outline} />
@@ -133,7 +133,7 @@ defmodule LuaNoxWeb.NavBar do
         <ul class="menu menu-vertical w-full space-y-1">
           <li>
             <.link
-              class="btn btn-ghost justify-start text-grey hover:text-info w-full min-h-[48px] px-4"
+              class="btn btn-ghost justify-start text-grey hover:text-primary w-full min-h-[48px] px-4"
               href="https://lumen-oss.github.io"
               phx-click={close_mobile_menu()}
             >
@@ -143,7 +143,7 @@ defmodule LuaNoxWeb.NavBar do
           </li>
           <li>
             <.link
-              class="btn btn-ghost justify-start text-grey hover:text-info w-full min-h-[48px] px-4"
+              class="btn btn-ghost justify-start text-grey hover:text-primary w-full min-h-[48px] px-4"
               navigate={~p"/donate"}
               phx-click={close_mobile_menu()}
             >
@@ -153,7 +153,7 @@ defmodule LuaNoxWeb.NavBar do
           </li>
           <li>
             <.link
-              class="btn btn-ghost justify-start text-grey hover:text-info w-full min-h-[48px] px-4"
+              class="btn btn-ghost justify-start text-grey hover:text-primary w-full min-h-[48px] px-4"
               href="https://github.com/lumen-oss/luanox"
               phx-click={close_mobile_menu()}
             >
