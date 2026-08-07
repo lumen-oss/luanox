@@ -51,6 +51,28 @@ defmodule LuaNox.Packages do
   end
 
   @doc """
+  Returns the most popular packages ordered by total downloads.
+
+  ## Examples
+
+      iex> list_featured()
+      [%Package{}, ...]
+
+      iex> list_featured(8)
+      [%Package{}, ...]
+  """
+  def list_featured(limit \\ 4) do
+    Package
+    |> join(:left, [p], r in LuaNox.Packages.Release, on: r.package_id == p.id)
+    |> group_by([p], p.id)
+    |> order_by([p, r], desc: fragment("COALESCE(SUM(?), 0)", r.download_count))
+    |> limit(^limit)
+    |> preload(:releases)
+    |> Repo.all()
+    |> Enum.map(&sort_releases/1)
+  end
+
+  @doc """
   Returns the list of packages with a given search query.
   Results are cached for 5 minutes to avoid repeated expensive queries.
   """
