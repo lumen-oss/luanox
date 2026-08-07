@@ -3,7 +3,7 @@ defmodule LuaNoxWeb.PackageBox do
 
   attr :name, :string, required: true
   attr :description, :string, default: ""
-  attr :version, :string, default: "0.1.0"
+  attr :version, :string
   attr :download_count, :integer, default: 0
 
   def package(assigns) do
@@ -16,7 +16,7 @@ defmodule LuaNoxWeb.PackageBox do
               {@name}
             </h2>
             <div class="bg-primary/10 text-primary border border-primary/20 px-2 py-1 text-xs font-mono">
-              v{to_string(@version)}
+              {if @version, do: "v" <> @version, else: "—"}
             </div>
           </div>
 
@@ -37,6 +37,12 @@ defmodule LuaNoxWeb.PackageBox do
       </div>
     </.link>
     """
+  end
+
+  defp latest_version([]), do: nil
+
+  defp latest_version(releases) do
+    releases |> List.last() |> Map.get(:version)
   end
 
   attr :packages, :map, required: true
@@ -63,7 +69,7 @@ defmodule LuaNoxWeb.PackageBox do
             <%= for %{name: name, summary: summary, releases: releases} <- @featured do %>
                <.package
                 name={name}
-                version={(List.last(releases) || %{version: "0.1.0"}) |> Map.get(:version)}
+                version={latest_version(releases)}
                 download_count={Enum.sum(for r <- releases, do: r.download_count)}
                 description={summary || ""}
               />
@@ -88,7 +94,7 @@ defmodule LuaNoxWeb.PackageBox do
             <%= for %{name: name, summary: summary, releases: releases} <- Enum.take(@packages, 4) do %>
               <.package
                 name={name}
-                version={(List.last(releases) || %{version: "0.1.0"}) |> Map.get(:version)}
+                version={latest_version(releases)}
                 download_count={Enum.sum(for r <- releases, do: r.download_count)}
                 description={summary || ""}
               />

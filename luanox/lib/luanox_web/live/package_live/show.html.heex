@@ -25,10 +25,7 @@
             <div class="text-center sm:text-left">
               <div class="text-sm text-base-content/70 mb-1">Latest Release</div>
               <div class="font-mono font-semibold text-primary text-lg">
-                v{to_string(
-                  (List.last(@package.releases) || %{version: "0.1.0"})
-                  |> Map.get(:version)
-                )}
+                {latest_version(@package.releases)}
               </div>
               <div class="text-xs text-base-content/70 mt-1">
                 {format_date(
