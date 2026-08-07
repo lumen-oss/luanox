@@ -51,7 +51,7 @@ defmodule LuaNoxWeb.UserLive.Settings do
               <div class="border-t border-base-300 pt-4 space-y-3">
                 <div class="flex justify-between items-center">
                   <span class="text-sm text-base-content/70">Member since</span>
-                  <span class="text-sm font-medium">August 2025</span>
+                  <span class="text-sm font-medium">{member_since_date(@current_scope.user.inserted_at)}</span>
                 </div>
                 <div class="flex justify-between items-center">
                   <span class="text-sm text-base-content/70">Auth provider</span>
@@ -235,4 +235,8 @@ defmodule LuaNoxWeb.UserLive.Settings do
     </Layouts.app>
     """
   end
+
+  defp member_since_date(%DateTime{} = date), do: Calendar.strftime(date, "%B %Y")
+  defp member_since_date(%NaiveDateTime{} = date), do: Calendar.strftime(date, "%B %Y")
+  defp member_since_date(_), do: "Unknown"
 end
