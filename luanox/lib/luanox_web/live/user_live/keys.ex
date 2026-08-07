@@ -230,7 +230,7 @@ defmodule LuaNoxWeb.UserLive.Keys do
      socket
      |> assign(:generated_key, nil)
      |> assign(:read_only, false)
-     |> assign(:ttl_weeks, 4)}
+     |> assign(:ttl_weeks, Application.get_env(:luanox, :key_ttl_weeks_default, 4))}
   end
 
   def handle_event("generate_key", %{"read_only" => read_only, "ttl_weeks" => ttl_weeks}, socket) do
@@ -241,7 +241,7 @@ defmodule LuaNoxWeb.UserLive.Keys do
     read_only = read_only == "true"
     ttl_weeks = String.to_integer(ttl_weeks)
     # Ensure TTL is within allowed range (1-4 weeks)
-    ttl_weeks = max(1, min(4, ttl_weeks))
+    ttl_weeks = max(1, min(Application.get_env(:luanox, :key_ttl_weeks_max, 4), ttl_weeks))
 
     # Never allow unbounded TTL as it will not only be a security risk but also
     # cause us to have to store a potentially infinite amount of revoked tokens in our database.
