@@ -40,6 +40,7 @@ defmodule LuaNoxWeb.PackageBox do
   end
 
   attr :packages, :map, required: true
+  attr :featured, :map, default: []
 
   def packages(assigns) do
     ~H"""
@@ -59,8 +60,8 @@ defmodule LuaNoxWeb.PackageBox do
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            <%= for %{name: name, summary: summary, releases: releases} <- Enum.take(@packages, 4) do %>
-              <.package
+            <%= for %{name: name, summary: summary, releases: releases} <- @featured do %>
+               <.package
                 name={name}
                 version={(List.last(releases) || %{version: "0.1.0"}) |> Map.get(:version)}
                 download_count={Enum.sum(for r <- releases, do: r.download_count)}
