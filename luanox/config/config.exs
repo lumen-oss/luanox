@@ -23,7 +23,9 @@ config :luanox, :scopes,
 config :luanox,
   namespace: LuaNox,
   ecto_repos: [LuaNox.Repo],
-  generators: [timestamp_type: :utc_datetime]
+  generators: [timestamp_type: :utc_datetime],
+  key_ttl_weeks_default: 4,
+  key_ttl_weeks_max: 4
 
 # Configures the endpoint
 config :luanox, LuaNoxWeb.Endpoint,
