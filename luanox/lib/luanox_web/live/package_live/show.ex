@@ -30,4 +30,9 @@ defmodule LuaNoxWeb.PackageLive.Show do
       _ -> "Unknown"
     end
   end
+
+defp latest_version([]), do: "-"
+  defp latest_version(releases) do
+    "v" <> (releases |> List.last() |> Map.get(:version))
+  end
 end
