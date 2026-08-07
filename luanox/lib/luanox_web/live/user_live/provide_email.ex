@@ -52,7 +52,7 @@ defmodule LuaNoxWeb.UserLive.ProvideEmail do
           </div>
 
           <%!-- Provider indicator --%>
-          <div class="flex items-center justify-center space-x-4 py-6 px-6 bg-base-100 border border-base-300">
+          <div class="flex items-center justify-center space-x-4 py-6 px-6 bg-base-100 border border-base-300 rounded-box">
             <%= if @oauth_data.provider == :github do %>
               <.icon name={:brand_github} type={:filled} class="size-5 text-base-content" />
             <% else %>
@@ -64,7 +64,7 @@ defmodule LuaNoxWeb.UserLive.ProvideEmail do
             <.icon name={:check} type={:outline} class="size-5 text-success" />
           </div>
 
-          <div class="bg-base-100 border border-base-300 p-8">
+          <div class="bg-base-100 border border-base-300 rounded-box p-8">
             <.form
               for={@form}
               id="email_form"

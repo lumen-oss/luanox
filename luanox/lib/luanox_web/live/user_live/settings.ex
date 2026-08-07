@@ -31,7 +31,7 @@ defmodule LuaNoxWeb.UserLive.Settings do
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <%!-- Profile Card --%>
           <div class="lg:col-span-1">
-            <div class="bg-base-200 border border-base-300 p-6 sticky top-6">
+            <div class="bg-base-200 border border-base-300 rounded-box p-6 sticky top-6">
               <div class="text-center">
                 <div class="avatar avatar-placeholder mb-4">
                   <div class="w-20 bg-primary/10 border-2 border-primary/20 rounded-full">
@@ -68,7 +68,7 @@ defmodule LuaNoxWeb.UserLive.Settings do
           <%!-- Settings Sections --%>
           <div class="lg:col-span-2 space-y-4">
             <%!-- Account Section --%>
-            <div class="collapse collapse-arrow bg-base-200 border border-base-300 !rounded-none">
+            <div class="collapse collapse-arrow bg-base-200 border border-base-300">
               <input type="checkbox" checked />
               <div class="collapse-title flex items-center gap-3 px-4 sm:px-6">
                 <.icon name={:user_circle} type={:outline} class="w-5 h-5 text-primary" />
@@ -141,7 +141,7 @@ defmodule LuaNoxWeb.UserLive.Settings do
             </div>
 
             <%!-- Notifications Section --%>
-            <div class="collapse collapse-arrow bg-base-200 border border-base-300 !rounded-none">
+            <div class="collapse collapse-arrow bg-base-200 border border-base-300">
               <input type="checkbox" />
               <div class="collapse-title flex items-center gap-3 px-4 sm:px-6">
                 <.icon name={:bell} type={:outline} class="w-5 h-5 text-primary" />
@@ -171,7 +171,7 @@ defmodule LuaNoxWeb.UserLive.Settings do
             </div>
 
             <%!-- Advanced Section --%>
-            <div class="collapse collapse-arrow bg-base-200 border border-base-300 !rounded-none">
+            <div class="collapse collapse-arrow bg-base-200 border border-base-300">
               <input type="checkbox" />
               <div class="collapse-title flex items-center gap-3 px-4 sm:px-6">
                 <.icon name={:settings} type={:outline} class="w-5 h-5 text-primary" />
@@ -182,7 +182,7 @@ defmodule LuaNoxWeb.UserLive.Settings do
               </div>
               <div class="collapse-content px-4 sm:px-6">
                 <div class="space-y-6 pt-2">
-                  <div class="bg-base-100 border border-base-300 rounded-sm p-4 sm:p-6 space-y-4">
+                  <div class="bg-base-100 border border-base-300 rounded-md p-4 sm:p-6 space-y-4">
                     <div class="flex items-center justify-between gap-3">
                       <div class="flex items-center gap-3">
                         <.icon name={:brand_github} type={:outline} class="w-5 h-5 text-success" />
