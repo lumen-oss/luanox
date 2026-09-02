@@ -86,7 +86,7 @@
                   </div>
                   <div class="flex items-center justify-between sm:justify-end gap-3 sm:gap-4">
                     <span class="text-sm text-base-content/70">
-                      {release.download_count} downloads
+                      {format_count(release.download_count)} downloads
                     </span>
                     <.link
                       href={~p"/api/download/#{@package.name}/#{to_string(release.version)}"}
@@ -116,7 +116,7 @@
               <div class="flex justify-between items-center">
                 <span class="text-sm lg:text-base text-base-content/70">Total Downloads</span>
                 <span class="font-semibold text-base lg:text-lg text-base-content">
-                  {Enum.sum(for r <- @package.releases, do: r.download_count)}
+                  {format_count(Enum.sum(for r <- @package.releases, do: r.download_count))}
                 </span>
               </div>
               <div class="flex justify-between items-center">
