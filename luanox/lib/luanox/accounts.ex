@@ -92,6 +92,17 @@ defmodule LuaNox.Accounts do
     |> Repo.insert()
   end
 
+## Settings
+
+  @doc """
+  Updates the user's avatar URL, e.g. from a fresh OAuth login.
+  """
+  def update_user_avatar(%User{} = user, avatar_url) when is_binary(avatar_url) do
+    user
+    |> Ecto.Changeset.change(%{avatar_url: avatar_url})
+    |> Repo.update()
+  end
+
   ## Settings
 
   @doc """

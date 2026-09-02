@@ -141,10 +141,17 @@
             </h3>
             <div class="space-y-3 lg:space-y-4">
               <div class="flex items-start gap-3">
-                <!-- Simple avatar placeholder -->
+                <%= if @package.user.avatar_url do %>
+                <img
+                  src={@package.user.avatar_url}
+                  alt=""
+                  class="w-10 h-10 lg:w-12 lg:h-12 rounded-full border border-base-300"
+                />
+              <% else %>
                 <div class="w-10 h-10 lg:w-12 lg:h-12 bg-primary/10 border rounded-full border-primary/20 flex items-center justify-center">
                   <.icon name={:user} type={:outline} class="w-5 h-5 lg:w-6 lg:h-6 text-primary" />
                 </div>
+              <% end %>
                 <div class="flex-1 min-w-0">
                   <div class="font-semibold text-sm lg:text-base text-base-content">
                     {@package.user.aka || @package.user.username}

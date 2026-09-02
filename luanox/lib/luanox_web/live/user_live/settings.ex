@@ -33,13 +33,21 @@ defmodule LuaNoxWeb.UserLive.Settings do
           <div class="lg:col-span-1">
             <div class="bg-base-200 border border-base-300 rounded-box p-6 sticky top-6">
               <div class="text-center">
-                <div class="avatar avatar-placeholder mb-4">
-                  <div class="w-20 bg-primary/10 border-2 border-primary/20 rounded-full">
-                    <span class="text-3xl font-bold text-primary">
-                      {String.first(@current_scope.user.username)}
-                    </span>
+                <%= if @current_scope.user.avatar_url do %>
+                  <div class="avatar mb-4">
+                    <div class="w-20 rounded-full">
+                      <img src={@current_scope.user.avatar_url} alt="" />
+                    </div>
                   </div>
-                </div>
+                <% else %>
+                  <div class="avatar avatar-placeholder mb-4">
+                    <div class="w-20 bg-primary/10 border-2 border-primary/20 rounded-full">
+                      <span class="text-3xl font-bold text-primary">
+                        {String.first(@current_scope.user.username)}
+                      </span>
+                    </div>
+                  </div>
+                <% end %>
                 <h3 class="text-lg font-semibold text-base-content mb-1">
                   {@current_scope.user.username}
                 </h3>
@@ -196,9 +204,9 @@ defmodule LuaNoxWeb.UserLive.Settings do
                   </div>
                   <div class="divider"></div>
                   <div class="flex flex-col sm:flex-row justify-end gap-2">
-                    <button class="btn btn-neutral">
+                    <.link href={~p"/auth/github"} class="btn btn-neutral">
                       <.icon name={:refresh} type={:outline} class="w-4 h-4" /> Sync Profile
-                    </button>
+                    </.link>
                     <button
                       class="btn btn-error"
                       onclick="disable_account_modal.showModal()"

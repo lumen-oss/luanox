@@ -12,6 +12,7 @@ defmodule LuaNox.Accounts.User do
     field :provider, :string
     field :username, :string
     field :aka, :string
+    field :avatar_url, :string
 
     timestamps(type: :utc_datetime)
   end
@@ -23,12 +24,13 @@ defmodule LuaNox.Accounts.User do
       provider: to_string(auth.provider),
       # TODO: Github does this for some reason. We must test if gitlab does this too
       username: auth.info.nickname,
-      aka: auth.info.name
+      aka: auth.info.name,
+      avatar_url: auth.info.image
     }
 
     user
     |> email_changeset(%{email: auth.info.email})
-    |> cast(attrs, [:provider, :username, :aka])
+    |> cast(attrs, [:provider, :username, :aka, :avatar_url])
     |> validate_required([:username])
     |> unique_constraint([:provider, :username])
     |> validate_provider()
