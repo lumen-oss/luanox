@@ -54,7 +54,11 @@ defmodule LuaNoxWeb.NavBar do
           role="button"
           class="btn btn-ghost btn-block justify-start text-grey hover:text-primary rounded-field max-sm:px-1"
         >
-          <.icon name={:user_circle} type={:outline} />
+          <%= if @current_scope.user.avatar_url do %>
+            <img src={@current_scope.user.avatar_url} alt="" class="w-6 h-6 rounded-full" />
+          <% else %>
+            <.icon name={:user_circle} type={:outline} />
+          <% end %>
           <span class="mt-px">
             {User.unique_username(@current_scope.user) |> String.slice(0..20)}
           </span>

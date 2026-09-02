@@ -112,4 +112,30 @@ defmodule LuaNox.AccountsTest do
       refute Accounts.get_user_by_session_token(token)
     end
   end
+
+  describe "register_user/1" do
+    test "stores the oauth avatar URL" do
+      auth = %Ueberauth.Auth{
+        provider: "github",
+        info: %Ueberauth.Auth.Info{
+          nickname: "ntb",
+          name: "NTBBloodbath",
+          email: unique_user_email(),
+          image: "https://avatars.githubusercontent.com/u/123456"
+        }
+      }
+
+      assert {:ok, %User{avatar_url: url}} = Accounts.register_user(auth)
+      assert url == "https://avatars.githubusercontent.com/u/123456"
+    end
+  end
+
+  describe "update_user_avatar/2" do
+    test "updates the avatar URL" do
+      user = user_fixture()
+
+      assert {:ok, %User{avatar_url: "https://example.com/new.png"}} =
+               Accounts.update_user_avatar(user, "https://example.com/new.png")
+    end
+  end
 end

@@ -14,6 +14,8 @@ defmodule LuaNoxWeb.UserOauth do
   def callback(%{assigns: %{ueberauth_auth: %Ueberauth.Auth{} = auth}} = conn, _params) do
     case LuaNox.Accounts.get_user_by_auth(auth) do
       %LuaNox.Accounts.User{} = user ->
+        user = refresh_avatar(user, auth.info.image)
+
         conn
         |> LuaNoxWeb.UserAuth.log_in_user(user)
 
@@ -23,7 +25,8 @@ defmodule LuaNoxWeb.UserOauth do
           info: %{
             nickname: auth.info.nickname,
             name: auth.info.name,
-            email: auth.info.email
+            email: auth.info.email,
+            image: auth.info.image
           }
         }
 
@@ -67,7 +70,8 @@ defmodule LuaNoxWeb.UserOauth do
         info: %Ueberauth.Auth.Info{
           nickname: auth.info.nickname,
           name: auth.info.name,
-          email: email
+          email: email,
+          image: auth.info.image
         }
       }
 
@@ -90,4 +94,13 @@ defmodule LuaNoxWeb.UserOauth do
     |> put_flash(:error, "Missing required parameters. Please try authenticating again.")
     |> redirect(to: ~p"/login")
   end
+
+  defp refresh_avatar(user, image) when is_binary(image) do
+    case LuaNox.Accounts.update_user_avatar(user, image) do
+      {:ok, user} -> user
+      {:error, _changeset} -> user
+    end
+  end
+
+  defp refresh_avatar(user, _image), do: user
 end
