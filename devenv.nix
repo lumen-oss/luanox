@@ -20,17 +20,18 @@ in
 
     languages.nix.enable = true;
 
-    packages = with pkgs; [
-      yarn          # Bundled JS dependencies
-      alejandra     # Nix formatter
-      tailwindcss_4 # We cannot use the bundled TailwindCSS CLI from Phoenix on NixOS
-      inotify-tools # Required for file watching on Phoenix
-      watchman      # Required for file watching on TailwindCSS CLI
+    packages = [
+      pkgs.yarn          # Bundled JS dependencies
+      pkgs.alejandra     # Nix formatter
+      pkgs.tailwindcss_4 # We cannot use the bundled TailwindCSS CLI from Phoenix on NixOS
+      pkgs.inotify-tools # Required for file watching on Phoenix
+      pkgs.watchman      # Required for file watching on TailwindCSS CLI
     ];
 
     # https://devenv.sh/services/
     services.postgres = {
         enable = true;
+        package = pkgs.postgresql_17;
         initialDatabases = [
           {
             name = "luanox";
