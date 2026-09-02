@@ -4,13 +4,15 @@ defmodule LuaNoxWeb.Router do
 
   import LuaNoxWeb.UserAuth
 
+  @csp "#{if Mix.env() == :dev, do: "http://127.0.0.1:4007"}"
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
     plug :fetch_live_flash
     plug :put_root_layout, html: {LuaNoxWeb.Layouts, :root}
     plug :protect_from_forgery
-    plug :put_secure_browser_headers
+    plug :put_secure_browser_headers, %{"content-security-policy" => @csp}
     plug :fetch_current_scope_for_user
   end
 

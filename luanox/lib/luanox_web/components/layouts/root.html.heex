@@ -26,6 +26,7 @@
         window.addEventListener("phx:set-theme", ({ detail: { theme } }) => setTheme(theme));
       })();
     </script>
+    <%= Application.get_env(:live_debugger, :live_debugger_tags) %>
   </head>
   <body class="bg-base-100 antialiased md:subpixel-antialiased">
     {@inner_content}
