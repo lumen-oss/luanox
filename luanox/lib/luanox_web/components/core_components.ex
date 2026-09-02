@@ -531,4 +531,25 @@ defmodule LuaNoxWeb.CoreComponents do
     </footer>
     """
   end
+
+  def format_count(count) when is_integer(count) and count < 1_000, do: Integer.to_string(count)
+  def format_count(count) when is_integer(count) do
+    {unit, suffix} =
+      cond do
+        count >= 1_000_000_000 -> {1_000_000_000, "B"}
+        count >= 1_000_000 -> {1_000_000, "M"}
+        true -> {1_000, "K"}
+      end
+
+    text =
+      if rem(count, unit) == 0 do
+        Integer.to_string(div(count, unit))
+      else
+        :erlang.float_to_binary(count / unit, decimals: 1)
+        |> String.trim_trailing("0")
+        |> String.trim_trailing(".")
+      end
+
+    text <> suffix
+  end
 end

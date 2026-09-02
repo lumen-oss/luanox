@@ -27,7 +27,7 @@ defmodule LuaNoxWeb.PackageBox do
           <div class="flex items-center justify-between pt-3 border-t border-base-300">
             <div class="flex items-center space-x-2 text-xs text-base-content/70">
               <.icon name={:download} type={:outline} class="w-3 h-3" />
-              <span>{@download_count} downloads</span>
+              <span>{format_count(@download_count)} downloads</span>
             </div>
             <div class="text-xs text-primary group-hover:text-primary/80 transition-colors">
               View Details →
@@ -76,7 +76,7 @@ defmodule LuaNoxWeb.PackageBox do
             <% end %>
           </div>
         </div>
-        
+
     <!-- Most Recent Updates Section -->
         <div class="mb-16">
           <div class="text-center mb-12">
@@ -101,7 +101,7 @@ defmodule LuaNoxWeb.PackageBox do
             <% end %>
           </div>
         </div>
-        
+
     <!-- Call to Action -->
         <div class="text-center">
           <div class="bg-base-100 border border-base-300 py-16 px-8">
