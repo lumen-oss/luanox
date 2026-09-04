@@ -8,7 +8,10 @@ defmodule LuaNoxWeb.PackageBox do
 
   def package(assigns) do
     ~H"""
-    <.link navigate={~p"/package/#{@name}"} class="group focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+    <.link
+      navigate={~p"/package/#{@name}"}
+      class="group focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+    >
       <div class="bg-base-100 border border-base-300 hover:border-primary/40 transition-colors duration-200 p-6">
         <div class="space-y-4">
           <div class="flex items-start justify-between">
@@ -20,7 +23,7 @@ defmodule LuaNoxWeb.PackageBox do
             </div>
           </div>
 
-          <p class="text-base-content/70 text-sm leading-relaxed min-h-[3rem] line-clamp-2">
+          <p class="text-base-content/70 text-sm leading-relaxed min-h-12 line-clamp-2">
             {if @description != "", do: @description, else: "No description available"}
           </p>
 
@@ -67,7 +70,7 @@ defmodule LuaNoxWeb.PackageBox do
 
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             <%= for %{name: name, summary: summary, releases: releases} <- @featured do %>
-               <.package
+              <.package
                 name={name}
                 version={latest_version(releases)}
                 download_count={Enum.sum(for r <- releases, do: r.download_count)}
@@ -77,7 +80,7 @@ defmodule LuaNoxWeb.PackageBox do
           </div>
         </div>
 
-    <!-- Most Recent Updates Section -->
+        <!-- Most Recent Updates Section -->
         <div class="mb-16">
           <div class="text-center mb-12">
             <div class="flex items-center justify-center space-x-4 mb-6">
@@ -102,7 +105,7 @@ defmodule LuaNoxWeb.PackageBox do
           </div>
         </div>
 
-    <!-- Call to Action -->
+        <!-- Call to Action -->
         <div class="text-center">
           <div class="bg-base-100 border border-base-300 py-16 px-8">
             <h3 class="text-2xl font-bold text-base-content mb-4">

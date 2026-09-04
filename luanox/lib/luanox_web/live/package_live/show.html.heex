@@ -140,27 +140,34 @@
               Author
             </h3>
             <div class="space-y-3 lg:space-y-4">
-              <div class="flex items-start gap-3">
+              <.link
+                navigate={~p"/users/#{@package.user.username}"}
+                class="flex items-start gap-3 group"
+              >
                 <%= if @package.user.avatar_url do %>
-                <img
-                  src={@package.user.avatar_url}
-                  alt={@package.user.aka || @package.user.username}
-                  class="w-10 h-10 lg:w-12 lg:h-12 rounded-full border border-base-300"
-                />
-              <% else %>
-                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-primary/10 border rounded-full border-primary/20 flex items-center justify-center">
-                  <.icon name={:user} type={:outline} class="w-5 h-5 lg:w-6 lg:h-6 text-primary" />
-                </div>
-              <% end %>
+                  <img
+                    src={@package.user.avatar_url}
+                    alt={@package.user.aka || @package.user.username}
+                    class="w-10 h-10 lg:w-12 lg:h-12 rounded-full border border-base-300"
+                  />
+                <% else %>
+                  <div class="w-10 h-10 lg:w-12 lg:h-12 bg-primary/10 border rounded-full border-primary/20 flex items-center justify-center">
+                    <.icon
+                      name={:user}
+                      type={:outline}
+                      class="w-5 h-5 lg:w-6 lg:h-6 text-primary"
+                    />
+                  </div>
+                <% end %>
                 <div class="flex-1 min-w-0">
-                  <div class="font-semibold text-sm lg:text-base text-base-content">
+                  <div class="font-semibold text-sm lg:text-base text-base-content group-hover:text-primary transition-colors">
                     {@package.user.aka || @package.user.username}
                   </div>
                   <div class="text-xs lg:text-sm text-base-content/70 mt-1">
                     Package maintainer
                   </div>
                 </div>
-              </div>
+              </.link>
 
               <div class="border-t border-base-300 pt-3">
                 <div class="text-xs lg:text-sm text-base-content/70">

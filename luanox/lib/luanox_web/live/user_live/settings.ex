@@ -14,7 +14,7 @@ defmodule LuaNoxWeb.UserLive.Settings do
       <div class="bg-base-100 border-b border-base-300">
         <div class="max-w-5xl mx-auto px-4 lg:px-6 py-4 lg:py-6">
           <div class="flex items-center gap-3">
-            <div class="w-16 h-16 sm:w-20 sm:h-20 bg-primary/10 border-2 border-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
+            <div class="w-16 h-16 sm:w-20 sm:h-20 bg-primary/10 border-2 border-primary/20 rounded-full flex items-center justify-center shrink-0">
               <.icon name={:user} type={:outline} class="w-10 h-10 sm:w-12 sm:h-12 text-primary" />
             </div>
             <div>
@@ -59,7 +59,9 @@ defmodule LuaNoxWeb.UserLive.Settings do
               <div class="border-t border-base-300 pt-4 space-y-3">
                 <div class="flex justify-between items-center">
                   <span class="text-sm text-base-content/70">Member since</span>
-                  <span class="text-sm font-medium">{member_since_date(@current_scope.user.inserted_at)}</span>
+                  <span class="text-sm font-medium">{member_since_date(
+                    @current_scope.user.inserted_at
+                  )}</span>
                 </div>
                 <div class="flex justify-between items-center">
                   <span class="text-sm text-base-content/70">Auth provider</span>

@@ -150,7 +150,10 @@ defmodule LuaNox.AccountsTest do
       user = user_fixture()
 
       assert {:ok, %User{avatar_url: "https://avatars.githubusercontent.com/u/36456999"}} =
-               Accounts.update_user_avatar(user, "https://avatars.githubusercontent.com/u/36456999")
+               Accounts.update_user_avatar(
+                 user,
+                 "https://avatars.githubusercontent.com/u/36456999"
+               )
     end
 
     test "rejects avatar URLs from untrusted hosts" do
@@ -166,7 +169,10 @@ defmodule LuaNox.AccountsTest do
       user = user_fixture()
 
       assert {:error, %Ecto.Changeset{}} =
-               Accounts.update_user_avatar(user, "http://avatars.githubusercontent.com/u/76052559")
+               Accounts.update_user_avatar(
+                 user,
+                 "http://avatars.githubusercontent.com/u/76052559"
+               )
     end
   end
 end
