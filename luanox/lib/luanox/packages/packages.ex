@@ -51,15 +51,15 @@ defmodule LuaNox.Packages do
   end
 
   @doc """
-  Returns all packages published by the given user, with releases sorted
-  newest-first.
+  Returns the total download count across all packages published by the
+  given user.
   """
-  def list_packages_by_user(%User{id: id}) do
+  def total_downloads_by_user(%User{id: user_id}) do
     Package
-    |> where([p], p.user_id == ^id)
-    |> preload(:releases)
-    |> Repo.all()
-    |> Enum.map(&sort_releases/1)
+    |> join(:left, [p], r in LuaNox.Packages.Release, on: r.package_id == p.id)
+    |> where([p], p.user_id == ^user_id)
+    |> select([_p, r], coalesce(sum(r.download_count), 0))
+    |> Repo.one()
   end
 
   @doc """

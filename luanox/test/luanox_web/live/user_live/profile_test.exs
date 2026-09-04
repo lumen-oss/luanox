@@ -44,6 +44,41 @@ defmodule LuaNoxWeb.UserLive.ProfileTest do
       assert to == ~p"/"
       assert %{"error" => "User not found"} = flash
     end
+
+    test "paginates the user's packages", %{conn: conn} do
+      user = user_fixture()
+      scope = user_scope_fixture(user)
+
+      for i <- 1..13 do
+        package_fixture(scope, %{name: "pkg_#{i}"})
+      end
+
+      {:ok, _lv, html} = live(conn, ~p"/users/#{user.username}")
+
+      assert html =~ "Showing 12 of 13 packages"
+
+      {:ok, _lv, page2} = live(conn, ~p"/users/#{user.username}?page=2")
+
+      assert page2 =~ "Showing 1 of 13 packages"
+    end
+
+    test "sorts packages by name", %{conn: conn} do
+      user = user_fixture()
+      scope = user_scope_fixture(user)
+
+      for name <- ~w(zeta_pkg alpha_pkg bravo_pkg) do
+        package_fixture(scope, %{name: name})
+      end
+
+      {:ok, _lv, html} = live(conn, ~p"/users/#{user.username}?sort=name")
+
+      alpha = :binary.match(html, "alpha_pkg")
+      bravo = :binary.match(html, "bravo_pkg")
+      zeta = :binary.match(html, "zeta_pkg")
+
+      assert elem(alpha, 0) < elem(bravo, 0)
+      assert elem(bravo, 0) < elem(zeta, 0)
+    end
   end
 
   describe "Package show page" do
