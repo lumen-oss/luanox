@@ -1,5 +1,11 @@
 <Layouts.app flash={@flash} current_scope={@current_scope}>
-  <div class="min-h-screen bg-base-100">
+  <%= if @not_found do %>
+    <.not_found
+      title="Package not found"
+      message="The package you are looking for does not exist or was removed."
+    />
+  <% else %>
+    <div class="min-h-screen bg-base-100">
     <div class="bg-base-200 border-b border-base-300">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
         <div class="mb-4 lg:mb-6">
@@ -203,5 +209,6 @@
         </div>
       </div>
     </div>
-  </div>
+    </div>
+  <% end %>
 </Layouts.app>

@@ -1,6 +1,8 @@
 defmodule LuaNoxWeb.PackageLive.Show do
   alias LuaNox.Packages
   use LuaNoxWeb, :live_view
+
+  import LuaNoxWeb.Components.NotFound
   import LuaNoxWeb.Markdown, only: [markdown: 1]
 
   def mount(%{"name" => name}, _session, socket) do
@@ -8,12 +10,13 @@ defmodule LuaNoxWeb.PackageLive.Show do
       nil ->
         {:ok,
          socket
-         |> put_flash(:error, "Package not found")
-         |> redirect(to: ~p"/packages")}
+         |> assign(:not_found, true)
+         |> assign(:page_title, "Package not found")}
 
       package ->
         {:ok,
          socket
+         |> assign(:not_found, false)
          |> assign(:package, package |> LuaNox.Repo.preload(:user))
          |> assign(:page_title, package.name)}
     end

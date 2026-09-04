@@ -3,6 +3,7 @@ defmodule LuaNoxWeb.UserLive.Profile do
   alias LuaNox.Packages
   use LuaNoxWeb, :live_view
 
+  import LuaNoxWeb.Components.NotFound
   import LuaNoxWeb.PackageBox
 
   def mount(%{"username" => username}, _session, socket) do
@@ -10,15 +11,20 @@ defmodule LuaNoxWeb.UserLive.Profile do
       nil ->
         {:ok,
          socket
-         |> put_flash(:error, "User not found")
-         |> redirect(to: ~p"/")}
+         |> assign(:not_found, true)
+         |> assign(:page_title, "User not found")}
 
       user ->
         {:ok,
          socket
+         |> assign(:not_found, false)
          |> assign(:user, user)
          |> assign(:page_title, user.aka || user.username)}
     end
+  end
+
+  def handle_params(_params, _url, %{assigns: %{not_found: true}} = socket) do
+    {:noreply, socket}
   end
 
   def handle_params(params, _url, socket) do

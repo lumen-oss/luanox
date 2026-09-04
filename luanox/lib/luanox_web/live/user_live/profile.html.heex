@@ -1,5 +1,11 @@
 <Layouts.app flash={@flash} current_scope={@current_scope}>
-  <div class="bg-base-100 border-b border-base-300">
+  <%= if @not_found do %>
+    <.not_found
+      title="User not found"
+      message="The user you are looking for does not exist."
+    />
+  <% else %>
+    <div class="bg-base-100 border-b border-base-300">
     <div class="max-w-6xl mx-auto px-4 md:px-6 lg:px-8 py-6 lg:py-8">
       <div class="flex flex-wrap flex-row items-center gap-4 lg:gap-6">
         <%= if @user.avatar_url do %>
@@ -121,5 +127,6 @@
         <% end %>
       </div>
     <% end %>
-  </div>
+    </div>
+  <% end %>
 </Layouts.app>

@@ -59,12 +59,10 @@ defmodule LuaNoxWeb.UserLive.ProfileTest do
       assert html =~ "lux CLI"
     end
 
-    test "redirects home for an unknown user", %{conn: conn} do
-      {:error, redirect} = live(conn, ~p"/users/does-not-exist")
+    test "renders not found for an unknown user", %{conn: conn} do
+      {:ok, _lv, html} = live(conn, ~p"/users/does-not-exist")
 
-      assert {:redirect, %{to: to, flash: flash}} = redirect
-      assert to == ~p"/"
-      assert %{"error" => "User not found"} = flash
+      assert html =~ "User not found"
     end
 
     test "paginates the user's packages", %{conn: conn} do
