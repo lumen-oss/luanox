@@ -144,7 +144,7 @@
                 <%= if @package.user.avatar_url do %>
                 <img
                   src={@package.user.avatar_url}
-                  alt=""
+                  alt={@package.user.aka || @package.user.username}
                   class="w-10 h-10 lg:w-12 lg:h-12 rounded-full border border-base-300"
                 />
               <% else %>
