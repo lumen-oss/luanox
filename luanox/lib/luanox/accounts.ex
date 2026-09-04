@@ -92,7 +92,7 @@ defmodule LuaNox.Accounts do
     |> Repo.insert()
   end
 
-## Settings
+  ## Settings
 
   @doc """
   Updates the user's avatar URL, e.g. from a fresh OAuth login.

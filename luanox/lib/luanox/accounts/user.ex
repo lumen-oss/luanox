@@ -37,6 +37,7 @@ defmodule LuaNox.Accounts.User do
     |> unique_constraint([:provider, :username])
     |> validate_provider()
     |> validate_avatar_url()
+
     # |> validate_aka()
   end
 

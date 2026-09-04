@@ -23,12 +23,12 @@ defmodule LuaNoxWeb.NavBar do
         </.link>
       </div>
 
-    <!-- Global menu items (always there no matters if mobile or desktop) -->
+      <!-- Global menu items (always there no matters if mobile or desktop) -->
       <div class="flex items-center space-x-2 md:space-x-6">
         <LuaNoxWeb.Layouts.theme_toggle />
         <button
           id="mobile-menu-toggle"
-          class="md:hidden btn btn-ghost rounded-field text-grey hover:text-base-content p-2 min-h-[44px] min-w-[44px]"
+          class="md:hidden btn btn-ghost rounded-field text-grey hover:text-base-content p-2 min-h-11 min-w-11"
           aria-expanded="false"
           aria-controls="mobile-menu"
           aria-label="Menu"
@@ -55,7 +55,11 @@ defmodule LuaNoxWeb.NavBar do
           class="btn btn-ghost btn-block justify-start text-grey hover:text-primary rounded-field max-sm:px-1"
         >
           <%= if @current_scope.user.avatar_url do %>
-            <img src={@current_scope.user.avatar_url} alt={User.unique_username(@current_scope.user)} class="w-6 h-6 rounded-full" />
+            <img
+              src={@current_scope.user.avatar_url}
+              alt={User.unique_username(@current_scope.user)}
+              class="w-6 h-6 rounded-full"
+            />
           <% else %>
             <.icon name={:user_circle} type={:outline} />
           <% end %>
@@ -145,7 +149,7 @@ defmodule LuaNoxWeb.NavBar do
         <ul class="menu menu-vertical w-full space-y-1">
           <li>
             <.link
-              class="btn btn-ghost justify-start text-grey hover:text-primary w-full min-h-[48px] px-4"
+              class="btn btn-ghost justify-start text-grey hover:text-primary w-full min-h-12 px-4"
               href="https://lumen-oss.github.io"
               phx-click={close_mobile_menu()}
             >
@@ -155,7 +159,7 @@ defmodule LuaNoxWeb.NavBar do
           </li>
           <li>
             <.link
-              class="btn btn-ghost justify-start text-grey hover:text-primary w-full min-h-[48px] px-4"
+              class="btn btn-ghost justify-start text-grey hover:text-primary w-full min-h-12 px-4"
               navigate={~p"/donate"}
               phx-click={close_mobile_menu()}
             >
@@ -165,7 +169,7 @@ defmodule LuaNoxWeb.NavBar do
           </li>
           <li>
             <.link
-              class="btn btn-ghost justify-start text-grey hover:text-primary w-full min-h-[48px] px-4"
+              class="btn btn-ghost justify-start text-grey hover:text-primary w-full min-h-12 px-4"
               href="https://github.com/lumen-oss/luanox"
               phx-click={close_mobile_menu()}
             >

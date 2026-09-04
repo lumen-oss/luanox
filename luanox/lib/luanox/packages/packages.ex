@@ -51,6 +51,18 @@ defmodule LuaNox.Packages do
   end
 
   @doc """
+  Returns all packages published by the given user, with releases sorted
+  newest-first.
+  """
+  def list_packages_by_user(%User{id: id}) do
+    Package
+    |> where([p], p.user_id == ^id)
+    |> preload(:releases)
+    |> Repo.all()
+    |> Enum.map(&sort_releases/1)
+  end
+
+  @doc """
   Returns the most popular packages ordered by total downloads.
 
   ## Examples

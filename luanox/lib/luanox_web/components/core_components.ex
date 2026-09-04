@@ -57,7 +57,7 @@ defmodule LuaNoxWeb.CoreComponents do
       id={@id}
       phx-click={JS.push("lv:clear-flash", value: %{key: @kind}) |> hide("##{@id}")}
       role="alert"
-      class="toast toast-top toast-end z-50 mt-[82px] md:mt-[90px]"
+      class="toast toast-top toast-end z-50 mt-20.5 md:mt-22.5"
       {@rest}
     >
       <div class={[
@@ -533,6 +533,7 @@ defmodule LuaNoxWeb.CoreComponents do
   end
 
   def format_count(count) when is_integer(count) and count < 1_000, do: Integer.to_string(count)
+
   def format_count(count) when is_integer(count) do
     {unit, suffix} =
       cond do

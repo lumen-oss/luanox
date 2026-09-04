@@ -12,7 +12,7 @@ defmodule LuaNoxWeb.UserLive.Keys do
         <div class="max-w-4xl mx-auto px-4 lg:px-8 py-6 lg:py-8">
           <div class="flex flex-col md:flex-row justify-between items-center gap-4 sm:gap-6">
             <div class="flex items-center gap-4 sm:gap-6">
-              <div class="w-16 h-16 sm:w-20 sm:h-20 bg-primary/10 border-2 border-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
+              <div class="w-16 h-16 sm:w-20 sm:h-20 bg-primary/10 border-2 border-primary/20 rounded-full flex items-center justify-center shrink-0">
                 <.icon name={:key} type={:outline} class="w-10 h-10 sm:w-12 sm:h-12 text-primary" />
               </div>
 
@@ -92,7 +92,7 @@ defmodule LuaNoxWeb.UserLive.Keys do
               </div>
 
               <div class="flex items-center gap-2 text-xs text-warning">
-                <.icon name={:alert_triangle} type={:outline} class="w-4 h-4 flex-shrink-0" />
+                <.icon name={:alert_triangle} type={:outline} class="w-4 h-4 shrink-0" />
                 <span>This key will only be shown once. Copy it now and store it securely.</span>
               </div>
             </div>
