@@ -100,6 +100,7 @@ defmodule LuaNox.Accounts do
   def update_user_avatar(%User{} = user, avatar_url) when is_binary(avatar_url) do
     user
     |> Ecto.Changeset.change(%{avatar_url: avatar_url})
+    |> User.validate_avatar_url()
     |> Repo.update()
   end
 

@@ -17,6 +17,8 @@ defmodule LuaNox.Accounts.User do
     timestamps(type: :utc_datetime)
   end
 
+  @trusted_avatar_hosts ~w(avatars.githubusercontent.com)
+
   def unique_username(%LuaNox.Accounts.User{} = user), do: user.username
 
   def oauth_changeset(user, %Auth{} = auth) do
@@ -34,7 +36,7 @@ defmodule LuaNox.Accounts.User do
     |> validate_required([:username])
     |> unique_constraint([:provider, :username])
     |> validate_provider()
-
+    |> validate_avatar_url()
     # |> validate_aka()
   end
 
@@ -60,6 +62,22 @@ defmodule LuaNox.Accounts.User do
       validate_required(changeset, [:aka])
     else
       changeset
+    end
+  end
+
+  def validate_avatar_url(changeset) do
+    case get_field(changeset, :avatar_url) do
+      nil ->
+        changeset
+
+      url when is_binary(url) ->
+        uri = URI.parse(url)
+
+        if uri.scheme == "https" and uri.host in @trusted_avatar_hosts do
+          changeset
+        else
+          add_error(changeset, :avatar_url, "must come from a trusted provider")
+        end
     end
   end
 
