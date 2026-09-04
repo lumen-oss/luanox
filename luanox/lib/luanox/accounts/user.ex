@@ -13,6 +13,7 @@ defmodule LuaNox.Accounts.User do
     field :username, :string
     field :aka, :string
     field :avatar_url, :string
+    field :bio, :string
 
     timestamps(type: :utc_datetime)
   end
@@ -20,6 +21,19 @@ defmodule LuaNox.Accounts.User do
   @trusted_avatar_hosts ~w(avatars.githubusercontent.com)
 
   def unique_username(%LuaNox.Accounts.User{} = user), do: user.username
+
+  def bio_changeset(user, bio) do
+    user
+    |> Ecto.Changeset.change(%{bio: strip_urls(bio)})
+    |> validate_length(:bio, max: 160)
+  end
+
+  # FIXME: heuristic, not a parser; obfuscated links (e.g. "evil . com") still pass.
+  def strip_urls(bio) when is_binary(bio) do
+    String.replace(bio, ~r/(?:https?:\/\/|www\.)[^\s]+|\b[a-z0-9-]+(?:\.[a-z0-9-]+)+\S*/i, "")
+  end
+
+  def strip_urls(bio) when is_nil(bio), do: bio
 
   def oauth_changeset(user, %Auth{} = auth) do
     attrs = %{

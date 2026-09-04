@@ -145,6 +145,41 @@ defmodule LuaNox.AccountsTest do
     end
   end
 
+  describe "update_bio/2" do
+    test "updates the user's bio" do
+      user = user_fixture()
+
+      assert {:ok, %User{bio: "Making awesome Lua plugins"}} =
+               Accounts.update_bio(user, "Making awesome Lua plugins")
+    end
+
+    test "strips URLs from the bio" do
+      user = user_fixture()
+
+      assert {:ok, %User{bio: bio}} =
+               Accounts.update_bio(user, "Check my site: https://malicious.example/foo")
+
+      refute bio =~ "https://"
+    end
+
+    test "strips bare domains from the bio" do
+      user = user_fixture()
+
+      assert {:ok, %User{bio: bio}} = Accounts.update_bio(user, "Visit evil.com now")
+
+      refute bio =~ "evil.com"
+    end
+
+    test "rejects bios longer than 160 characters" do
+      user = user_fixture()
+
+      assert {:error, %Ecto.Changeset{errors: errors}} =
+               Accounts.update_bio(user, String.duplicate("a", 161))
+
+      assert {"should be at most %{count} character(s)", _opts} = errors[:bio]
+    end
+  end
+
   describe "update_user_avatar/2" do
     test "updates the avatar URL" do
       user = user_fixture()

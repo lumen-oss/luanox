@@ -28,6 +28,11 @@
           <p class="text-sm text-base-content/70 mt-1">
             @{@user.username}
           </p>
+          <%= if @user.bio do %>
+            <p class="text-base-content/80 mt-2 max-w-prose">
+              {@user.bio}
+            </p>
+          <% end %>
         </div>
 
         <div class="flex gap-12 text-center sm:text-left">
