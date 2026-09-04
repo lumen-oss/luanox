@@ -4,8 +4,13 @@ defmodule LuaNoxWeb.UserLive.Settings do
   on_mount({LuaNoxWeb.UserAuth, :require_sudo_mode})
 
   def mount(_params, _session, socket) do
-    # TODO: actually use a changeset or create the Phoenix.HTML.Form struct by hand
-    {:ok, socket |> assign(:email_form, nil) |> assign(:username_form, nil)}
+    bio_count = (socket.assigns.current_scope.user.bio || "") |> String.length()
+
+    {:ok,
+     socket
+     |> assign(:email_form, nil)
+     |> assign(:username_form, nil)
+     |> assign(:bio_count, bio_count)}
   end
 
   def render(assigns) do
@@ -96,14 +101,26 @@ defmodule LuaNoxWeb.UserLive.Settings do
                 <div class="space-y-6 pt-2">
                   <%!-- Bio Form --%>
                   <div>
-                    <label class="text-sm font-medium text-base-content/80 mb-2 block">
-                      Bio
-                    </label>
-                    <.form for={%{}} id="bio_form" phx-submit="update_bio" class="space-y-3">
+                    <div class="flex items-center justify-between mb-2">
+                      <label class="text-sm font-medium text-base-content/80 block">Bio</label>
+                      <span id="bio-count" class="text-xs text-base-content/50 transition-colors duration-150">
+                        {@bio_count}/160
+                      </span>
+                    </div>
+                    <.form
+                      for={%{}}
+                      id="bio_form"
+                      phx-submit="update_bio"
+                      class="space-y-3"
+                    >
                       <textarea
+                        id="bio-input"
                         name="user[bio]"
                         rows="3"
                         maxlength="160"
+                        phx-hook="CharacterCounter"
+                        data-counter-target="bio-count"
+                        data-counter-max="160"
                         placeholder="Tell people about yourself (max 160 characters)"
                         class="textarea textarea-bordered w-full"
                       >{@current_scope.user.bio}</textarea>
@@ -290,7 +307,10 @@ defmodule LuaNoxWeb.UserLive.Settings do
             put_flash(socket, :info, "Bio updated successfully.")
           end
 
-        {:noreply, assign(socket, :current_scope, LuaNox.Accounts.Scope.for_user(user))}
+        {:noreply,
+         socket
+         |> assign(:current_scope, LuaNox.Accounts.Scope.for_user(user))
+         |> assign(:bio_count, String.length(user.bio || ""))}
 
       {:error, _changeset} ->
         {:noreply, put_flash(socket, :error, "Could not update bio.")}
