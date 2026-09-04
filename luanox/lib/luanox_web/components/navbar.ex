@@ -22,7 +22,7 @@ defmodule LuaNoxWeb.NavBar do
           <span class="font-semibold">Luanox</span>
         </.link>
       </div>
-      
+
     <!-- Global menu items (always there no matters if mobile or desktop) -->
       <div class="flex items-center space-x-2 md:space-x-6">
         <LuaNoxWeb.Layouts.theme_toggle />
@@ -55,7 +55,7 @@ defmodule LuaNoxWeb.NavBar do
           class="btn btn-ghost btn-block justify-start text-grey hover:text-primary rounded-field max-sm:px-1"
         >
           <%= if @current_scope.user.avatar_url do %>
-            <img src={@current_scope.user.avatar_url} alt="" class="w-6 h-6 rounded-full" />
+            <img src={@current_scope.user.avatar_url} alt={User.unique_username(@current_scope.user)} class="w-6 h-6 rounded-full" />
           <% else %>
             <.icon name={:user_circle} type={:outline} />
           <% end %>

@@ -36,7 +36,7 @@ defmodule LuaNoxWeb.UserLive.Settings do
                 <%= if @current_scope.user.avatar_url do %>
                   <div class="avatar mb-4">
                     <div class="w-20 rounded-full">
-                      <img src={@current_scope.user.avatar_url} alt="" />
+                      <img src={@current_scope.user.avatar_url} alt={@current_scope.user.username} />
                     </div>
                   </div>
                 <% else %>
