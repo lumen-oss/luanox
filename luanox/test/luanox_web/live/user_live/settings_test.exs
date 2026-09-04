@@ -30,6 +30,19 @@ defmodule LuaNoxWeb.UserLive.SettingsTest do
       assert LuaNox.Accounts.get_user!(user.id).bio == "Building rocks"
     end
 
+    test "renders a bio character counter", %{conn: conn} do
+      user = user_fixture()
+
+      {:ok, _lv, html} =
+        conn
+        |> log_in_user(user)
+        |> live(~p"/settings")
+
+      assert html =~ "0/160"
+      assert html =~ ~s(phx-hook="CharacterCounter")
+      assert html =~ ~s(data-counter-target="bio-count")
+    end
+
     test "strips links from the submitted bio", %{conn: conn} do
       user = user_fixture()
 

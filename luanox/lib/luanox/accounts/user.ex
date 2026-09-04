@@ -24,9 +24,15 @@ defmodule LuaNox.Accounts.User do
 
   def bio_changeset(user, bio) do
     user
-    |> Ecto.Changeset.change(%{bio: strip_urls(bio)})
+    |> Ecto.Changeset.change(%{bio: sanitize_bio(bio)})
     |> validate_length(:bio, max: 160)
   end
+
+  defp sanitize_bio(bio) when is_binary(bio) do
+    bio |> strip_urls() |> String.trim()
+  end
+
+  defp sanitize_bio(bio), do: bio
 
   # FIXME: heuristic, not a parser; obfuscated links (e.g. "evil . com") still pass.
   def strip_urls(bio) when is_binary(bio) do

@@ -170,6 +170,13 @@ defmodule LuaNox.AccountsTest do
       refute bio =~ "evil.com"
     end
 
+    test "trims surrounding whitespace from the bio" do
+      user = user_fixture()
+
+      assert {:ok, %User{bio: "hello world"}} =
+               Accounts.update_bio(user, "  hello world\n")
+    end
+
     test "rejects bios longer than 160 characters" do
       user = user_fixture()
 
