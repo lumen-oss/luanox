@@ -121,12 +121,27 @@ defmodule LuaNox.AccountsTest do
           nickname: "ntb",
           name: "NTBBloodbath",
           email: unique_user_email(),
-          image: "https://avatars.githubusercontent.com/u/123456"
+          image: "https://avatars.githubusercontent.com/u/36456999"
         }
       }
 
       assert {:ok, %User{avatar_url: url}} = Accounts.register_user(auth)
-      assert url == "https://avatars.githubusercontent.com/u/123456"
+      assert url == "https://avatars.githubusercontent.com/u/36456999"
+    end
+
+    test "rejects avatar URLs from untrusted hosts" do
+      auth = %Ueberauth.Auth{
+        provider: "github",
+        info: %Ueberauth.Auth.Info{
+          nickname: "ntb",
+          name: "NTBBloodbath",
+          email: unique_user_email(),
+          image: "https://evil.example/avatar.png"
+        }
+      }
+
+      assert {:error, %Ecto.Changeset{errors: errors}} = Accounts.register_user(auth)
+      assert {"must come from a trusted provider", _opts} = errors[:avatar_url]
     end
   end
 
@@ -134,8 +149,24 @@ defmodule LuaNox.AccountsTest do
     test "updates the avatar URL" do
       user = user_fixture()
 
-      assert {:ok, %User{avatar_url: "https://example.com/new.png"}} =
-               Accounts.update_user_avatar(user, "https://example.com/new.png")
+      assert {:ok, %User{avatar_url: "https://avatars.githubusercontent.com/u/36456999"}} =
+               Accounts.update_user_avatar(user, "https://avatars.githubusercontent.com/u/36456999")
+    end
+
+    test "rejects avatar URLs from untrusted hosts" do
+      user = user_fixture()
+
+      assert {:error, %Ecto.Changeset{errors: errors}} =
+               Accounts.update_user_avatar(user, "https://evil.example/avatar.png")
+
+      assert {"must come from a trusted provider", _opts} = errors[:avatar_url]
+    end
+
+    test "rejects non-https avatar URLs" do
+      user = user_fixture()
+
+      assert {:error, %Ecto.Changeset{}} =
+               Accounts.update_user_avatar(user, "http://avatars.githubusercontent.com/u/76052559")
     end
   end
 end
