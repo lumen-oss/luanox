@@ -104,6 +104,12 @@ defmodule LuaNox.Accounts do
     |> Repo.update()
   end
 
+  def update_bio(%User{} = user, bio) do
+    user
+    |> User.bio_changeset(bio)
+    |> Repo.update()
+  end
+
   ## Settings
 
   @doc """

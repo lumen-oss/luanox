@@ -15,6 +15,39 @@ defmodule LuaNoxWeb.UserLive.SettingsTest do
       assert html =~ "Manage your profile and account preferences"
     end
 
+    test "updates the user's bio", %{conn: conn} do
+      user = user_fixture()
+
+      {:ok, lv, _html} =
+        conn
+        |> log_in_user(user)
+        |> live(~p"/settings")
+
+      lv
+      |> form("#bio_form", user: %{bio: "Building rocks"})
+      |> render_submit()
+
+      assert LuaNox.Accounts.get_user!(user.id).bio == "Building rocks"
+    end
+
+    test "strips links from the submitted bio", %{conn: conn} do
+      user = user_fixture()
+
+      {:ok, lv, _html} =
+        conn
+        |> log_in_user(user)
+        |> live(~p"/settings")
+
+      lv
+      |> form("#bio_form", user: %{bio: "Visit https://evil.example and evil.com"})
+      |> render_submit()
+
+      bio = LuaNox.Accounts.get_user!(user.id).bio
+
+      refute bio =~ "https://evil.example"
+      refute bio =~ "evil.com"
+    end
+
     test "redirects if user is not logged in", %{conn: conn} do
       assert {:error, redirect} = live(conn, ~p"/settings")
 

@@ -21,6 +21,15 @@ defmodule LuaNoxWeb.UserLive.ProfileTest do
       assert html =~ to_string(release.version)
     end
 
+    test "renders the user's bio", %{conn: conn} do
+      user = user_fixture()
+      {:ok, user} = LuaNox.Accounts.update_bio(user, "Maker of Lua tools")
+
+      {:ok, _lv, html} = live(conn, ~p"/users/#{user.username}")
+
+      assert html =~ "Maker of Lua tools"
+    end
+
     test "does not expose the user's email", %{conn: conn} do
       user = user_fixture()
 

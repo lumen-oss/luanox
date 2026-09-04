@@ -54,6 +54,11 @@ defmodule LuaNoxWeb.UserLive.Settings do
                 <p class="text-sm text-base-content/70 mb-4">
                   {@current_scope.user.email}
                 </p>
+                <%= if @current_scope.user.bio do %>
+                  <p class="text-sm text-base-content/80 mb-4">
+                    {@current_scope.user.bio}
+                  </p>
+                <% end %>
               </div>
 
               <div class="border-t border-base-300 pt-4 space-y-3">
@@ -89,6 +94,29 @@ defmodule LuaNoxWeb.UserLive.Settings do
               </div>
               <div class="collapse-content px-4 sm:px-6">
                 <div class="space-y-6 pt-2">
+                  <%!-- Bio Form --%>
+                  <div>
+                    <label class="text-sm font-medium text-base-content/80 mb-2 block">
+                      Bio
+                    </label>
+                    <.form for={%{}} id="bio_form" phx-submit="update_bio" class="space-y-3">
+                      <textarea
+                        name="user[bio]"
+                        rows="3"
+                        maxlength="160"
+                        placeholder="Tell people about yourself (max 160 characters)"
+                        class="textarea textarea-bordered w-full"
+                      >{@current_scope.user.bio}</textarea>
+                      <button
+                        type="submit"
+                        class="btn btn-primary btn-sm w-full sm:w-auto"
+                        phx-disable-with="Updating..."
+                      >
+                        <.icon name={:check} type={:outline} class="w-4 h-4" /> Save Changes
+                      </button>
+                    </.form>
+                  </div>
+
                   <%!-- Email Form --%>
                   <div>
                     <label class="text-sm font-medium text-base-content/80 mb-2 block">
@@ -245,6 +273,31 @@ defmodule LuaNoxWeb.UserLive.Settings do
     </Layouts.app>
     """
   end
+
+  def handle_event("update_bio", %{"user" => %{"bio" => bio}}, socket) do
+    user = socket.assigns.current_scope.user
+
+    case LuaNox.Accounts.update_bio(user, bio) do
+      {:ok, user} ->
+        socket =
+          if LuaNox.Accounts.User.strip_urls(bio) != bio do
+            put_flash(
+              socket,
+              :info,
+              "Bio saved, but links were removed. Links aren't allowed in bios."
+            )
+          else
+            put_flash(socket, :info, "Bio updated successfully.")
+          end
+
+        {:noreply, assign(socket, :current_scope, LuaNox.Accounts.Scope.for_user(user))}
+
+      {:error, _changeset} ->
+        {:noreply, put_flash(socket, :error, "Could not update bio.")}
+    end
+  end
+
+  def handle_event(_event, _params, socket), do: {:noreply, socket}
 
   defp member_since_date(%DateTime{} = date), do: Calendar.strftime(date, "%B %Y")
   defp member_since_date(%NaiveDateTime{} = date), do: Calendar.strftime(date, "%B %Y")
