@@ -10,7 +10,15 @@ defmodule LuaNox.MixProject do
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
-      listeners: [Phoenix.CodeReloader]
+      listeners: [Phoenix.CodeReloader],
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test,
+        "coveralls.json": :test
+      ]
     ]
   end
 
@@ -65,7 +73,8 @@ defmodule LuaNox.MixProject do
       {:flop_phoenix, "~> 0.25"},
       {:tidewave, "~> 0.5", only: :dev},
       {:hammer, "~> 7.0"},
-      {:cachex, "~> 3.6"}
+      {:cachex, "~> 3.6"},
+      {:excoveralls, "~> 0.18", only: :test}
     ]
   end
 
