@@ -37,6 +37,19 @@ defmodule LuaNoxWeb.UserLive.ProfileTest do
       assert html =~ "has not published any packages yet"
     end
 
+    test "renders a publish CTA on the current user's empty profile", %{conn: conn} do
+      user = user_fixture()
+
+      {:ok, _lv, html} =
+        conn
+        |> log_in_user(user)
+        |> live(~p"/users/#{user.username}")
+
+      assert html =~ "You have not published any packages yet"
+      assert html =~ "Get started with the docs"
+      assert html =~ "lux CLI"
+    end
+
     test "redirects home for an unknown user", %{conn: conn} do
       {:error, redirect} = live(conn, ~p"/users/does-not-exist")
 

@@ -71,9 +71,26 @@
 
     <%= if @packages == [] do %>
       <div class="bg-base-200 border border-base-300 rounded-box p-10 text-center">
-        <p class="text-base-content/70">
-          This user has not published any packages yet.
-        </p>
+        <%= if @current_scope && @current_scope.user && @current_scope.user.id == @user.id do %>
+          <h3 class="text-lg font-semibold text-base-content mb-2">
+            You have not published any packages yet
+          </h3>
+          <p class="text-base-content/70 mb-4">
+            Packages are uploaded with the lux CLI or luarocks.
+          </p>
+          <.link
+            href="https://lumen-oss.github.io"
+            class="btn btn-primary"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            Get started with the docs
+          </.link>
+        <% else %>
+          <p class="text-base-content/70">
+            This user has not published any packages yet.
+          </p>
+        <% end %>
       </div>
     <% else %>
       <div class="text-sm text-base-content/70 mb-4">
