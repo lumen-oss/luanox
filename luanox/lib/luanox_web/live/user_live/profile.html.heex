@@ -32,7 +32,7 @@
 
         <div class="flex gap-12 text-center sm:text-left">
           <div>
-            <div class="text-lg font-semibold text-base-content">{length(@packages)}</div>
+            <div class="text-lg font-semibold text-base-content">{@meta.total_count}</div>
             <div class="text-sm text-base-content/70">Packages</div>
           </div>
           <div>
@@ -53,7 +53,21 @@
   </div>
 
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <h2 class="text-lg lg:text-xl font-semibold text-base-content mb-6">Published Packages</h2>
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+      <h2 class="text-lg lg:text-xl font-semibold text-base-content">Published Packages</h2>
+
+      <.form for={%{}} phx-change="update_filter" class="sm:w-48">
+        <select
+          name="sort"
+          class="select select-bordered w-full bg-base-100 border-base-300 focus:border-primary"
+        >
+          <option value="recent" selected={(@params["sort"] || "recent") == "recent"}>
+            Most Recent
+          </option>
+          <option value="name" selected={@params["sort"] == "name"}>Name (A-Z)</option>
+        </select>
+      </.form>
+    </div>
 
     <%= if @packages == [] do %>
       <div class="bg-base-200 border border-base-300 rounded-box p-10 text-center">
@@ -62,6 +76,16 @@
         </p>
       </div>
     <% else %>
+      <div class="text-sm text-base-content/70 mb-4">
+        Showing {length(@packages)} of {@meta.total_count} packages
+      </div>
+
+      <div class="flex justify-center pb-8 mb-4 border-b border-base-300">
+        <div class="flop-pagination">
+          <Flop.Phoenix.pagination meta={@meta} path={~p"/users/#{@user.username}"} />
+        </div>
+      </div>
+
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <%= for package <- @packages do %>
           <.package

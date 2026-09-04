@@ -4,7 +4,7 @@ defmodule LuaNox.Packages.Package do
   import Ecto.Changeset
 
   @derive {Flop.Schema,
-           filterable: [:name, :summary, :search],
+           filterable: [:name, :summary, :search, :user_id],
            sortable: [:name, :inserted_at],
            default_order: %{
              order_by: [:inserted_at],
