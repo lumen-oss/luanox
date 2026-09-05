@@ -103,7 +103,10 @@ defmodule LuaNoxWeb.UserLive.Settings do
                   <div>
                     <div class="flex items-center justify-between mb-2">
                       <label class="text-sm font-medium text-base-content/80 block">Bio</label>
-                      <span id="bio-count" class="text-xs text-base-content/50 transition-colors duration-150">
+                      <span
+                        id="bio-count"
+                        class="text-xs text-base-content/50 transition-colors duration-150"
+                      >
                         {@bio_count}/160
                       </span>
                     </div>

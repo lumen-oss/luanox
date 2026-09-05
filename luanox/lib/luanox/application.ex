@@ -12,8 +12,7 @@ defmodule LuaNox.Application do
       LuaNox.Repo,
       {DNSCluster, query: Application.get_env(:luanox, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: LuaNox.PubSub},
-      {LuaNoxWeb.RateLimit,
-       clean_period: :timer.minutes(5)},
+      {LuaNoxWeb.RateLimit, clean_period: :timer.minutes(5)},
       {Cachex, name: :search_cache, limit: 1_000},
       LuaNoxWeb.Endpoint
     ]

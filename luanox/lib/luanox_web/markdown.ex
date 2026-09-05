@@ -4,10 +4,11 @@ defmodule LuaNoxWeb.Markdown do
   import Phoenix.HTML, only: [raw: 1]
 
   def markdown(%{content: markdown} = assigns) when is_binary(markdown) do
-    html = MDEx.to_html!(markdown,
-            extension: [table: true, autolink: true, tagfilter: true],
-            render: [unsafe: false]
-          )
+    html =
+      MDEx.to_html!(markdown,
+        extension: [table: true, autolink: true, tagfilter: true],
+        render: [unsafe: false]
+      )
 
     assigns = assign(assigns, :html, html)
 

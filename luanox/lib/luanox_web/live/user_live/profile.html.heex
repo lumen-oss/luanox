@@ -6,127 +6,127 @@
     />
   <% else %>
     <div class="bg-base-100 border-b border-base-300">
-    <div class="max-w-6xl mx-auto px-4 md:px-6 lg:px-8 py-6 lg:py-8">
-      <div class="flex flex-wrap flex-row items-center gap-4 lg:gap-6">
-        <%= if @user.avatar_url do %>
-          <div class="avatar">
-            <div class="w-20 h-20 lg:w-24 lg:h-24 rounded-full">
-              <img src={@user.avatar_url} alt={@user.username} />
+      <div class="max-w-6xl mx-auto px-4 md:px-6 lg:px-8 py-6 lg:py-8">
+        <div class="flex flex-wrap flex-row items-center gap-4 lg:gap-6">
+          <%= if @user.avatar_url do %>
+            <div class="avatar">
+              <div class="w-20 h-20 lg:w-24 lg:h-24 rounded-full">
+                <img src={@user.avatar_url} alt={@user.username} />
+              </div>
             </div>
-          </div>
-        <% else %>
-          <div class="avatar avatar-placeholder">
-            <div class="w-20 h-20 lg:w-24 lg:h-24 bg-primary/10 border-2 border-primary/20 rounded-full">
-              <span class="text-3xl font-bold text-primary">
-                {String.first(@user.username)}
-              </span>
+          <% else %>
+            <div class="avatar avatar-placeholder">
+              <div class="w-20 h-20 lg:w-24 lg:h-24 bg-primary/10 border-2 border-primary/20 rounded-full">
+                <span class="text-3xl font-bold text-primary">
+                  {String.first(@user.username)}
+                </span>
+              </div>
             </div>
-          </div>
-        <% end %>
+          <% end %>
 
-        <div class="flex-1 min-w-0">
-          <div class="flex flex-wrap items-center gap-3">
-            <h1 class="text-2xl md:text-3xl font-bold text-base-content">
-              {@user.aka || @user.username}
-            </h1>
-            <span class="badge badge-primary badge-sm">{@user.provider}</span>
+          <div class="flex-1 min-w-0">
+            <div class="flex flex-wrap items-center gap-3">
+              <h1 class="text-2xl md:text-3xl font-bold text-base-content">
+                {@user.aka || @user.username}
+              </h1>
+              <span class="badge badge-primary badge-sm">{@user.provider}</span>
+            </div>
+            <p class="text-sm text-base-content/70 mt-1">
+              @{@user.username}
+            </p>
+            <%= if @user.bio do %>
+              <p class="text-base-content/80 mt-2 max-w-prose">
+                {@user.bio}
+              </p>
+            <% end %>
           </div>
-          <p class="text-sm text-base-content/70 mt-1">
-            @{@user.username}
-          </p>
-          <%= if @user.bio do %>
-            <p class="text-base-content/80 mt-2 max-w-prose">
-              {@user.bio}
+
+          <div class="flex gap-12 text-center sm:text-left">
+            <div>
+              <div class="text-lg font-semibold text-base-content">{@meta.total_count}</div>
+              <div class="text-sm text-base-content/70">Packages</div>
+            </div>
+            <div>
+              <div class="text-lg font-semibold text-base-content">
+                {format_count(@total_downloads)}
+              </div>
+              <div class="text-sm text-base-content/70">Downloads</div>
+            </div>
+            <div>
+              <div class="text-lg font-semibold text-base-content">
+                {member_since_date(@user.inserted_at)}
+              </div>
+              <div class="text-sm text-base-content/70">Member since</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+        <h2 class="text-lg lg:text-xl font-semibold text-base-content">Published Packages</h2>
+
+        <.form for={%{}} phx-change="update_filter" class="sm:w-48">
+          <select
+            name="sort"
+            class="select select-bordered w-full bg-base-100 border-base-300 focus:border-primary"
+          >
+            <option value="recent" selected={(@params["sort"] || "recent") == "recent"}>
+              Most Recent
+            </option>
+            <option value="name" selected={@params["sort"] == "name"}>Name (A-Z)</option>
+          </select>
+        </.form>
+      </div>
+
+      <%= if @packages == [] do %>
+        <div class="bg-base-200 border border-base-300 rounded-box p-10 text-center">
+          <%= if @current_scope && @current_scope.user && @current_scope.user.id == @user.id do %>
+            <h3 class="text-lg font-semibold text-base-content mb-2">
+              You have not published any packages yet
+            </h3>
+            <p class="text-base-content/70 mb-4">
+              Packages are uploaded with the lux CLI or luarocks.
+            </p>
+            <.link
+              href="https://lumen-oss.github.io"
+              class="btn btn-primary"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Get started with the docs
+            </.link>
+          <% else %>
+            <p class="text-base-content/70">
+              This user has not published any packages yet.
             </p>
           <% end %>
         </div>
+      <% else %>
+        <div class="text-sm text-base-content/70 mb-4">
+          Showing {length(@packages)} of {@meta.total_count} packages
+        </div>
 
-        <div class="flex gap-12 text-center sm:text-left">
-          <div>
-            <div class="text-lg font-semibold text-base-content">{@meta.total_count}</div>
-            <div class="text-sm text-base-content/70">Packages</div>
-          </div>
-          <div>
-            <div class="text-lg font-semibold text-base-content">
-              {format_count(@total_downloads)}
-            </div>
-            <div class="text-sm text-base-content/70">Downloads</div>
-          </div>
-          <div>
-            <div class="text-lg font-semibold text-base-content">
-              {member_since_date(@user.inserted_at)}
-            </div>
-            <div class="text-sm text-base-content/70">Member since</div>
+        <div class="flex justify-center pb-8 mb-4 border-b border-base-300">
+          <div class="flop-pagination">
+            <Flop.Phoenix.pagination meta={@meta} path={~p"/users/#{@user.username}"} />
           </div>
         </div>
-      </div>
-    </div>
-  </div>
 
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-      <h2 class="text-lg lg:text-xl font-semibold text-base-content">Published Packages</h2>
-
-      <.form for={%{}} phx-change="update_filter" class="sm:w-48">
-        <select
-          name="sort"
-          class="select select-bordered w-full bg-base-100 border-base-300 focus:border-primary"
-        >
-          <option value="recent" selected={(@params["sort"] || "recent") == "recent"}>
-            Most Recent
-          </option>
-          <option value="name" selected={@params["sort"] == "name"}>Name (A-Z)</option>
-        </select>
-      </.form>
-    </div>
-
-    <%= if @packages == [] do %>
-      <div class="bg-base-200 border border-base-300 rounded-box p-10 text-center">
-        <%= if @current_scope && @current_scope.user && @current_scope.user.id == @user.id do %>
-          <h3 class="text-lg font-semibold text-base-content mb-2">
-            You have not published any packages yet
-          </h3>
-          <p class="text-base-content/70 mb-4">
-            Packages are uploaded with the lux CLI or luarocks.
-          </p>
-          <.link
-            href="https://lumen-oss.github.io"
-            class="btn btn-primary"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Get started with the docs
-          </.link>
-        <% else %>
-          <p class="text-base-content/70">
-            This user has not published any packages yet.
-          </p>
-        <% end %>
-      </div>
-    <% else %>
-      <div class="text-sm text-base-content/70 mb-4">
-        Showing {length(@packages)} of {@meta.total_count} packages
-      </div>
-
-      <div class="flex justify-center pb-8 mb-4 border-b border-base-300">
-        <div class="flop-pagination">
-          <Flop.Phoenix.pagination meta={@meta} path={~p"/users/#{@user.username}"} />
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <%= for package <- @packages do %>
+            <.package
+              name={package.name}
+              version={
+                List.last(package.releases) && Map.get(List.last(package.releases), :version)
+              }
+              download_count={Enum.sum(for(r <- package.releases, do: r.download_count))}
+              description={package.summary || ""}
+            />
+          <% end %>
         </div>
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <%= for package <- @packages do %>
-          <.package
-            name={package.name}
-            version={
-              List.last(package.releases) && Map.get(List.last(package.releases), :version)
-            }
-            download_count={Enum.sum(for(r <- package.releases, do: r.download_count))}
-            description={package.summary || ""}
-          />
-        <% end %>
-      </div>
-    <% end %>
+      <% end %>
     </div>
   <% end %>
 </Layouts.app>

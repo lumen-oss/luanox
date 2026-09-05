@@ -6,209 +6,212 @@
     />
   <% else %>
     <div class="min-h-screen bg-base-100">
-    <div class="bg-base-200 border-b border-base-300">
-      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
-        <div class="mb-4 lg:mb-6">
-          <.link
-            navigate={~p"/packages"}
-            class="text-sm text-base-content/70 hover:text-primary transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-          >
-            ← Back to packages
-          </.link>
-        </div>
-
-        <div class="flex flex-col gap-4 lg:gap-6">
-          <div class="flex-1">
-            <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-base-content mb-3 lg:mb-4">
-              {@package.name}
-            </h1>
-            <p class="text-base-content/80 text-base lg:text-lg leading-relaxed">
-              {@package.summary || "No description available"}
-            </p>
-          </div>
-
-          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 bg-base-100 border border-base-300 rounded-box">
-            <div class="text-center sm:text-left">
-              <div class="text-sm text-base-content/70 mb-1">Latest Release</div>
-              <div class="font-mono font-semibold text-primary text-lg">
-                {latest_version(@package.releases)}
-              </div>
-              <div class="text-xs text-base-content/70 mt-1">
-                {format_date(
-                  (List.last(@package.releases) || %{inserted_at: @package.inserted_at})
-                  |> Map.get(:inserted_at)
-                )}
-              </div>
-            </div>
-
+      <div class="bg-base-200 border-b border-base-300">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+          <div class="mb-4 lg:mb-6">
             <.link
-              href={~p"/api/download/#{@package.name}"}
-              class="btn bg-primary text-primary-content border-primary hover:bg-primary/90 flex items-center justify-center w-full sm:w-auto"
+              navigate={~p"/packages"}
+              class="text-sm text-base-content/70 hover:text-primary transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             >
-              <.icon name={:download} type={:outline} class="w-4 h-4 mr-2" /> Download Latest
+              ← Back to packages
             </.link>
           </div>
+
+          <div class="flex flex-col gap-4 lg:gap-6">
+            <div class="flex-1">
+              <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-base-content mb-3 lg:mb-4">
+                {@package.name}
+              </h1>
+              <p class="text-base-content/80 text-base lg:text-lg leading-relaxed">
+                {@package.summary || "No description available"}
+              </p>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 bg-base-100 border border-base-300 rounded-box">
+              <div class="text-center sm:text-left">
+                <div class="text-sm text-base-content/70 mb-1">Latest Release</div>
+                <div class="font-mono font-semibold text-primary text-lg">
+                  {latest_version(@package.releases)}
+                </div>
+                <div class="text-xs text-base-content/70 mt-1">
+                  {format_date(
+                    (List.last(@package.releases) || %{inserted_at: @package.inserted_at})
+                    |> Map.get(:inserted_at)
+                  )}
+                </div>
+              </div>
+
+              <.link
+                href={~p"/api/download/#{@package.name}"}
+                class="btn bg-primary text-primary-content border-primary hover:bg-primary/90 flex items-center justify-center w-full sm:w-auto"
+              >
+                <.icon name={:download} type={:outline} class="w-4 h-4 mr-2" /> Download Latest
+              </.link>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
-      <div class="flex flex-col lg:grid lg:grid-cols-3 gap-6 lg:gap-8">
-        <div class="lg:col-span-2 space-y-6 lg:space-y-8">
-          <%= if @package.description && @package.description != @package.summary do %>
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+        <div class="flex flex-col lg:grid lg:grid-cols-3 gap-6 lg:gap-8">
+          <div class="lg:col-span-2 space-y-6 lg:space-y-8">
+            <%= if @package.description && @package.description != @package.summary do %>
+              <div class="bg-base-200 border border-base-300 p-4 lg:p-6 rounded-box">
+                <h2 class="text-lg lg:text-xl font-semibold text-base-content mb-3 lg:mb-4 flex items-center">
+                  <.icon
+                    name={:file_text}
+                    type={:outline}
+                    class="w-4 h-4 lg:w-5 lg:h-5 mr-2 text-primary"
+                  /> Description
+                </h2>
+                <div class="prose prose-sm max-w-none text-base-content/80">
+                  <.markdown content={@package.description} />
+                </div>
+              </div>
+            <% end %>
+
             <div class="bg-base-200 border border-base-300 p-4 lg:p-6 rounded-box">
-              <h2 class="text-lg lg:text-xl font-semibold text-base-content mb-3 lg:mb-4 flex items-center">
+              <h2 class="text-lg lg:text-xl font-semibold text-base-content mb-4 lg:mb-6 flex items-center">
                 <.icon
-                  name={:file_text}
+                  name={:tag}
                   type={:outline}
                   class="w-4 h-4 lg:w-5 lg:h-5 mr-2 text-primary"
-                /> Description
+                /> Versions
               </h2>
-              <div class="prose prose-sm max-w-none text-base-content/80">
-                <.markdown content={@package.description} />
-              </div>
-            </div>
-          <% end %>
 
-          <div class="bg-base-200 border border-base-300 p-4 lg:p-6 rounded-box">
-            <h2 class="text-lg lg:text-xl font-semibold text-base-content mb-4 lg:mb-6 flex items-center">
-              <.icon name={:tag} type={:outline} class="w-4 h-4 lg:w-5 lg:h-5 mr-2 text-primary" />
-              Versions
-            </h2>
-
-            <div class="space-y-3 lg:space-y-4">
-              <%= for release <- Enum.reverse(@package.releases) do %>
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 py-3 lg:py-4 px-3 lg:px-4 bg-base-100 rounded-box border border-base-300 hover:border-primary/30 transition-colors">
-                  <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                    <.link
-                      href={~p"/api/download/#{@package.name}/#{to_string(release.version)}"}
-                      class="font-mono text-base font-semibold text-primary hover:text-primary/80"
-                    >
-                      v{to_string(release.version)}
-                    </.link>
-                    <span class="text-sm text-base-content/70">
-                      {format_date(release.inserted_at)}
-                    </span>
-                  </div>
-                  <div class="flex items-center justify-between sm:justify-end gap-3 sm:gap-4">
-                    <span class="text-sm text-base-content/70">
-                      {format_count(release.download_count)} downloads
-                    </span>
-                    <.link
-                      href={~p"/api/download/#{@package.name}/#{to_string(release.version)}"}
-                      class="btn btn-sm bg-primary/10 text-primary border-primary/20 hover:bg-primary/20"
-                    >
-                      <.icon name={:download} type={:outline} class="w-3 h-3 mr-1" /> Download
-                    </.link>
-                  </div>
-                </div>
-              <% end %>
-            </div>
-          </div>
-        </div>
-
-        <div class="space-y-4 lg:space-y-6">
-          <div class="bg-base-200 border border-base-300 rounded-box p-4 lg:p-6">
-            <h3 class="text-base lg:text-lg font-semibold text-base-content mb-4 lg:mb-6">
-              Package Overview
-            </h3>
-            <div class="space-y-3 lg:space-y-4">
-              <div class="flex justify-between items-center">
-                <span class="text-sm lg:text-base text-base-content/70">Package Name</span>
-                <span class="font-mono font-semibold text-sm lg:text-base text-base-content">
-                  {@package.name}
-                </span>
-              </div>
-              <div class="flex justify-between items-center">
-                <span class="text-sm lg:text-base text-base-content/70">Total Downloads</span>
-                <span class="font-semibold text-base lg:text-lg text-base-content">
-                  {format_count(Enum.sum(for r <- @package.releases, do: r.download_count))}
-                </span>
-              </div>
-              <div class="flex justify-between items-center">
-                <span class="text-sm lg:text-base text-base-content/70">Total Versions</span>
-                <span class="font-semibold text-sm lg:text-base text-base-content">
-                  {length(@package.releases)}
-                </span>
-              </div>
-              <div class="flex justify-between items-center">
-                <span class="text-sm lg:text-base text-base-content/70">Created</span>
-                <span class="font-medium text-sm lg:text-base text-base-content">
-                  {format_date(@package.inserted_at)}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div class="bg-base-200 border border-base-300 rounded-box p-4 lg:p-6">
-            <h3 class="text-base lg:text-lg font-semibold text-base-content mb-4 lg:mb-6 flex items-center">
-              <%!-- <.icon name={:user} type={:outline} class="w-4 h-4 lg:w-5 lg:h-5 mr-2 text-primary" /> --%>
-              Author
-            </h3>
-            <div class="space-y-3 lg:space-y-4">
-              <.link
-                navigate={~p"/users/#{@package.user.username}"}
-                class="flex items-start gap-3 group"
-              >
-                <%= if @package.user.avatar_url do %>
-                  <img
-                    src={@package.user.avatar_url}
-                    alt={@package.user.aka || @package.user.username}
-                    class="w-10 h-10 lg:w-12 lg:h-12 rounded-full border border-base-300"
-                  />
-                <% else %>
-                  <div class="w-10 h-10 lg:w-12 lg:h-12 bg-primary/10 border rounded-full border-primary/20 flex items-center justify-center">
-                    <.icon
-                      name={:user}
-                      type={:outline}
-                      class="w-5 h-5 lg:w-6 lg:h-6 text-primary"
-                    />
+              <div class="space-y-3 lg:space-y-4">
+                <%= for release <- Enum.reverse(@package.releases) do %>
+                  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 py-3 lg:py-4 px-3 lg:px-4 bg-base-100 rounded-box border border-base-300 hover:border-primary/30 transition-colors">
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                      <.link
+                        href={~p"/api/download/#{@package.name}/#{to_string(release.version)}"}
+                        class="font-mono text-base font-semibold text-primary hover:text-primary/80"
+                      >
+                        v{to_string(release.version)}
+                      </.link>
+                      <span class="text-sm text-base-content/70">
+                        {format_date(release.inserted_at)}
+                      </span>
+                    </div>
+                    <div class="flex items-center justify-between sm:justify-end gap-3 sm:gap-4">
+                      <span class="text-sm text-base-content/70">
+                        {format_count(release.download_count)} downloads
+                      </span>
+                      <.link
+                        href={~p"/api/download/#{@package.name}/#{to_string(release.version)}"}
+                        class="btn btn-sm bg-primary/10 text-primary border-primary/20 hover:bg-primary/20"
+                      >
+                        <.icon name={:download} type={:outline} class="w-3 h-3 mr-1" /> Download
+                      </.link>
+                    </div>
                   </div>
                 <% end %>
-                <div class="flex-1 min-w-0">
-                  <div class="font-semibold text-sm lg:text-base text-base-content group-hover:text-primary transition-colors">
-                    {@package.user.aka || @package.user.username}
-                  </div>
-                  <div class="text-xs lg:text-sm text-base-content/70 mt-1">
-                    Package maintainer
-                  </div>
-                </div>
-              </.link>
-
-              <div class="border-t border-base-300 pt-3">
-                <div class="text-xs lg:text-sm text-base-content/70">
-                  Member since {format_date(@package.user.inserted_at)}
-                </div>
               </div>
             </div>
           </div>
 
-          <div class="bg-base-200 border border-base-300 rounded-box p-4 lg:p-6">
-            <h3 class="text-base lg:text-lg font-semibold text-base-content mb-3 lg:mb-4">
-              Installation
-            </h3>
-            <div class="space-y-3">
-              <div>
-                <div class="text-sm lg:text-base text-base-content/70 mb-2 flex items-center">
-                  <span class="font-medium">Via Lux</span>
+          <div class="space-y-4 lg:space-y-6">
+            <div class="bg-base-200 border border-base-300 rounded-box p-4 lg:p-6">
+              <h3 class="text-base lg:text-lg font-semibold text-base-content mb-4 lg:mb-6">
+                Package Overview
+              </h3>
+              <div class="space-y-3 lg:space-y-4">
+                <div class="flex justify-between items-center">
+                  <span class="text-sm lg:text-base text-base-content/70">Package Name</span>
+                  <span class="font-mono font-semibold text-sm lg:text-base text-base-content">
+                    {@package.name}
+                  </span>
                 </div>
-                <div class="bg-base-300 border border-base-300 p-3 font-mono text-xs lg:text-sm text-base-content rounded-md overflow-x-auto">
-                  lx install {@package.name}
+                <div class="flex justify-between items-center">
+                  <span class="text-sm lg:text-base text-base-content/70">Total Downloads</span>
+                  <span class="font-semibold text-base lg:text-lg text-base-content">
+                    {format_count(Enum.sum(for r <- @package.releases, do: r.download_count))}
+                  </span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-sm lg:text-base text-base-content/70">Total Versions</span>
+                  <span class="font-semibold text-sm lg:text-base text-base-content">
+                    {length(@package.releases)}
+                  </span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-sm lg:text-base text-base-content/70">Created</span>
+                  <span class="font-medium text-sm lg:text-base text-base-content">
+                    {format_date(@package.inserted_at)}
+                  </span>
                 </div>
               </div>
-              <div>
-                <div class="text-sm lg:text-base text-base-content/70 mb-2 flex items-center">
-                  <span class="font-medium">Via LuaRocks</span>
+            </div>
+
+            <div class="bg-base-200 border border-base-300 rounded-box p-4 lg:p-6">
+              <h3 class="text-base lg:text-lg font-semibold text-base-content mb-4 lg:mb-6 flex items-center">
+                <%!-- <.icon name={:user} type={:outline} class="w-4 h-4 lg:w-5 lg:h-5 mr-2 text-primary" /> --%>
+                Author
+              </h3>
+              <div class="space-y-3 lg:space-y-4">
+                <.link
+                  navigate={~p"/users/#{@package.user.username}"}
+                  class="flex items-start gap-3 group"
+                >
+                  <%= if @package.user.avatar_url do %>
+                    <img
+                      src={@package.user.avatar_url}
+                      alt={@package.user.aka || @package.user.username}
+                      class="w-10 h-10 lg:w-12 lg:h-12 rounded-full border border-base-300"
+                    />
+                  <% else %>
+                    <div class="w-10 h-10 lg:w-12 lg:h-12 bg-primary/10 border rounded-full border-primary/20 flex items-center justify-center">
+                      <.icon
+                        name={:user}
+                        type={:outline}
+                        class="w-5 h-5 lg:w-6 lg:h-6 text-primary"
+                      />
+                    </div>
+                  <% end %>
+                  <div class="flex-1 min-w-0">
+                    <div class="font-semibold text-sm lg:text-base text-base-content group-hover:text-primary transition-colors">
+                      {@package.user.aka || @package.user.username}
+                    </div>
+                    <div class="text-xs lg:text-sm text-base-content/70 mt-1">
+                      Package maintainer
+                    </div>
+                  </div>
+                </.link>
+
+                <div class="border-t border-base-300 pt-3">
+                  <div class="text-xs lg:text-sm text-base-content/70">
+                    Member since {format_date(@package.user.inserted_at)}
+                  </div>
                 </div>
-                <div class="bg-base-300 border border-base-300 p-3 font-mono text-xs lg:text-sm text-base-content rounded-md overflow-x-auto">
-                  luarocks install {@package.name}
+              </div>
+            </div>
+
+            <div class="bg-base-200 border border-base-300 rounded-box p-4 lg:p-6">
+              <h3 class="text-base lg:text-lg font-semibold text-base-content mb-3 lg:mb-4">
+                Installation
+              </h3>
+              <div class="space-y-3">
+                <div>
+                  <div class="text-sm lg:text-base text-base-content/70 mb-2 flex items-center">
+                    <span class="font-medium">Via Lux</span>
+                  </div>
+                  <div class="bg-base-300 border border-base-300 p-3 font-mono text-xs lg:text-sm text-base-content rounded-md overflow-x-auto">
+                    lx install {@package.name}
+                  </div>
+                </div>
+                <div>
+                  <div class="text-sm lg:text-base text-base-content/70 mb-2 flex items-center">
+                    <span class="font-medium">Via LuaRocks</span>
+                  </div>
+                  <div class="bg-base-300 border border-base-300 p-3 font-mono text-xs lg:text-sm text-base-content rounded-md overflow-x-auto">
+                    luarocks install {@package.name}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
     </div>
   <% end %>
 </Layouts.app>

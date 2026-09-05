@@ -21,8 +21,8 @@
               Discover and explore our collection of Lua packages
             </p>
           </div>
-          
-<!-- Search and Filter Section -->
+
+          <!-- Search and Filter Section -->
           <div class="bg-base-100 border border-base-300 p-4 lg:p-6">
             <.form for={%{}} phx-change="update_filter" class="space-y-4">
               <div class="flex flex-col sm:flex-row gap-4">
@@ -38,8 +38,8 @@
                     phx-debounce="300"
                   />
                 </div>
-                
-<!-- Sort Dropdown -->
+
+                <!-- Sort Dropdown -->
                 <div class="sm:w-48">
                   <select
                     name="sort"
@@ -51,15 +51,15 @@
                     <option value="name" selected={@params["sort"] == "name"}>Name (A-Z)</option>
                   </select>
                 </div>
-                
-<!-- Search Button -->
+
+                <!-- Search Button -->
                 <button type="submit" class="btn btn-primary">
                   <.icon name={:search} type={:outline} class="w-4 h-4 mr-2" /> Search
                 </button>
               </div>
             </.form>
-            
-<!-- Results Info -->
+
+            <!-- Results Info -->
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mt-4 pt-4 border-t border-base-300">
               <div class="text-sm text-base-content/70">
                 Showing {length(@packages)} of {@meta.total_count} packages
@@ -95,7 +95,9 @@
           <%= for package <- @packages do %>
             <.package
               name={package.name}
-              version={List.last(package.releases) && Map.get(List.last(package.releases), :version)}
+              version={
+                List.last(package.releases) && Map.get(List.last(package.releases), :version)
+              }
               download_count={Enum.sum(for r <- package.releases, do: r.download_count)}
               description={package.summary || ""}
             />

@@ -2,7 +2,13 @@ defmodule LuaNoxWeb.PackageJSON do
   alias LuaNoxWeb.ReleaseJSON
   alias LuaNox.Packages.Package
 
-  def index(%{packages: packages, total_count: total, page: page, page_size: page_size, total_pages: total_pages}) do
+  def index(%{
+        packages: packages,
+        total_count: total,
+        page: page,
+        page_size: page_size,
+        total_pages: total_pages
+      }) do
     data =
       Enum.reduce(packages, %{}, fn package, acc ->
         data = data(package)
