@@ -29,8 +29,7 @@ defmodule LuaNoxWeb.UserLive.ProvideEmail do
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash} current_scope={nil}>
-      <%!-- The height calculation inherits both the navbar and footer sizes in px --%>
-      <div class="flex min-h-[calc(100vh-116px)] md:min-h-[calc(100vh-124px)] bg-base-200">
+      <div class="flex-1 flex bg-base-200">
         <div class="page-container max-w-md space-y-8 py-16">
           <div class="text-center space-y-8">
             <div class="flex justify-center">

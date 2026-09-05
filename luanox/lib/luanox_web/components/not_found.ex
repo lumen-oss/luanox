@@ -6,7 +6,7 @@ defmodule LuaNoxWeb.Components.NotFound do
 
   def not_found(assigns) do
     ~H"""
-    <div class="page-container flex items-center justify-center max-w-6xl h-[calc(100vh-116px)] md:h-[calc(100vh-124px)] py-16 lg:py-24">
+    <div class="page-container flex-1 flex items-center justify-center max-w-6xl py-16 lg:py-24">
       <div class="bg-base-200 border border-base-300 rounded-box p-12 text-center max-w-xl mx-auto">
         <.icon
           name={:help_circle}

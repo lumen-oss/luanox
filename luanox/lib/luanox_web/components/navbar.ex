@@ -47,12 +47,12 @@ defmodule LuaNoxWeb.NavBar do
 
   defp account_dropdown(%{current_scope: _} = assigns) do
     ~H"""
-    <div class="dropdown dropdown-end max-sm:w-full">
+    <div class="dropdown dropdown-end w-full sm:w-auto">
       <%= if @current_scope do %>
         <div
           tabindex="0"
           role="button"
-          class="btn btn-ghost btn-block justify-start text-grey hover:text-primary rounded-field max-sm:px-1"
+          class="btn btn-ghost btn-block justify-start text-grey hover:text-primary rounded-field px-1 sm:px-4"
         >
           <%= if @current_scope.user.avatar_url do %>
             <img
@@ -69,7 +69,7 @@ defmodule LuaNoxWeb.NavBar do
         </div>
       <% else %>
         <.link
-          class="btn btn-ghost btn-block justify-start text-grey hover:text-primary rounded-field max-sm:px-1"
+          class="btn btn-ghost btn-block justify-start text-grey hover:text-primary rounded-field px-1 sm:px-4"
           navigate={~p"/login"}
         >
           <.icon name={:user_circle} type={:outline} />
