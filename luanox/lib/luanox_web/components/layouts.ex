@@ -24,9 +24,7 @@ defmodule LuaNoxWeb.Layouts do
         class="grow transition-all duration-500 ease-in-out opacity-0 phx-page-loading:opacity-0 motion-reduce:transition-none motion-reduce:opacity-100"
         phx-mounted={JS.remove_class("opacity-0")}
       >
-        <div class="mx-auto">
-          {render_slot(@inner_block)}
-        </div>
+        {render_slot(@inner_block)}
       </main>
 
       <footer>

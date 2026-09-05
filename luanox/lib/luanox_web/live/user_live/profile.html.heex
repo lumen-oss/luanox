@@ -6,7 +6,7 @@
     />
   <% else %>
     <div class="bg-base-100 border-b border-base-300">
-      <div class="max-w-6xl mx-auto px-4 md:px-6 lg:px-8 py-6 lg:py-8">
+      <div class="page-container max-w-6xl py-6 lg:py-8">
         <div class="flex flex-wrap flex-row items-center gap-4 lg:gap-6">
           <%= if @user.avatar_url do %>
             <div class="avatar">
@@ -63,7 +63,7 @@
       </div>
     </div>
 
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="page-container max-w-6xl py-8">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <h2 class="text-lg lg:text-xl font-semibold text-base-content">Published Packages</h2>
 

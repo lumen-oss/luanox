@@ -76,6 +76,12 @@
   }
 }
 
+@layer components {
+  .page-container {
+    @apply mx-auto w-full px-4 sm:px-6 lg:px-8;
+  }
+}
+
 .prose a {
   color: oklch(var(--color-primary));
   text-decoration-color: oklch(var(--color-primary) / 0.3);

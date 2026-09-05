@@ -17,7 +17,7 @@ defmodule LuaNoxWeb.UserLive.Settings do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <div class="bg-base-100 border-b border-base-300">
-        <div class="max-w-5xl mx-auto px-4 lg:px-6 py-4 lg:py-6">
+        <div class="page-container max-w-5xl py-4 lg:py-6">
           <div class="flex items-center gap-3">
             <div class="w-16 h-16 sm:w-20 sm:h-20 bg-primary/10 border-2 border-primary/20 rounded-full flex items-center justify-center shrink-0">
               <.icon name={:user} type={:outline} class="w-10 h-10 sm:w-12 sm:h-12 text-primary" />
@@ -32,7 +32,7 @@ defmodule LuaNoxWeb.UserLive.Settings do
         </div>
       </div>
 
-      <div class="max-w-5xl mx-auto px-4 lg:px-6 py-6 lg:py-8">
+      <div class="page-container max-w-5xl py-6 lg:py-8">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <%!-- Profile Card --%>
           <div class="lg:col-span-1">
