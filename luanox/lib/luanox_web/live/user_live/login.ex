@@ -4,9 +4,8 @@ defmodule LuaNoxWeb.UserLive.Login do
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
-      <%!-- The height calculation inherits both the navbar and footer sizes in px --%>
-      <div class="flex h-[calc(100vh-116px)] md:h-[calc(100vh-124px)]">
-        <div class="max-w-sm space-y-4 py-8 m-auto">
+      <div class="flex-1 flex items-center">
+        <div class="max-w-sm w-full space-y-4 py-8 mx-auto">
           <.header class="text-center">
             <p>Choose an OAuth Provider</p>
             <:subtitle>

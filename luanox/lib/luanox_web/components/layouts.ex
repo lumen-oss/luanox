@@ -21,7 +21,7 @@ defmodule LuaNoxWeb.Layouts do
       </header>
 
       <main
-        class="grow transition-all duration-500 ease-in-out opacity-0 phx-page-loading:opacity-0 motion-reduce:transition-none motion-reduce:opacity-100"
+        class="grow flex flex-col transition-all duration-500 ease-in-out opacity-0 phx-page-loading:opacity-0 motion-reduce:transition-none motion-reduce:opacity-100"
         phx-mounted={JS.remove_class("opacity-0")}
       >
         {render_slot(@inner_block)}
