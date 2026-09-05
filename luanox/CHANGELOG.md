@@ -1,5 +1,41 @@
 # Changelog
 
+## [0.4.0](https://github.com/lumen-oss/luanox/compare/v0.3.0...v0.4.0) (2026-09-05)
+
+
+### Features
+
+* **a11y:** add aria-expanded and Escape close for mobile menu ([131459f](https://github.com/lumen-oss/luanox/commit/131459ffbed5d2a538e514a67633e287181553d0))
+* **a11y:** honor prefers-reduced-motion and add focus-visible rings ([55f35d6](https://github.com/lumen-oss/luanox/commit/55f35d6f51791ac05b2e08f25879e87892332f38))
+* **accounts:** add editable bio and show it on the profile ([43d015f](https://github.com/lumen-oss/luanox/commit/43d015ff3f767aa2329605c40ff5257ecdd44cfb))
+* **accounts:** store github avatar url from oauth ([f7de546](https://github.com/lumen-oss/luanox/commit/f7de546473f147b14ecfa30280d42f00c10a0994)), closes [#80](https://github.com/lumen-oss/luanox/issues/80)
+* add `profile` to user dropdown ([658b096](https://github.com/lumen-oss/luanox/commit/658b096d362be0850e8eafbf2e24cbfa01a0910b))
+* add custom fonts ([7f7a978](https://github.com/lumen-oss/luanox/commit/7f7a9788615dcfdc182f53a7a05569d640394853))
+* add tailwind typography package for styling markdown README files ([8a041f7](https://github.com/lumen-oss/luanox/commit/8a041f79d60b08ed36773a2744113b5dc28b212d))
+* **luanox:** add LiveDebugger dependency to dev environments ([651bc8b](https://github.com/lumen-oss/luanox/commit/651bc8bea6484b82bfefa829142e4e2edd784391))
+* **packages:** order featured section by total downloads ([77fe3f4](https://github.com/lumen-oss/luanox/commit/77fe3f4de5ab9b78234cdc80e9564f0d466c2f86))
+* **settings:** add a live character counter to the bio field ([d67369c](https://github.com/lumen-oss/luanox/commit/d67369cabc0a1c286258e09ee98453f898478aea))
+* **web:** abbreviate large download counts ([4800137](https://github.com/lumen-oss/luanox/commit/48001373d3a5b9582230e77690d35337ee6787bb)), closes [#58](https://github.com/lumen-oss/luanox/issues/58)
+* **web:** add custom error pages and in-page not-found states ([3cbff5c](https://github.com/lumen-oss/luanox/commit/3cbff5c4934eff1d9da2cbd0f1bb5288738c9533))
+* **web:** add public user profile pages ([4fe105d](https://github.com/lumen-oss/luanox/commit/4fe105d954d2a8525df05157cdec6f5bfb4a4f9e))
+* **web:** paginate and sort packages on profile page ([5f2d323](https://github.com/lumen-oss/luanox/commit/5f2d32308da5adb854b9dbe7ea9a68361ff1b6d7))
+* **web:** personalise empty profile state for the owner ([7337a30](https://github.com/lumen-oss/luanox/commit/7337a3044185b1bce9e63a911758cac15e4dc2e9))
+
+
+### Bug Fixes
+
+* **a11y:** add meaningful alt value to the user avatar ([199ba55](https://github.com/lumen-oss/luanox/commit/199ba550106f693d2e0385f10187b567b0706158))
+* **accounts:** validate avatar urls against trusted hosts ([a398c78](https://github.com/lumen-oss/luanox/commit/a398c78e4aa0ce434ad2bf1377abb415b3e78a7c))
+* **theme:** correct dark base ramp contrast ([0371155](https://github.com/lumen-oss/luanox/commit/0371155e6abbc2e859d21acdefbd70d1bb788a47))
+* **theme:** remove global primary button scale; keep hero CTA glow only ([7246977](https://github.com/lumen-oss/luanox/commit/72469779b9cbdc5d18e89d07fb5d2d507da4753f))
+* **ui:** drop ghost v0.1.0 fallback, show '-' when no releases ([e88aaec](https://github.com/lumen-oss/luanox/commit/e88aaec3d565bea581dcf36f2fd4d2f36e9d23b7))
+* **ui:** show real member-since date from user account ([3b80d37](https://github.com/lumen-oss/luanox/commit/3b80d37ff538f0e81e21fa8ce3d34eadf6b4beac))
+* **ui:** style markdown prose links with primary color ([13ed697](https://github.com/lumen-oss/luanox/commit/13ed697c12aa6054aee2e3c428285b79d26c7dee))
+* **ui:** unify card elevation and key/code-block contrast ([ead6e01](https://github.com/lumen-oss/luanox/commit/ead6e01f6daa1b7304b723430d0141c600808f64))
+* **web:** interpolate version struct in package badges ([0a5fec6](https://github.com/lumen-oss/luanox/commit/0a5fec64cdf285635a70601b9550ef17034796ea))
+* **web:** make pagination and account dropdown mobile-first ([aabf8fb](https://github.com/lumen-oss/luanox/commit/aabf8fb37bd8185dae898285f18d00d5870eb61a))
+* **web:** prevent mobile horizontal overflow on hero tagline and profile stats ([f4b6868](https://github.com/lumen-oss/luanox/commit/f4b6868514a2ad837f2605c22430bb0a0fe3457f))
+
 ## [0.3.0](https://github.com/lumen-oss/luanox/compare/v0.2.0...v0.3.0) (2026-07-01)
 
 
