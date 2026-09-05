@@ -10,9 +10,9 @@ defmodule LuaNoxWeb.PackageBox do
     ~H"""
     <.link
       navigate={~p"/package/#{@name}"}
-      class="group focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+      class="group h-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
     >
-      <div class="bg-base-100 border border-base-300 hover:border-primary/40 transition-colors duration-200 p-6">
+      <div class="h-full flex flex-col bg-base-100 border border-base-300 hover:border-primary/40 transition-colors duration-200 p-6">
         <div class="space-y-4">
           <div class="flex items-start justify-between">
             <h2 class="text-lg font-semibold text-base-content group-hover:text-primary transition-colors">
@@ -23,7 +23,7 @@ defmodule LuaNoxWeb.PackageBox do
             </div>
           </div>
 
-          <p class="text-base-content/70 text-sm leading-relaxed min-h-12 line-clamp-2">
+          <p class="flex-1 text-base-content/70 text-sm leading-relaxed min-h-12 line-clamp-2">
             {if @description != "", do: @description, else: "No description available"}
           </p>
 
@@ -68,7 +68,7 @@ defmodule LuaNoxWeb.PackageBox do
             </p>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <%= for %{name: name, summary: summary, releases: releases} <- @featured do %>
               <.package
                 name={name}
@@ -93,7 +93,7 @@ defmodule LuaNoxWeb.PackageBox do
             </p>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <%= for %{name: name, summary: summary, releases: releases} <- Enum.take(@packages, 4) do %>
               <.package
                 name={name}
