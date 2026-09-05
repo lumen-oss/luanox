@@ -23,7 +23,7 @@ defmodule LuaNoxWeb.UserLive.Settings do
               <.icon name={:user} type={:outline} class="w-10 h-10 sm:w-12 sm:h-12 text-primary" />
             </div>
             <div>
-              <h1 class="text-xl sm:text-2xl font-semibold text-base-content">Settings</h1>
+              <h1 class="text-2xl sm:text-3xl lg:text-4xl font-semibold text-base-content">Settings</h1>
               <p class="text-sm sm:text-base text-base-content/70">
                 Manage your profile and account preferences
               </p>

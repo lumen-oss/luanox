@@ -17,7 +17,7 @@ defmodule LuaNoxWeb.UserLive.Keys do
               </div>
 
               <div class="space-y-1 flex-1">
-                <h1 class="text-2xl sm:text-3xl font-bold text-base-content">
+                <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-base-content">
                   API Keys
                 </h1>
                 <p class="text-sm sm:text-base text-base-content/70">
