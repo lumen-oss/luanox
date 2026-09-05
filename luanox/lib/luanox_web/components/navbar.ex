@@ -45,7 +45,9 @@ defmodule LuaNoxWeb.NavBar do
     """
   end
 
-  defp account_dropdown(%{current_scope: _} = assigns) do
+  defp account_dropdown(%{current_scope: current_scope} = assigns) do
+    assigns = assigns |> assign(:unique_username, User.unique_username(current_scope.user))
+
     ~H"""
     <div class="dropdown dropdown-end w-full sm:w-auto">
       <%= if @current_scope do %>
@@ -57,14 +59,14 @@ defmodule LuaNoxWeb.NavBar do
           <%= if @current_scope.user.avatar_url do %>
             <img
               src={@current_scope.user.avatar_url}
-              alt={User.unique_username(@current_scope.user)}
+              alt={@unique_username}
               class="w-6 h-6 rounded-full"
             />
           <% else %>
             <.icon name={:user_circle} type={:outline} />
           <% end %>
           <span class="mt-px">
-            {User.unique_username(@current_scope.user) |> String.slice(0..20)}
+            {String.slice(@unique_username, 0..20)}
           </span>
         </div>
       <% else %>
@@ -83,6 +85,9 @@ defmodule LuaNoxWeb.NavBar do
         tabindex="0"
         class="menu dropdown-content bg-base-200 border border-base-300 rounded-box z-1 mt-4 w-52 p-2 shadow-sm"
       >
+        <li>
+          <.link navigate={~p"/users/#{@unique_username}"}>Profile</.link>
+        </li>
         <li>
           <.link navigate={~p"/settings"}>Settings</.link>
         </li>
