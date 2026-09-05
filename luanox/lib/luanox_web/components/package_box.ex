@@ -27,13 +27,10 @@ defmodule LuaNoxWeb.PackageBox do
             {if @description != "", do: @description, else: "No description available"}
           </p>
 
-          <div class="flex items-center justify-between pt-3 border-t border-base-300">
+          <div class="pt-3 border-t border-base-300">
             <div class="flex items-center space-x-2 text-xs text-base-content/70">
               <.icon name={:download} type={:outline} class="w-3 h-3" />
               <span>{format_count(@download_count)} downloads</span>
-            </div>
-            <div class="text-xs text-primary group-hover:text-primary/80 transition-colors">
-              View Details →
             </div>
           </div>
         </div>
