@@ -26,6 +26,7 @@ defmodule LuaNoxWeb.ConnCase do
   def log_in_user(conn, user, opts \\ []) do
     token = LuaNox.Accounts.generate_user_session_token(user)
     maybe_set_token_authenticated_at(token, opts[:token_authenticated_at])
+
     conn
     |> Phoenix.ConnTest.init_test_session(%{})
     |> Plug.Conn.put_session(:user_token, token)
@@ -42,6 +43,7 @@ defmodule LuaNoxWeb.ConnCase do
   end
 
   defp maybe_set_token_authenticated_at(_token, nil), do: nil
+
   defp maybe_set_token_authenticated_at(token, authenticated_at) do
     LuaNox.AccountsFixtures.override_token_authenticated_at(token, authenticated_at)
   end

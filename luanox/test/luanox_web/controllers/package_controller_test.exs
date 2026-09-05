@@ -25,7 +25,11 @@ defmodule LuaNoxWeb.PackageControllerTest do
 
   describe "create package" do
     test "renders package when data is valid", %{conn: conn} do
-      conn = post(conn, ~p"/api/packages", package: %{name: "my-pkg", summary: "A package", description: "Details"})
+      conn =
+        post(conn, ~p"/api/packages",
+          package: %{name: "my-pkg", summary: "A package", description: "Details"}
+        )
+
       assert %{"name" => "my-pkg"} = json_response(conn, 201)["data"]
     end
 

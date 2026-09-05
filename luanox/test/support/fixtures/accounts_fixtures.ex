@@ -5,6 +5,7 @@ defmodule LuaNox.AccountsFixtures do
 
   def unique_user_email, do: "user#{System.unique_integer()}@example.com"
   def valid_user_password, do: "hello world!"
+
   def valid_user_attributes(attrs \\ %{}) do
     Enum.into(attrs, %{email: unique_user_email()})
   end
@@ -68,6 +69,7 @@ defmodule LuaNox.AccountsFixtures do
 
   def offset_user_token(token, amount_to_add, unit) do
     dt = DateTime.add(DateTime.utc_now(:second), amount_to_add, unit)
+
     LuaNox.Repo.update_all(
       from(ut in Accounts.UserToken, where: ut.token == ^token),
       set: [inserted_at: dt, authenticated_at: dt]

@@ -4,7 +4,11 @@ defmodule LuaNox.PackagesFixtures do
 
     attrs =
       attrs
-      |> Enum.into(%{name: "pkg_#{unique}", summary: "Summary #{unique}", description: "Desc #{unique}"})
+      |> Enum.into(%{
+        name: "pkg_#{unique}",
+        summary: "Summary #{unique}",
+        description: "Desc #{unique}"
+      })
       |> then(fn map -> Map.new(map, fn {k, v} -> {to_string(k), v} end) end)
 
     %LuaNox.Packages.Package{}
