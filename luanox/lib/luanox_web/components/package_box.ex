@@ -54,7 +54,7 @@ defmodule LuaNoxWeb.PackageBox do
   def packages(assigns) do
     ~H"""
     <div class="py-16 bg-base-200">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="page-container max-w-7xl">
         <!-- Featured Packages Section -->
         <div class="mb-16">
           <div class="text-center mb-12">

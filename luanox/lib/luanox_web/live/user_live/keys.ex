@@ -9,7 +9,7 @@ defmodule LuaNoxWeb.UserLive.Keys do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <div class="bg-base-100 border-b border-base-300">
-        <div class="max-w-4xl mx-auto px-4 lg:px-8 py-6 lg:py-8">
+        <div class="page-container max-w-4xl py-6 lg:py-8">
           <div class="flex flex-col md:flex-row justify-between items-center gap-4 sm:gap-6">
             <div class="flex items-center gap-4 sm:gap-6">
               <div class="w-16 h-16 sm:w-20 sm:h-20 bg-primary/10 border-2 border-primary/20 rounded-full flex items-center justify-center shrink-0">
@@ -38,7 +38,7 @@ defmodule LuaNoxWeb.UserLive.Keys do
         </div>
       </div>
 
-      <div class="max-w-4xl mx-auto px-4 lg:px-8 py-6 lg:py-8">
+      <div class="page-container max-w-4xl py-6 lg:py-8">
         <div class="space-y-6">
           <div class="bg-base-200 border border-base-300 rounded-box p-6">
             <div class="flex items-center gap-3 mb-4">
