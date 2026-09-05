@@ -116,22 +116,18 @@
   pointer-events: none;
 }
 
-.donation-section .bg-white\/10 {
-  background: rgba(255, 255, 255, 0.08) !important;
-  backdrop-filter: blur(16px) saturate(120%) brightness(105%) !important;
+.donation-card {
+  background: oklch(var(--color-base-100) / 0.65);
+  backdrop-filter: blur(16px) saturate(120%) brightness(105%);
+  border: 1px solid oklch(var(--color-base-100) / 0.2);
 
   box-shadow:
     0 0 80px -20px oklch(var(--color-primary) / 0.4),
     0 0 40px -10px oklch(var(--color-secondary) / 0.3),
     0 25px 50px -12px rgba(0, 0, 0, 0.25),
     0 16px 16px -8px rgba(0, 0, 0, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.1);
-}
-
-.donation-section .border-white\/20 {
-  border-color: rgba(255, 255, 255, 0.15) !important;
-  border-width: 1px !important;
+    inset 0 1px 0 oklch(var(--color-base-100) / 0.5),
+    inset 0 0 0 1px oklch(var(--color-base-100) / 0.2);
 }
 
 @keyframes gentle-pulse {
@@ -366,7 +362,7 @@
   }
 }
 
-#donation-modal .relative.z-10>div {
+#donation-modal .donation-modal-panel {
   animation: modalSlideIn 0.3s ease-out;
 }
 
