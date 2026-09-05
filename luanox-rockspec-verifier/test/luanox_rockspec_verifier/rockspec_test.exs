@@ -13,7 +13,10 @@ defmodule LuanoxRockspecVerifier.RockspecTest do
 
   describe "valid rockspecs" do
     test "passes with all valid fields and https URL" do
-      assert Rockspec.verify(@valid_rockspec, %{expected_name: "my-package", expected_version: "1.0.0"})
+      assert Rockspec.verify(@valid_rockspec, %{
+               expected_name: "my-package",
+               expected_version: "1.0.0"
+             })
     end
 
     test "passes with git+https URL and tag" do
@@ -61,7 +64,10 @@ defmodule LuanoxRockspecVerifier.RockspecTest do
       build = { type = "builtin" }
       """
 
-      assert Rockspec.verify(rockspec, %{expected_name: "my-cool-package", expected_version: "0.1.0"})
+      assert Rockspec.verify(rockspec, %{
+               expected_name: "my-cool-package",
+               expected_version: "0.1.0"
+             })
     end
 
     test "passes with package name containing underscores" do
@@ -73,7 +79,10 @@ defmodule LuanoxRockspecVerifier.RockspecTest do
       build = { type = "builtin" }
       """
 
-      assert Rockspec.verify(rockspec, %{expected_name: "my_cool_package", expected_version: "3.2.1"})
+      assert Rockspec.verify(rockspec, %{
+               expected_name: "my_cool_package",
+               expected_version: "3.2.1"
+             })
     end
 
     test "passes with complex semver version" do
@@ -91,7 +100,10 @@ defmodule LuanoxRockspecVerifier.RockspecTest do
 
   describe "expected_name validation - denied" do
     test "rejects expected_name with spaces" do
-      refute Rockspec.verify(@valid_rockspec, %{expected_name: "my package", expected_version: "1.0.0"})
+      refute Rockspec.verify(@valid_rockspec, %{
+               expected_name: "my package",
+               expected_version: "1.0.0"
+             })
     end
 
     test "rejects expected_name with special characters" do
@@ -99,15 +111,24 @@ defmodule LuanoxRockspecVerifier.RockspecTest do
     end
 
     test "rejects expected_name with dots" do
-      refute Rockspec.verify(@valid_rockspec, %{expected_name: "my.package", expected_version: "1.0.0"})
+      refute Rockspec.verify(@valid_rockspec, %{
+               expected_name: "my.package",
+               expected_version: "1.0.0"
+             })
     end
 
     test "rejects expected_name with forward slash" do
-      refute Rockspec.verify(@valid_rockspec, %{expected_name: "my/package", expected_version: "1.0.0"})
+      refute Rockspec.verify(@valid_rockspec, %{
+               expected_name: "my/package",
+               expected_version: "1.0.0"
+             })
     end
 
     test "rejects expected_name with backslash" do
-      refute Rockspec.verify(@valid_rockspec, %{expected_name: "my\\package", expected_version: "1.0.0"})
+      refute Rockspec.verify(@valid_rockspec, %{
+               expected_name: "my\\package",
+               expected_version: "1.0.0"
+             })
     end
 
     test "rejects empty expected_name" do
@@ -115,17 +136,26 @@ defmodule LuanoxRockspecVerifier.RockspecTest do
     end
 
     test "rejects expected_name with spaces and special chars" do
-      refute Rockspec.verify(@valid_rockspec, %{expected_name: "my package!@#", expected_version: "1.0.0"})
+      refute Rockspec.verify(@valid_rockspec, %{
+               expected_name: "my package!@#",
+               expected_version: "1.0.0"
+             })
     end
   end
 
   describe "expected_version validation - denied" do
     test "rejects non-semver expected_version" do
-      refute Rockspec.verify(@valid_rockspec, %{expected_name: "my-package", expected_version: "abc"})
+      refute Rockspec.verify(@valid_rockspec, %{
+               expected_name: "my-package",
+               expected_version: "abc"
+             })
     end
 
     test "rejects expected_version with only major.minor" do
-      refute Rockspec.verify(@valid_rockspec, %{expected_name: "my-package", expected_version: "1.0"})
+      refute Rockspec.verify(@valid_rockspec, %{
+               expected_name: "my-package",
+               expected_version: "1.0"
+             })
     end
 
     test "rejects empty expected_version" do
@@ -133,15 +163,24 @@ defmodule LuanoxRockspecVerifier.RockspecTest do
     end
 
     test "rejects expected_version with letters" do
-      refute Rockspec.verify(@valid_rockspec, %{expected_name: "my-package", expected_version: "1.0.0a"})
+      refute Rockspec.verify(@valid_rockspec, %{
+               expected_name: "my-package",
+               expected_version: "1.0.0a"
+             })
     end
 
     test "rejects expected_version with v prefix" do
-      refute Rockspec.verify(@valid_rockspec, %{expected_name: "my-package", expected_version: "v1.0.0"})
+      refute Rockspec.verify(@valid_rockspec, %{
+               expected_name: "my-package",
+               expected_version: "v1.0.0"
+             })
     end
 
     test "rejects expected_version with spaces" do
-      refute Rockspec.verify(@valid_rockspec, %{expected_name: "my-package", expected_version: "1 .0.0"})
+      refute Rockspec.verify(@valid_rockspec, %{
+               expected_name: "my-package",
+               expected_version: "1 .0.0"
+             })
     end
   end
 

@@ -9,7 +9,8 @@ defmodule LuanoxRockspecVerifier.Application do
   def start(_type, _args) do
     children = [
       LuanoxRockspecVerifierWeb.Telemetry,
-      {DNSCluster, query: Application.get_env(:luanox_rockspec_verifier, :dns_cluster_query) || :ignore},
+      {DNSCluster,
+       query: Application.get_env(:luanox_rockspec_verifier, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: LuanoxRockspecVerifier.PubSub},
       # Start a worker by calling: LuanoxRockspecVerifier.Worker.start_link(arg)
       # {LuanoxRockspecVerifier.Worker, arg},
