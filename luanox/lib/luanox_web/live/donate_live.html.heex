@@ -82,18 +82,24 @@
 
           <div class="space-y-3 text-base-content/80">
             <p class="text-sm leading-relaxed">
-              Luanox exists to create a reliable, secure and accessible package ecosystem for the Lua programming language.
-              We believe that Lua's embedded nature should not exclude it from easy and reliable module hosting.
+              Luanox exists to create a secure and accessible package ecosystem
+              for the Lua programming language. We believe that Lua's embedded
+              nature should not exclude it from easy and reliable module
+              hosting.
             </p>
             <p class="text-sm leading-relaxed">
-              Our platform implements all the best practices in the package management scene. We store zero sensitive data on our own
-              servers. Due to Lua's dynamic nature, we have a dedicated, isolated sandboxing service that performs package verification checks and analysis
-              before publishing.
+              We implement cutting-edge security practices in the package
+              management scene: we store zero sensitive data on our own
+              servers. If someone leaked our whole server infrastructure, they
+              won't have your API keys or passwords. We also have a dedicated,
+              isolated sandboxing service that ensures uploaded packages are
+              safe.
             </p>
             <p class="text-sm leading-relaxed">
-              Every contribution helps us maintain server infrastructure, improve our security tools and support
-              the volunteer community that makes this ecosystem possible. Together, we're building something
-              that will benefit Lua developers for years to come.
+              Every contribution helps us maintain server infrastructure,
+              improve our security tools and support the volunteer community
+              that makes this ecosystem possible. Together, we're building
+              something that will benefit Lua developers for years to come.
             </p>
           </div>
 
@@ -151,7 +157,12 @@
                   </div>
                 </div>
 
-                <div class="text-center mt-4 mb-4">
+                <div class="flex items-center gap-2 text-white/80 justify-center p-5">
+                  <.icon name={:shield_check} type={:outline} class="w-4 h-4 text-success" />
+                  <span class="text-sm">Secured by OpenCollective</span>
+                </div>
+
+                <div class="text-center mb-4">
                   <a
                     href="https://opencollective.com/lumen-labs/donate"
                     target="_blank"
@@ -165,17 +176,6 @@
                       class="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200"
                     />
                   </a>
-                </div>
-
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-                  <div class="flex items-center gap-2 text-white/80">
-                    <.icon name={:shield_check} type={:outline} class="w-4 h-4 text-success" />
-                    <span class="text-sm">Secured by OpenCollective</span>
-                  </div>
-                  <div class="flex items-center gap-2 text-white/80">
-                    <.icon name={:eye} type={:outline} class="w-4 h-4 text-primary" />
-                    <span class="text-sm">100% Transparent</span>
-                  </div>
                 </div>
               </div>
             </div>
@@ -192,14 +192,12 @@
           Meet the Team
         </h2>
         <p class="text-base text-base-content/80 max-w-2xl mx-auto">
-          We're all aligned and working together to build the future of Lua package management.
+          We're all aligned and working together at the frontier of Lua package management.
         </p>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
-        <div class="bg-base-100 rounded-2xl p-6 lg:p-8 border border-primary/20 relative overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-          <div class="absolute top-0 right-0 w-20 h-20 bg-primary/8 rounded-full blur-3xl"></div>
-
+        <div class="bg-base-100 rounded-2xl p-6 lg:p-8 border border-primary/20 relative overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
           <div class="relative z-10 text-center">
             <div class="mb-6">
               <div class="w-24 h-24 bg-linear-to-br from-primary to-secondary rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg ring-2 ring-primary/20">
@@ -248,7 +246,7 @@
           </div>
         </div>
 
-        <div class="bg-base-100 rounded-2xl p-6 lg:p-8 border border-info/20 relative overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+        <div class="bg-base-100 rounded-2xl p-6 lg:p-8 border border-info/20 relative overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
           <div class="absolute top-0 right-0 w-20 h-20 bg-info/8 rounded-full blur-3xl"></div>
 
           <div class="relative z-10 text-center">
@@ -274,7 +272,7 @@
 
             <p class="text-base-content/80 text-sm leading-relaxed mb-6">
               "Insanity is running the same build over and over again and getting different results."
-              <br /> Core maintainer of Lux and <code>lux.nvim</code>.
+              <br /> Core maintainer of lux, lux.nvim and ecosystem integration.
             </p>
 
             <div class="space-y-2 mb-6">
@@ -300,7 +298,7 @@
           </div>
         </div>
 
-        <div class="bg-base-100 rounded-2xl p-6 lg:p-8 border border-success/20 relative overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+        <div class="bg-base-100 rounded-2xl p-6 lg:p-8 border border-success/20 relative overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
           <div class="absolute top-0 right-0 w-20 h-20 bg-success/8 rounded-full blur-3xl"></div>
 
           <div class="relative z-10 text-center">
@@ -348,96 +346,6 @@
             >
               <.icon name={:external_link} type={:outline} class="w-4 h-4" /> Visit Website
             </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="bg-base-200 py-12">
-    <div class="page-container max-w-4xl">
-      <div class="text-center mb-8">
-        <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-base-content mb-4">
-          Frequently Asked Questions
-        </h2>
-        <p class="text-base-content/70">
-          Everything you need to know about supporting Luanox
-        </p>
-      </div>
-
-      <div class="space-y-4">
-        <div class="collapse collapse-plus bg-base-100 border border-base-300/50 shadow-sm">
-          <input type="radio" name="faq-accordion" />
-          <div class="collapse-title text-lg font-semibold text-base-content">
-            <.icon name={:help} type={:outline} class="w-5 h-5 inline mr-3 text-primary" />
-            How are donations used?
-          </div>
-          <div class="collapse-content text-base-content/80">
-            <p class="pt-4 leading-relaxed">
-              Your donations directly fund server infrastructure, security audits, development tools, and community support.
-              We maintain complete transparency through our OpenCollective page where you can see exactly how funds are allocated.
-            </p>
-          </div>
-        </div>
-
-        <div class="collapse collapse-plus bg-base-100 border border-base-300/50 shadow-sm">
-          <input type="radio" name="faq-accordion" />
-          <div class="collapse-title text-lg font-semibold text-base-content">
-            <.icon name={:shield_check} type={:outline} class="w-5 h-5 inline mr-3 text-success" />
-            Is my donation secure?
-          </div>
-          <div class="collapse-content text-base-content/80">
-            <p class="pt-4 leading-relaxed">
-              Of course! All donations are processed securely through OpenCollective using industry-standard encryption.
-              Your payment information is never stored on our servers, and OpenCollective is a trusted platform used by thousands of open-source projects.
-            </p>
-          </div>
-        </div>
-
-        <div class="collapse collapse-plus bg-base-100 border border-base-300/50 shadow-sm">
-          <input type="radio" name="faq-accordion" />
-          <div class="collapse-title text-lg font-semibold text-base-content">
-            <.icon name={:heart} type={:outline} class="w-5 h-5 inline mr-3 text-error" />
-            Can I contribute without donating?
-          </div>
-          <div class="collapse-content text-base-content/80">
-            <p class="pt-4 leading-relaxed">
-              Absolutely! You can contribute code, documentation, bug reports, or help other community members.
-              Visit our
-              <a href="https://github.com/luanox-project" class="link link-primary">
-                GitHub repository
-              </a>
-              to get started,
-              or join our community discussions to share your expertise.
-            </p>
-          </div>
-        </div>
-
-        <div class="collapse collapse-plus bg-base-100 border border-base-300/50 shadow-sm">
-          <input type="radio" name="faq-accordion" />
-          <div class="collapse-title text-lg font-semibold text-base-content">
-            <.icon name={:user} type={:outline} class="w-5 h-5 inline mr-3 text-info" />
-            Can I donate anonymously?
-          </div>
-          <div class="collapse-content text-base-content/80">
-            <p class="pt-4 leading-relaxed">
-              Yes, you can! OpenCollective allows anonymous donations, so you can support Luanox without revealing your identity.
-              Simply leave the "Display Name" field blank during the donation process.
-            </p>
-          </div>
-        </div>
-
-        <div class="collapse collapse-plus bg-base-100 border border-base-300/50 shadow-sm">
-          <input type="radio" name="faq-accordion" />
-          <div class="collapse-title text-lg font-semibold text-base-content">
-            <.icon name={:star} type={:filled} class="w-5 h-5 inline mr-3 text-accent" />
-            Will I be listed as a sponsor/backer?
-          </div>
-          <div class="collapse-content text-base-content/80">
-            <p class="pt-4 leading-relaxed">
-              Yes! We love recognizing our supporters. You'll receive a special badge on our README files and on your Luanox account page.
-              Your contribution helps us grow, and we want to show our appreciation by highlighting you as a valued member of our community.
-            </p>
           </div>
         </div>
       </div>
