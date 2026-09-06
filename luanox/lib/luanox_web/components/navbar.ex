@@ -113,6 +113,8 @@ defmodule LuaNoxWeb.NavBar do
           <.link
             class="btn btn-ghost text-grey hover:text-primary"
             href="https://lumen-oss.github.io"
+            target="_blank"
+            rel="noopener"
           >
             <.icon name={:book_2} type={:outline} />
             <span class="mt-px">Docs</span>
@@ -131,6 +133,8 @@ defmodule LuaNoxWeb.NavBar do
           <.link
             class="btn btn-ghost text-grey hover:text-primary"
             href="https://github.com/lumen-oss/luanox"
+            target="_blank"
+            rel="noopener"
           >
             <.icon name={:brand_github} type={:outline} />
             <span class="mt-px">Source</span>
@@ -158,6 +162,8 @@ defmodule LuaNoxWeb.NavBar do
             <.link
               class="btn btn-ghost justify-start text-grey hover:text-primary w-full min-h-12 px-4"
               href="https://lumen-oss.github.io"
+              target="_blank"
+              rel="noopener"
               phx-click={close_mobile_menu()}
             >
               <.icon name={:book_2} type={:outline} class="size-5" />
@@ -178,6 +184,8 @@ defmodule LuaNoxWeb.NavBar do
             <.link
               class="btn btn-ghost justify-start text-grey hover:text-primary w-full min-h-12 px-4"
               href="https://github.com/lumen-oss/luanox"
+              target="_blank"
+              rel="noopener"
               phx-click={close_mobile_menu()}
             >
               <.icon name={:brand_github} type={:outline} class="size-5" />
