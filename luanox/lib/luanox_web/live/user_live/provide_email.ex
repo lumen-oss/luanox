@@ -33,7 +33,7 @@ defmodule LuaNoxWeb.UserLive.ProvideEmail do
         <div class="page-container max-w-md space-y-8 py-16">
           <div class="text-center space-y-8">
             <div class="flex justify-center">
-              <div class="bg-primary p-6">
+              <div class="bg-primary p-6 rounded-box">
                 <.icon name={:mail} type={:outline} class="size-8 text-primary-content" />
               </div>
             </div>

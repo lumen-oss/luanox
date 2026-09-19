@@ -16,8 +16,14 @@ defmodule LuaNoxWeb.UserOauth do
       %LuaNox.Accounts.User{} = user ->
         user = refresh_avatar(user, auth.info.image)
 
-        conn
-        |> LuaNoxWeb.UserAuth.log_in_user(user)
+        if LuaNox.Accounts.totp_enabled?(user) do
+          conn
+          |> put_session(:pending_2fa_user_id, user.id)
+          |> redirect(to: ~p"/login/totp")
+        else
+          conn
+          |> LuaNoxWeb.UserAuth.log_in_user(user)
+        end
 
       nil when is_nil(auth.info.email) ->
         auth_stripped = %{
@@ -103,4 +109,36 @@ defmodule LuaNoxWeb.UserOauth do
   end
 
   defp refresh_avatar(user, _image), do: user
+
+  def verify_totp(conn, %{"user_id" => user_id, "code" => code}) do
+    user = LuaNox.Accounts.get_user(user_id)
+    key = "user:#{user_id}"
+
+    cond do
+      user == nil ->
+        conn
+        |> put_flash(:error, "Invalid session. Please log in again.")
+        |> redirect(to: ~p"/login")
+
+      match?({:deny, _}, LuaNoxWeb.RateLimit.hit(:totp, key)) ->
+        conn
+        |> put_flash(:error, "Too many attempts. Please try again later.")
+        |> redirect(to: ~p"/login/totp")
+
+      match?({:ok, _}, LuaNox.Accounts.verify_2fa(user, code)) ->
+        conn
+        |> LuaNoxWeb.UserAuth.log_in_user(user)
+
+      true ->
+        conn
+        |> put_flash(:error, "Invalid code. Please try again.")
+        |> redirect(to: ~p"/login/totp")
+    end
+  end
+
+  def verify_totp(conn, _params) do
+    conn
+    |> put_flash(:error, "Missing required parameters.")
+    |> redirect(to: ~p"/login/totp")
+  end
 end

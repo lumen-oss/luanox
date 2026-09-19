@@ -21,6 +21,10 @@ defmodule LuaNoxWeb.ErrorJSON do
     %{errors: %{detail: "The provided rockspec file is invalid"}}
   end
 
+  def render("tfa_required.json", _assigns) do
+    %{errors: %{detail: "Two-factor authentication required"}}
+  end
+
   def render("rate_limit_exceeded.json", %{retry_after: retry_after}) do
     %{
       errors: %{

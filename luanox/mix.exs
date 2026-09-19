@@ -74,6 +74,8 @@ defmodule LuaNox.MixProject do
       {:tidewave, "~> 0.5", only: :dev},
       {:hammer, "~> 7.0"},
       {:cachex, "~> 3.6"},
+      {:nimble_totp, "~> 1.0"},
+      {:eqrcode, "~> 0.2.0"},
       {:excoveralls, "~> 0.18", only: :test}
     ]
   end
