@@ -217,4 +217,129 @@ defmodule LuaNox.AccountsTest do
                )
     end
   end
+
+  describe "two-factor authentication" do
+    test "totp_enabled?/1 returns false when no secret" do
+      user = user_fixture()
+      refute Accounts.totp_enabled?(user)
+    end
+
+    test "enable_totp/3 with valid code persists the secret" do
+      user = user_fixture()
+      secret = Accounts.generate_totp_secret()
+      code = NimbleTOTP.verification_code(Base.decode32!(secret))
+
+      assert {:ok, user} = Accounts.enable_totp(user, secret, code)
+      assert Accounts.totp_enabled?(user)
+      assert user.totp_secret == secret
+    end
+
+    test "totp_secret is encrypted at rest" do
+      user = user_fixture()
+      secret = Accounts.generate_totp_secret()
+      code = NimbleTOTP.verification_code(Base.decode32!(secret))
+      {:ok, user} = Accounts.enable_totp(user, secret, code)
+
+      raw_row = LuaNox.Repo.query!("SELECT totp_secret FROM users WHERE id = $1", [user.id]).rows
+
+      [[stored]] = raw_row
+      refute stored == secret
+      assert is_binary(stored)
+      assert byte_size(stored) > byte_size(secret)
+    end
+
+    test "enable_totp/3 with invalid code returns error" do
+      user = user_fixture()
+      secret = Accounts.generate_totp_secret()
+
+      assert {:error, :invalid_code} = Accounts.enable_totp(user, secret, "000000")
+      refute Accounts.totp_enabled?(user)
+    end
+
+    test "verify_totp/2 validates the current code" do
+      user = user_fixture()
+      secret = Accounts.generate_totp_secret()
+      code = NimbleTOTP.verification_code(Base.decode32!(secret))
+
+      {:ok, user} = Accounts.enable_totp(user, secret, code)
+      assert Accounts.verify_totp(user, NimbleTOTP.verification_code(Base.decode32!(secret)))
+      refute Accounts.verify_totp(user, "000000")
+    end
+
+    test "disable_totp/2 clears secret and recovery codes" do
+      user = user_fixture()
+      secret = Accounts.generate_totp_secret()
+      code = NimbleTOTP.verification_code(Base.decode32!(secret))
+
+      {:ok, user} = Accounts.enable_totp(user, secret, code)
+      Accounts.generate_recovery_codes(user)
+      assert length(LuaNox.Repo.all(LuaNox.Accounts.UserRecoveryCode)) == 10
+
+      {:ok, user} = Accounts.disable_totp(user, NimbleTOTP.verification_code(Base.decode32!(secret)))
+      refute Accounts.totp_enabled?(user)
+      assert LuaNox.Repo.all(LuaNox.Accounts.UserRecoveryCode) == []
+    end
+
+    test "disable_totp/2 rejects an invalid code" do
+      user = user_fixture()
+      secret = Accounts.generate_totp_secret()
+      code = NimbleTOTP.verification_code(Base.decode32!(secret))
+      {:ok, user} = Accounts.enable_totp(user, secret, code)
+
+      assert {:error, :invalid_code} = Accounts.disable_totp(user, "000000")
+    end
+
+    test "generate_recovery_codes/1 returns 10 unique plaintext codes" do
+      user = user_fixture()
+      codes = Accounts.generate_recovery_codes(user)
+
+      assert length(codes) == 10
+      assert length(Enum.uniq(codes)) == 10
+    end
+
+    test "generate_recovery_codes/1 uses 96-bit codes" do
+      user = user_fixture()
+
+      [code | _] = Accounts.generate_recovery_codes(user)
+
+      # 12 random bytes, base32-encoded (no padding) => ~20 chars
+      assert String.length(code) >= 19
+      assert String.length(code) <= 20
+    end
+
+    test "recovery codes are stored as argon2 hashes" do
+      user = user_fixture()
+      codes = Accounts.generate_recovery_codes(user)
+
+      [code | _] = codes
+
+      stored = LuaNox.Repo.all(LuaNox.Accounts.UserRecoveryCode)
+      assert length(stored) == 10
+
+      hash = hd(stored).code_hash
+      assert String.starts_with?(hash, "$argon2")
+      assert Argon2.verify_pass(code, hash)
+    end
+
+    test "verify_recovery_code/2 is single-use" do
+      user = user_fixture()
+      [code | _] = Accounts.generate_recovery_codes(user)
+
+      assert {:ok, _} = Accounts.verify_recovery_code(user, code)
+      assert {:error, :invalid_code} = Accounts.verify_recovery_code(user, code)
+    end
+
+    test "verify_2fa/2 accepts either totp or recovery code" do
+      user = user_fixture()
+      secret = Accounts.generate_totp_secret()
+      code = NimbleTOTP.verification_code(Base.decode32!(secret))
+      {:ok, user} = Accounts.enable_totp(user, secret, code)
+
+      assert {:ok, _} = Accounts.verify_2fa(user, NimbleTOTP.verification_code(Base.decode32!(secret)))
+      assert {:error, :invalid_code} = Accounts.verify_2fa(user, "000000")
+
+      [recovery | _] = Accounts.generate_recovery_codes(user)
+      assert {:ok, _} = Accounts.verify_2fa(user, recovery)
+    end
+  end
 end

@@ -85,21 +85,23 @@ defmodule LuaNoxWeb.ReleaseController do
         } = release_params
       ) do
     if Path.extname(rockspec.filename) == ".rockspec" do
-      case Packages.get_package(package_name) do
-        nil ->
-          {:error, :not_found}
+      scope = conn.assigns.current_scope
 
-        %Package{} = package ->
-          case Packages.add_release(conn.assigns.current_scope, package, release_params) do
-            {:ok, %Release{} = release} ->
-              conn
-              |> put_status(:created)
-              |> put_resp_header("location", ~p"/api/releases/#{release.id}")
-              |> render(:show, release: release)
+      with :ok <- require_tfa_token(conn, scope),
+           %Package{} = package <- Packages.get_package(package_name) do
+        case Packages.add_release(scope, package, release_params) do
+          {:ok, %Release{} = release} ->
+            conn
+            |> put_status(:created)
+            |> put_resp_header("location", ~p"/api/releases/#{release.id}")
+            |> render(:show, release: release)
 
-            {:error, _} = ret ->
-              ret
-          end
+          {:error, _} = ret ->
+            ret
+        end
+      else
+        {:error, :tfa_required} -> {:error, :tfa_required}
+        nil -> {:error, :not_found}
       end
     else
       {:error, :invalid_rockspec}
@@ -127,6 +129,22 @@ defmodule LuaNoxWeb.ReleaseController do
          %OpenApiSpex.Reference{"$ref": "#/components/schemas/Error"}}
     }
   )
+
+  defp require_tfa_token(conn, scope) do
+    if LuaNox.Accounts.totp_enabled?(scope.user) do
+      token = get_req_header(conn, "x-tfa-token") |> List.first()
+
+      case token && Cachex.get(:tfa_cache, "tfa_token:#{token}") do
+        {:ok, user_id} when is_integer(user_id) ->
+          if user_id == scope.user.id, do: :ok, else: {:error, :tfa_required}
+
+        _ ->
+          {:error, :tfa_required}
+      end
+    else
+      :ok
+    end
+  end
 
   def show(conn, %{"id" => id}) do
     case Packages.get_release(id) do

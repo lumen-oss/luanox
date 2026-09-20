@@ -10,7 +10,11 @@ defmodule LuaNoxWeb.UserLive.Settings do
      socket
      |> assign(:email_form, nil)
      |> assign(:username_form, nil)
-     |> assign(:bio_count, bio_count)}
+     |> assign(:bio_count, bio_count)
+     |> assign(:totp_pending_secret, nil)
+     |> assign(:totp_recovery_codes, nil)
+     |> assign(:totp_modal_open, false)
+     |> assign(:totp_disable_modal_open, false)}
   end
 
   def render(assigns) do
@@ -228,6 +232,71 @@ defmodule LuaNoxWeb.UserLive.Settings do
               </div>
             </div>
 
+            <%!-- Security Section --%>
+            <div class="collapse collapse-arrow bg-base-200 border border-base-300">
+              <input type="checkbox" />
+              <div class="collapse-title flex items-center gap-3 px-4 sm:px-6">
+                <.icon name={:shield} type={:outline} class="w-5 h-5 text-primary" />
+                <div>
+                  <h2 class="font-semibold text-base-content">Two-Factor Authentication</h2>
+                  <p class="text-sm text-base-content/70">Protect your account with TOTP</p>
+                </div>
+              </div>
+              <div class="collapse-content px-4 sm:px-6">
+                <div class="space-y-6 pt-2">
+                  <%= if @current_scope.user.totp_secret do %>
+                    <div class="bg-base-100 border border-base-300 rounded-md p-4 sm:p-6 space-y-4">
+                      <div class="flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                          <.icon name={:shield_check} type={:outline} class="w-5 h-5 text-success" />
+                          <div>
+                            <p class="text-sm font-medium text-base-content">Two-Factor Authentication</p>
+                            <p class="text-xs text-base-content/70">Your account is protected by an authenticator app</p>
+                          </div>
+                        </div>
+                        <span class="badge badge-success badge-sm">Enabled</span>
+                      </div>
+                    </div>
+                    <div class="flex flex-col sm:flex-row justify-end gap-2">
+                      <button
+                        class="btn btn-neutral btn-sm"
+                        phx-click="regenerate_recovery_codes"
+                      >
+                        <.icon name={:refresh} type={:outline} class="w-4 h-4" /> Regenerate Recovery Codes
+                      </button>
+                      <button
+                        class="btn btn-error btn-sm"
+                        phx-click="open_disable_modal"
+                      >
+                        <.icon name={:shield_off} type={:outline} class="w-4 h-4" /> Disable 2FA
+                      </button>
+                    </div>
+                  <% else %>
+                    <div class="bg-base-100 border border-base-300 rounded-md p-4 sm:p-6 space-y-4">
+                      <div class="flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                          <.icon name={:shield} type={:outline} class="w-5 h-5 text-base-content/50" />
+                          <div>
+                            <p class="text-sm font-medium text-base-content">Two-Factor Authentication</p>
+                            <p class="text-xs text-base-content/70">Require a code from your authenticator app to log in</p>
+                          </div>
+                        </div>
+                        <span class="badge badge-neutral badge-sm">Disabled</span>
+                      </div>
+                    </div>
+                    <div class="flex justify-end">
+                      <button
+                        class="btn btn-primary btn-sm"
+                        phx-click="enable_2fa"
+                      >
+                        <.icon name={:shield_plus} type={:outline} class="w-4 h-4" /> Enable 2FA
+                      </button>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+
             <%!-- Advanced Section --%>
             <div class="collapse collapse-arrow bg-base-200 border border-base-300">
               <input type="checkbox" />
@@ -270,6 +339,109 @@ defmodule LuaNoxWeb.UserLive.Settings do
           </div>
         </div>
       </div>
+
+      <dialog id="totp_modal" class="modal" open={@totp_modal_open}>
+        <div class="modal-box">
+          <%= if @totp_recovery_codes do %>
+            <h3 class="text-lg font-bold text-base-content mb-4">Recovery Codes</h3>
+            <p class="text-sm text-base-content/80 mb-4">
+              Save these codes somewhere safe. Each can be used once to regain access if you lose your authenticator app.
+            </p>
+            <div class="grid grid-cols-2 gap-2 mb-6">
+              <%= for code <- @totp_recovery_codes do %>
+                <code class="font-mono text-sm bg-base-300 border border-base-300 rounded-md px-3 py-2 text-center">
+                  {code}
+                </code>
+              <% end %>
+            </div>
+            <div class="modal-action">
+              <button class="btn btn-primary" phx-click="confirm_recovery_codes_saved">
+                <.icon name={:check} type={:outline} class="w-4 h-4" /> I Saved My Codes
+              </button>
+            </div>
+          <% else %>
+            <h3 class="text-lg font-bold text-base-content mb-4">Enable Two-Factor Authentication</h3>
+            <p class="text-sm text-base-content/80 mb-4">
+              Scan this QR code with your authenticator app, or enter the secret manually.
+            </p>
+            <%= if @totp_pending_secret do %>
+              <div class="flex justify-center mb-4">
+                <img
+                  src={qr_data_uri(@totp_pending_secret, @current_scope.user.username)}
+                  alt="QR code for two-factor authentication"
+                  class="size-56 mx-auto rounded-box"
+                />
+              </div>
+              <div class="text-center mb-4">
+                <code class="font-mono text-xs bg-base-300 border border-base-300 rounded-md px-3 py-2 break-all">
+                  {secret_display(@totp_pending_secret)}
+                </code>
+              </div>
+              <.form for={%{}} phx-submit="confirm_2fa" class="space-y-4">
+                <.input
+                  type="text"
+                  name="code"
+                  inputmode="numeric"
+                  autocomplete="one-time-code"
+                  label="Verification Code"
+                  placeholder="6-digit code"
+                  value=""
+                  class="input min-w-full text-center font-mono tracking-widest"
+                  required
+                />
+                <div class="modal-action">
+                  <button type="button" class="btn btn-neutral mr-3" phx-click="close_2fa_modal">
+                    Cancel
+                  </button>
+                  <button type="submit" class="btn btn-primary">
+                    <.icon name={:shield_check} type={:outline} class="w-4 h-4" /> Enable 2FA
+                  </button>
+                </div>
+              </.form>
+            <% else %>
+              <div class="modal-action">
+                <button class="btn btn-neutral mr-3" phx-click="close_2fa_modal">Cancel</button>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+        <form method="dialog" class="modal-backdrop" phx-click="close_2fa_modal">
+          <button>close</button>
+        </form>
+      </dialog>
+
+      <dialog id="totp_disable_modal" class="modal" open={@totp_disable_modal_open}>
+        <div class="modal-box">
+          <h3 class="text-lg font-bold text-base-content mb-4">Disable Two-Factor Authentication?</h3>
+          <p class="text-sm text-base-content/80 mb-6">
+            Enter a current code from your authenticator app to confirm disabling 2FA.
+          </p>
+          <.form for={%{}} phx-submit="disable_2fa" class="space-y-4">
+            <.input
+              type="text"
+              name="code"
+              inputmode="numeric"
+              autocomplete="one-time-code"
+              label="Verification Code"
+              placeholder="6-digit code"
+              value=""
+              class="input min-w-full text-center font-mono tracking-widest"
+              required
+            />
+            <div class="modal-action">
+              <button type="button" class="btn btn-neutral btn-sm mr-3" phx-click="close_disable_modal">
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-error btn-sm">
+                <.icon name={:shield_off} type={:outline} class="w-4 h-4" /> Disable 2FA
+              </button>
+            </div>
+          </.form>
+        </div>
+        <form method="dialog" class="modal-backdrop" phx-click="close_disable_modal">
+          <button>close</button>
+        </form>
+      </dialog>
 
       <dialog id="disable_account_modal" class="modal">
         <div class="modal-box">
@@ -320,7 +492,111 @@ defmodule LuaNoxWeb.UserLive.Settings do
     end
   end
 
+  def handle_event("enable_2fa", _params, socket) do
+    secret = LuaNox.Accounts.generate_totp_secret()
+
+    {:noreply,
+     socket
+     |> assign(:totp_pending_secret, secret)
+     |> assign(:totp_recovery_codes, nil)
+     |> assign(:totp_modal_open, true)}
+  end
+
+  def handle_event("close_2fa_modal", _params, socket) do
+    {:noreply,
+     socket
+     |> assign(:totp_modal_open, false)
+     |> assign(:totp_pending_secret, nil)
+     |> assign(:totp_recovery_codes, nil)}
+  end
+
+  def handle_event("open_disable_modal", _params, socket) do
+    {:noreply, assign(socket, :totp_disable_modal_open, true)}
+  end
+
+  def handle_event("close_disable_modal", _params, socket) do
+    {:noreply, assign(socket, :totp_disable_modal_open, false)}
+  end
+
+  def handle_event("confirm_2fa", %{"code" => code}, socket) do
+    user = socket.assigns.current_scope.user
+    secret = socket.assigns.totp_pending_secret
+
+    case LuaNoxWeb.RateLimit.hit(:totp, "user:#{user.id}") do
+      {:deny, _} ->
+        {:noreply, put_flash(socket, :error, "Too many attempts. Please try again later.")}
+
+      {:allow, _} ->
+        case LuaNox.Accounts.enable_totp(user, secret, code) do
+          {:ok, user} ->
+            codes = LuaNox.Accounts.generate_recovery_codes(user)
+
+            {:noreply,
+             socket
+             |> assign(:current_scope, LuaNox.Accounts.Scope.for_user(user))
+             |> assign(:totp_recovery_codes, codes)}
+
+          {:error, :invalid_code} ->
+            {:noreply, put_flash(socket, :error, "Invalid code. Please try again.")}
+        end
+    end
+  end
+
+  def handle_event("confirm_recovery_codes_saved", _params, socket) do
+    {:noreply,
+     socket
+     |> assign(:totp_modal_open, false)
+     |> assign(:totp_pending_secret, nil)
+     |> assign(:totp_recovery_codes, nil)
+     |> put_flash(:info, "Two-factor authentication enabled.")}
+  end
+
+  def handle_event("regenerate_recovery_codes", _params, socket) do
+    user = socket.assigns.current_scope.user
+    codes = LuaNox.Accounts.generate_recovery_codes(user)
+
+    {:noreply,
+     socket
+     |> assign(:totp_recovery_codes, codes)
+     |> assign(:totp_modal_open, true)}
+  end
+
+  def handle_event("disable_2fa", %{"code" => code}, socket) do
+    user = socket.assigns.current_scope.user
+
+    case LuaNoxWeb.RateLimit.hit(:totp, "user:#{user.id}") do
+      {:deny, _} ->
+        {:noreply, put_flash(socket, :error, "Too many attempts. Please try again later.")}
+
+      {:allow, _} ->
+        case LuaNox.Accounts.disable_totp(user, code) do
+          {:ok, user} ->
+            {:noreply,
+             socket
+             |> assign(:current_scope, LuaNox.Accounts.Scope.for_user(user))
+             |> assign(:totp_disable_modal_open, false)
+             |> put_flash(:info, "Two-factor authentication disabled.")}
+
+          {:error, :invalid_code} ->
+            {:noreply, put_flash(socket, :error, "Invalid code. Please try again.")}
+        end
+    end
+  end
+
   def handle_event(_event, _params, socket), do: {:noreply, socket}
+
+  def qr_otpauth_uri(secret, username) do
+    NimbleTOTP.otpauth_uri("Luanox:#{username}", Base.decode32!(secret), issuer: "Luanox")
+  end
+
+  defp qr_data_uri(secret, username) do
+    "data:image/png;base64," <>
+      (secret |> qr_otpauth_uri(username) |> EQRCode.encode(:q) |> EQRCode.png(width: 224) |> Base.encode64())
+  end
+
+  defp secret_display(secret) do
+    secret |> String.replace(~r/.{4}/, "\\0 ")
+  end
 
   defp member_since_date(%DateTime{} = date), do: Calendar.strftime(date, "%B %Y")
   defp member_since_date(%NaiveDateTime{} = date), do: Calendar.strftime(date, "%B %Y")

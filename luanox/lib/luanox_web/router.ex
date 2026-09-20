@@ -34,9 +34,11 @@ defmodule LuaNoxWeb.Router do
       live "/users/:username", UserLive.Profile, :show
       live "/donate", DonateLive
       live "/login", UserLive.Login, :new
+      live "/login/totp", UserLive.TotpLogin, :new
       live "/provide-email", UserLive.ProvideEmail, :new
 
       post "/complete-signup", UserOauth, :complete_signup
+      post "/login/totp", UserOauth, :verify_totp
     end
   end
 
@@ -65,7 +67,7 @@ defmodule LuaNoxWeb.Router do
     get "/api/tool_version", LuaRocksApiController, :tool_version
     get "/api/1/:key/status", LuaRocksApiController, :status
     get "/api/1/:key/check_rockspec", LuaRocksApiController, :check_rockspec
-    post "/api/1/:key/verify_tfa", LuaRocksApiController, :verify_tfa
+    get "/api/1/:key/verify_tfa", LuaRocksApiController, :verify_tfa
     post "/api/1/:key/upload", LuaRocksApiController, :upload
     post "/api/1/:key/upload_rock/:version_id", LuaRocksApiController, :upload_rock
   end

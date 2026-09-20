@@ -6,7 +6,7 @@ defmodule LuaNox.Accounts do
   import Ecto.Query, warn: false
   alias LuaNox.Repo
 
-  alias LuaNox.Accounts.{User, UserToken}
+  alias LuaNox.Accounts.{User, UserRecoveryCode, UserToken}
 
   ## Database getters
 
@@ -154,4 +154,137 @@ defmodule LuaNox.Accounts do
     Repo.delete_all(UserToken.by_token_and_context_query(token, "session"))
     :ok
   end
+
+## Two-factor authentication
+
+  @doc """
+  Returns true if the user has TOTP two-factor authentication enabled.
+  """
+  def totp_enabled?(%User{} = user), do: is_binary(user.totp_secret)
+
+  @doc """
+  Generates a new TOTP secret.
+  """
+  def generate_totp_secret, do: NimbleTOTP.secret() |> Base.encode32(padding: false)
+
+  @doc """
+  Enables TOTP for the user after verifying the given code against the secret.
+
+  Returns `{:ok, user}` on success or `{:error, :invalid_code}` when the
+  verification code does not match.
+  """
+  def enable_totp(%User{} = user, secret, code) when is_binary(code) do
+    if NimbleTOTP.valid?(Base.decode32!(secret), code) do
+      user
+      |> Ecto.Changeset.change(%{totp_secret: secret})
+      |> Repo.update()
+    else
+      {:error, :invalid_code}
+    end
+  end
+
+  @doc """
+  Disables TOTP for the user after verifying a valid code.
+
+  Also deletes all recovery codes.
+  """
+  def disable_totp(%User{} = user, code) when is_binary(code) do
+    if verify_totp(user, code) do
+      user
+      |> Ecto.Changeset.change(%{totp_secret: nil})
+      |> Repo.update()
+      |> case do
+        {:ok, user} ->
+          Repo.delete_all(
+            from(rc in UserRecoveryCode, where: rc.user_id == ^user.id)
+          )
+
+          {:ok, user}
+
+        error ->
+          error
+      end
+    else
+      {:error, :invalid_code}
+    end
+  end
+
+  @doc """
+  Verifies a TOTP code against the user's secret.
+
+  Returns false when the user does not have TOTP enabled.
+  """
+  def verify_totp(%User{} = user, code) when is_binary(code) do
+    secret = Base.decode32!(user.totp_secret)
+    time = System.os_time(:second)
+
+    totp_enabled?(user) &&
+      (NimbleTOTP.valid?(secret, code, time: time) or
+         NimbleTOTP.valid?(secret, code, time: time - 30))
+  end
+
+  def verify_totp(_user, _code), do: false
+
+  @doc """
+  Generates 10 new single-use recovery codes for the user.
+
+  The plaintext codes are returned exactly once and must be shown to the
+  user. Only their hashes are stored.
+  """
+  def generate_recovery_codes(%User{} = user) do
+    Repo.delete_all(from rc in UserRecoveryCode, where: rc.user_id == ^user.id)
+
+    codes = Enum.map(1..10, fn _ -> :crypto.strong_rand_bytes(12) |> Base.encode32(padding: false) end)
+
+    now = DateTime.utc_now() |> DateTime.truncate(:second)
+
+    Repo.insert_all(UserRecoveryCode, Enum.map(codes, fn code ->
+      %{
+        user_id: user.id,
+        code_hash: Argon2.hash_pwd_salt(code),
+        inserted_at: now,
+        updated_at: now
+      }
+    end))
+
+    codes
+  end
+
+  @doc """
+  Verifies a single-use recovery code, marking it as used on success.
+  """
+  def verify_recovery_code(%User{} = user, code) when is_binary(code) do
+    user = Repo.preload(user, :recovery_codes)
+
+    case Enum.find(user.recovery_codes, &(is_nil(&1.used_at) && Argon2.verify_pass(code, &1.code_hash))) do
+      %UserRecoveryCode{} = recovery_code ->
+        {:ok,
+         recovery_code
+         |> Ecto.Changeset.change(%{used_at: DateTime.utc_now() |> DateTime.truncate(:second)})
+         |> Repo.update()}
+
+      _ ->
+        {:error, :invalid_code}
+    end
+  end
+
+  @doc """
+  Verifies either a TOTP or a recovery code for the user.
+
+  Returns `{:ok, user}` on success or `{:error, :invalid_code}`.
+  """
+  def verify_2fa(%User{} = user, code) when is_binary(code) do
+    cond do
+      verify_totp(user, code) ->
+        {:ok, user}
+
+      match?({:ok, _}, verify_recovery_code(user, code)) ->
+        {:ok, user}
+
+      true ->
+        {:error, :invalid_code}
+    end
+  end
+
+  def verify_2fa(_user, _code), do: {:error, :invalid_code}
 end

@@ -321,4 +321,86 @@ defmodule LuaNoxWeb.IntegrationWorkflowTest do
       assert json_response(conn, 404)
     end
   end
+
+  describe "two-factor upload gating" do
+    test "verify_tfa returns a token for a valid code", %{conn: conn, user: user} do
+      secret = LuaNox.Accounts.generate_totp_secret()
+      code = NimbleTOTP.verification_code(Base.decode32!(secret))
+      {:ok, _user} = LuaNox.Accounts.enable_totp(user, secret, code)
+
+      conn = get(conn, ~p"/api/1/#{api_key(user)}/verify_tfa", %{code: code})
+      resp = json_response(conn, 200)
+
+      assert resp["success"] == true
+      assert resp["expires"] > DateTime.utc_now() |> DateTime.to_unix()
+      assert is_binary(resp["tfa_token"])
+    end
+
+    test "verify_tfa rejects an invalid code", %{conn: conn, user: user} do
+      secret = LuaNox.Accounts.generate_totp_secret()
+      code = NimbleTOTP.verification_code(Base.decode32!(secret))
+      {:ok, _user} = LuaNox.Accounts.enable_totp(user, secret, code)
+
+      conn = get(conn, ~p"/api/1/#{api_key(user)}/verify_tfa", %{code: "000000"})
+      assert json_response(conn, 401)["errors"]
+    end
+
+    test "upload requires a TFA token when enrolled", %{conn: conn, user: user, scope: scope} do
+      package_fixture(scope, %{name: "tfa-pkg"})
+      secret = LuaNox.Accounts.generate_totp_secret()
+      code = NimbleTOTP.verification_code(Base.decode32!(secret))
+      {:ok, _user} = LuaNox.Accounts.enable_totp(user, secret, code)
+
+      upload = create_rockspec_upload("tfa-pkg-1.0.0-1.rockspec", rockspec_content("tfa-pkg", "1.0.0-1"))
+      conn = post(conn, ~p"/api/releases", %{"package" => "tfa-pkg", "version" => "1.0.0-1", "rockspec" => upload})
+
+      assert json_response(conn, 401)["errors"]["detail"] =~ "Two-factor authentication required"
+    end
+
+    test "upload succeeds with a valid TFA token", %{conn: conn, user: user, scope: scope} do
+      package_fixture(scope, %{name: "tfapass-pkg"})
+      secret = LuaNox.Accounts.generate_totp_secret()
+      code = NimbleTOTP.verification_code(Base.decode32!(secret))
+      {:ok, _user} = LuaNox.Accounts.enable_totp(user, secret, code)
+
+      {:ok, token} = tfa_token_for(user)
+
+      upload = create_rockspec_upload("tfapass-pkg-1.0.0-1.rockspec", rockspec_content("tfapass-pkg", "1.0.0-1"))
+
+      conn =
+        conn
+        |> put_req_header("x-tfa-token", token)
+        |> post(~p"/api/releases", %{"package" => "tfapass-pkg", "version" => "1.0.0-1", "rockspec" => upload})
+
+      assert json_response(conn, 201)
+    end
+
+    test "upload without TFA token succeeds when not enrolled", %{conn: conn, scope: scope} do
+      package_fixture(scope, %{name: "notfa-pkg"})
+
+      upload = create_rockspec_upload("notfa-pkg-1.0.0-1.rockspec", rockspec_content("notfa-pkg", "1.0.0-1"))
+      conn = post(conn, ~p"/api/releases", %{"package" => "notfa-pkg", "version" => "1.0.0-1", "rockspec" => upload})
+
+      assert json_response(conn, 201)
+    end
+
+    defp api_key(user) do
+      {:ok, jwt, _} =
+        LuaNox.Guardian.encode_and_sign(user, %{
+          "allowed_packages" => nil,
+          "write_restriction" => false
+        })
+
+      jwt
+    end
+
+    defp tfa_token_for(user) do
+      user = LuaNox.Repo.reload(user)
+      code = NimbleTOTP.verification_code(Base.decode32!(user.totp_secret))
+
+      token = :crypto.strong_rand_bytes(32) |> Base.url_encode64(padding: false)
+      Cachex.put(:tfa_cache, "tfa_token:#{token}", user.id, ttl: :timer.minutes(10))
+      {:ok, token}
+    end
+  end
 end

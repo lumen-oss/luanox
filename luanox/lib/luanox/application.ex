@@ -10,10 +10,12 @@ defmodule LuaNox.Application do
     children = [
       LuaNoxWeb.Telemetry,
       LuaNox.Repo,
+      LuaNox.Vault,
       {DNSCluster, query: Application.get_env(:luanox, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: LuaNox.PubSub},
       {LuaNoxWeb.RateLimit, clean_period: :timer.minutes(5)},
       {Cachex, name: :search_cache, limit: 1_000},
+      Supervisor.child_spec({Cachex, name: :tfa_cache, limit: 10_000}, id: :tfa_cache),
       LuaNoxWeb.Endpoint
     ]
 

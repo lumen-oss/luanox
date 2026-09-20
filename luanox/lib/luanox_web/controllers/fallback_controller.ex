@@ -29,6 +29,13 @@ defmodule LuaNoxWeb.FallbackController do
     |> render(:no_query_string)
   end
 
+  def call(conn, {:error, :tfa_required}) do
+    conn
+    |> put_status(:unauthorized)
+    |> put_view(json: LuaNoxWeb.ErrorJSON)
+    |> render(:tfa_required)
+  end
+
   def call(conn, {:error, :insufficient_permissions}) do
     conn
     |> put_status(:forbidden)

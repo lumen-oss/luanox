@@ -73,17 +73,49 @@ defmodule LuaNoxWeb.LuaRocksApiController do
     |> json(%{errors: ["Missing required parameters: package, version"]})
   end
 
+  def verify_tfa(conn, %{"code" => code}) do
+    with_auth(conn, fn conn, scope ->
+      user = scope.user
+
+      case LuaNoxWeb.RateLimit.hit(:totp, "tfa:#{user.id}") do
+        {:deny, _} ->
+          conn
+          |> put_status(:too_many_requests)
+          |> json(%{errors: ["Rate limit exceeded"]})
+
+        {:allow, _} ->
+          case LuaNox.Accounts.verify_2fa(user, code) do
+            {:ok, _} ->
+              tfa_token = :crypto.strong_rand_bytes(32) |> Base.url_encode64(padding: false)
+              expires = DateTime.utc_now() |> DateTime.add(10, :minute)
+
+              Cachex.put(:tfa_cache, "tfa_token:#{tfa_token}", user.id, ttl: :timer.minutes(10))
+
+              conn
+              |> put_status(:ok)
+              |> json(%{success: true, expires: DateTime.to_unix(expires), tfa_token: tfa_token})
+
+            {:error, :invalid_code} ->
+              conn
+              |> put_status(:unauthorized)
+              |> json(%{errors: ["Invalid verification code"]})
+          end
+      end
+    end)
+  end
+
   def verify_tfa(conn, _params) do
     with_auth(conn, fn conn, _scope ->
       conn
       |> put_status(:bad_request)
-      |> json(%{errors: ["Two-factor authentication is not enabled on this account"]})
+      |> json(%{errors: ["Missing verification code"]})
     end)
   end
 
   def upload(conn, %{"rockspec_file" => %Plug.Upload{} = file}) do
     with_auth(conn, fn conn, scope ->
-      with {:ok, rockspec_text} <- File.read(file.path),
+      with {:ok, _} <- require_tfa_token(conn, scope),
+           {:ok, rockspec_text} <- File.read(file.path),
            {:ok, spec} <- parse_rockspec(rockspec_text),
            {:ok, package, release, is_new} <- upload(scope, spec, rockspec_text) do
         json(conn, %{
@@ -98,6 +130,11 @@ defmodule LuaNoxWeb.LuaRocksApiController do
           is_new: is_new
         })
       else
+        {:error, :tfa_required} ->
+          conn
+          |> put_status(:unauthorized)
+          |> json(%{errors: ["Two-factor authentication required"]})
+
         {:error, :invalid_rockspec} ->
           conn
           |> put_status(:bad_request)
@@ -131,6 +168,22 @@ defmodule LuaNoxWeb.LuaRocksApiController do
       json(conn, %{})
     end)
   end
+
+  defp require_tfa_token(conn, scope) do
+  if LuaNox.Accounts.totp_enabled?(scope.user) do
+    token = get_req_header(conn, "x-tfa-token") |> List.first()
+
+    case token && Cachex.get(:tfa_cache, "tfa_token:#{token}") do
+      {:ok, user_id} when is_integer(user_id) ->
+        if user_id == scope.user.id, do: :ok, else: {:error, :tfa_required}
+
+      _ ->
+        {:error, :tfa_required}
+    end
+  else
+    :ok
+  end
+end
 
   defp parse_rockspec(rockspec_text) do
     endpoint = Application.get_env(:luanox, :rockspec_parse_endpoint)

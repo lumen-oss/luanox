@@ -27,7 +27,32 @@ config :ueberauth, Ueberauth.Strategy.Github.OAuth,
 config :luanox,
   rockspec_storage: Application.app_dir(:luanox, "priv/static/releases") |> Path.expand()
 
+config :luanox, LuaNox.Vault,
+  json_library: Jason,
+  ciphers: [
+    default:
+      {Cloak.Ciphers.AES.GCM,
+       tag: "AES.GCM.V1",
+       key:
+         Base.decode64!(
+           System.get_env("LUANOX_FIELD_ENCRYPTION_KEY") ||
+             "C1xjF2h4+kcDitPdEeJBA+6LOL7NoVWuZ1M6t/qaqvc="
+         )}
+  ]
+
 if config_env() == :prod do
+  config :luanox, LuaNox.Vault,
+    json_library: Jason,
+    ciphers: [
+      default:
+        {Cloak.Ciphers.AES.GCM,
+         tag: "AES.GCM.V1",
+         key:
+           Base.decode64!(
+             System.get_env("LUANOX_FIELD_ENCRYPTION_KEY") ||
+               raise("environment variable LUANOX_FIELD_ENCRYPTION_KEY is missing")
+           )}
+    ]
   database_url =
     "ecto://#{System.get_env("POSTGRES_USER")}:#{System.get_env("POSTGRES_PASSWORD")}@" <>
       "#{System.get_env("POSTGRES_HOST")}:" <>
