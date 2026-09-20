@@ -234,14 +234,14 @@ defmodule LuaNox.Accounts do
   def generate_recovery_codes(%User{} = user) do
     Repo.delete_all(from rc in UserRecoveryCode, where: rc.user_id == ^user.id)
 
-    codes = Enum.map(1..10, fn _ -> :crypto.strong_rand_bytes(5) |> Base.encode32() end)
+    codes = Enum.map(1..10, fn _ -> :crypto.strong_rand_bytes(12) |> Base.encode32(padding: false) end)
 
     now = DateTime.utc_now() |> DateTime.truncate(:second)
 
     Repo.insert_all(UserRecoveryCode, Enum.map(codes, fn code ->
       %{
         user_id: user.id,
-        code_hash: hash_recovery_code(code),
+        code_hash: Argon2.hash_pwd_salt(code),
         inserted_at: now,
         updated_at: now
       }
@@ -254,8 +254,10 @@ defmodule LuaNox.Accounts do
   Verifies a single-use recovery code, marking it as used on success.
   """
   def verify_recovery_code(%User{} = user, code) when is_binary(code) do
-    case Repo.get_by(UserRecoveryCode, user_id: user.id, code_hash: hash_recovery_code(code)) do
-      %UserRecoveryCode{used_at: nil} = recovery_code ->
+    user = Repo.preload(user, :recovery_codes)
+
+    case Enum.find(user.recovery_codes, &(is_nil(&1.used_at) && Argon2.verify_pass(code, &1.code_hash))) do
+      %UserRecoveryCode{} = recovery_code ->
         {:ok,
          recovery_code
          |> Ecto.Changeset.change(%{used_at: DateTime.utc_now() |> DateTime.truncate(:second)})
@@ -285,6 +287,4 @@ defmodule LuaNox.Accounts do
   end
 
   def verify_2fa(_user, _code), do: {:error, :invalid_code}
-
-  defp hash_recovery_code(code), do: :crypto.hash(:sha256, code) |> Base.encode16(case: :lower)
 end

@@ -14,7 +14,7 @@ defmodule LuaNox.Accounts.User do
     field :aka, :string
     field :avatar_url, :string
     field :bio, :string
-    field :totp_secret, :string
+    field :totp_secret, LuaNox.Vault.Encrypted.Binary
     has_many :recovery_codes, LuaNox.Accounts.UserRecoveryCode
 
     timestamps(type: :utc_datetime)

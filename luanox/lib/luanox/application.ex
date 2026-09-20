@@ -10,6 +10,7 @@ defmodule LuaNox.Application do
     children = [
       LuaNoxWeb.Telemetry,
       LuaNox.Repo,
+      LuaNox.Vault,
       {DNSCluster, query: Application.get_env(:luanox, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: LuaNox.PubSub},
       {LuaNoxWeb.RateLimit, clean_period: :timer.minutes(5)},

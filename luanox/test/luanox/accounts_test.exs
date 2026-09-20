@@ -234,6 +234,20 @@ defmodule LuaNox.AccountsTest do
       assert user.totp_secret == secret
     end
 
+    test "totp_secret is encrypted at rest" do
+      user = user_fixture()
+      secret = Accounts.generate_totp_secret()
+      code = NimbleTOTP.verification_code(Base.decode32!(secret))
+      {:ok, user} = Accounts.enable_totp(user, secret, code)
+
+      raw_row = LuaNox.Repo.query!("SELECT totp_secret FROM users WHERE id = $1", [user.id]).rows
+
+      [[stored]] = raw_row
+      refute stored == secret
+      assert is_binary(stored)
+      assert byte_size(stored) > byte_size(secret)
+    end
+
     test "enable_totp/3 with invalid code returns error" do
       user = user_fixture()
       secret = Accounts.generate_totp_secret()
@@ -281,6 +295,30 @@ defmodule LuaNox.AccountsTest do
 
       assert length(codes) == 10
       assert length(Enum.uniq(codes)) == 10
+    end
+
+    test "generate_recovery_codes/1 uses 96-bit codes" do
+      user = user_fixture()
+
+      [code | _] = Accounts.generate_recovery_codes(user)
+
+      # 12 random bytes, base32-encoded (no padding) => ~20 chars
+      assert String.length(code) >= 19
+      assert String.length(code) <= 20
+    end
+
+    test "recovery codes are stored as argon2 hashes" do
+      user = user_fixture()
+      codes = Accounts.generate_recovery_codes(user)
+
+      [code | _] = codes
+
+      stored = LuaNox.Repo.all(LuaNox.Accounts.UserRecoveryCode)
+      assert length(stored) == 10
+
+      hash = hd(stored).code_hash
+      assert String.starts_with?(hash, "$argon2")
+      assert Argon2.verify_pass(code, hash)
     end
 
     test "verify_recovery_code/2 is single-use" do
