@@ -1,0 +1,76 @@
+defmodule Luxpkgs.Accounts.Scope do
+  @moduledoc """
+  Defines the scope of the caller to be used throughout the app.
+
+  The `Luxpkgs.Accounts.Scope` allows public interfaces to receive
+  information about the caller, such as if the call is initiated from an
+  end-user, and if so, which user. Additionally, such a scope can carry fields
+  such as "super user" or other privileges for use as authorization, or to
+  ensure specific code paths can only be access for a given scope.
+
+  It is useful for logging as well as for scoping pubsub subscriptions and
+  broadcasts when a caller subscribes to an interface or performs a particular
+  action.
+
+  Feel free to extend the fields on this struct to fit the needs of
+  growing application requirements.
+  """
+
+  alias Luxpkgs.Packages.Release
+  alias Luxpkgs.Repo
+  alias Luxpkgs.Packages.Package
+  alias Luxpkgs.Accounts.User
+
+  defstruct user: nil, package_whitelist: nil, write_restricted: false, require_tfa: true
+
+  @doc """
+  Creates a scope for the given user.
+
+  Returns nil if no user is given.
+  """
+  def for_user(%User{} = user) do
+    %__MODULE__{user: user, package_whitelist: nil, write_restricted: false, require_tfa: true}
+  end
+
+  def for_user(nil), do: nil
+
+  def for_package(%Package{} = package) do
+    Repo.preload(package, :user) |> Map.get(:user) |> for_user()
+  end
+
+  def for_package(nil), do: nil
+
+  def for_release(%Release{} = release) do
+    Repo.preload(release, :package) |> Map.get(:package) |> for_package()
+  end
+
+  def for_release(nil), do: nil
+
+  def for_jwt(%{
+        user: %User{} = user,
+        package_whitelist: package_whitelist,
+        write_restricted: write_restricted,
+        require_tfa: require_tfa
+      }) do
+    # TODO(vhyrro): we should move this out to resource_from_claims, not the job of this function
+    # JOSE encodes nil as JSON null which decodes back as :null atom
+    whitelist = if package_whitelist == :null, do: nil, else: package_whitelist
+    restricted = if write_restricted == :null, do: false, else: write_restricted
+    require_tfa = if require_tfa == :null, do: true, else: require_tfa
+
+    for_user(user)
+    |> Map.put(:package_whitelist, whitelist)
+    |> Map.put(:write_restricted, restricted)
+    |> Map.put(:require_tfa, require_tfa)
+  end
+
+  def package_permitted?(%__MODULE__{package_whitelist: nil}, _package), do: true
+
+  def package_permitted?(%__MODULE__{package_whitelist: package_whitelist}, %Package{} = package) do
+    package.name in package_whitelist
+  end
+
+  def package_permitted?(%__MODULE__{package_whitelist: package_whitelist}, %{"name" => name}) do
+    name in package_whitelist
+  end
+end

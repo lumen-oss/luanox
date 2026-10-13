@@ -1,0 +1,10 @@
+type: workspace
+model: workspace
+id: wk_mMzjgebEKx
+createdAt: 2025-05-19T19:40:56.332457031
+updatedAt: 2025-05-19T19:40:56.332457651
+name: Luxpkgs
+description: ''
+settingValidateCertificates: true
+settingFollowRedirects: true
+settingRequestTimeout: 0
