@@ -95,6 +95,7 @@ defmodule LuxpkgsWeb.UserLive.SettingsTfaTest do
       |> render_submit()
 
     assert html =~ "Save these backup codes now"
+    assert html =~ ~s(phx-update="ignore")
     assert TOTP.backup_codes_remaining(user) == 10
     assert TOTP.verify(user, old) == :error
   end
