@@ -47,8 +47,10 @@ defmodule LuxpkgsWeb.UserLive.Keys do
             </div>
 
             <div class="space-y-3 text-sm text-base-content/80">
-              <p>API keys allow you to authenticate and interact with the Luxpkgs API programmatically.
-                Use them to publish packages, manage releases, and access your package data.</p>
+              <p>
+                API keys allow you to authenticate and interact with the Luxpkgs API programmatically.
+                Use them to publish packages, manage releases, and access your package data.
+              </p>
               <ul phx-no-format class="list-disc list-inside space-y-1 pl-4">
                 <li>Keys can be configured to expire between 1-4 weeks for security</li>
                 <li>Never share your API keys with anyone - they are more sensitive than a password</li>
@@ -122,7 +124,7 @@ defmodule LuxpkgsWeb.UserLive.Keys do
         </div>
       </div>
 
-      <dialog id="create_key_modal" class="modal">
+      <dialog id="create_key_modal" class="modal" phx-update="ignore">
         <div class="modal-box">
           <h3 class="text-lg font-bold text-base-content mb-4">Create New API Key</h3>
           <p class="text-sm text-base-content/80 mb-6">
@@ -209,7 +211,7 @@ defmodule LuxpkgsWeb.UserLive.Keys do
         </form>
       </dialog>
 
-      <dialog id="revoke_key_modal" class="modal">
+      <dialog id="revoke_key_modal" class="modal" phx-update="ignore">
         <div class="modal-box">
           <h3 class="text-lg font-bold text-base-content mb-4">Revoke API Key</h3>
           <p class="text-sm text-base-content/80 mb-4">

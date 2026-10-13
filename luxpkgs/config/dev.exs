@@ -38,9 +38,7 @@ config :luxpkgs, Luxpkgs.Vault,
   ciphers: [
     default: {
       Cloak.Ciphers.AES.GCM,
-      tag: "AES.GCM.V1",
-      key: :crypto.hash(:sha256, "luxpkgs dev vault key"),
-      iv_length: 12
+      tag: "AES.GCM.V1", key: :crypto.hash(:sha256, "luxpkgs dev vault key"), iv_length: 12
     }
   ]
 

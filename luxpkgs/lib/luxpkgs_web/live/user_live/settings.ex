@@ -239,7 +239,7 @@ defmodule LuxpkgsWeb.UserLive.Settings do
 
             <%!-- Two-Factor Authentication Section --%>
             <div class="collapse collapse-arrow bg-base-200 border border-base-300 !rounded-none">
-              <input type="checkbox" />
+              <input type="checkbox" checked={@backup_codes != nil} />
               <div class="collapse-title flex items-center gap-3 px-4 sm:px-6">
                 <.icon name={:shield_check} type={:outline} class="w-5 h-5 text-primary" />
                 <div>
@@ -352,7 +352,7 @@ defmodule LuxpkgsWeb.UserLive.Settings do
         </div>
       </div>
 
-      <dialog id="disable_account_modal" class="modal">
+      <dialog id="disable_account_modal" class="modal" phx-update="ignore">
         <div class="modal-box">
           <h3 class="text-lg font-bold text-base-content mb-4">Disable Account?</h3>
           <p class="text-sm text-base-content/80 mb-6">
@@ -372,7 +372,7 @@ defmodule LuxpkgsWeb.UserLive.Settings do
         </form>
       </dialog>
 
-      <dialog id="regenerate_backup_codes_modal" class="modal">
+      <dialog id="regenerate_backup_codes_modal" class="modal" phx-update="ignore">
         <div class="modal-box">
           <h3 class="text-lg font-bold text-base-content mb-4">Regenerate backup codes?</h3>
           <p class="text-sm text-base-content/80 mb-6">
@@ -401,7 +401,11 @@ defmodule LuxpkgsWeb.UserLive.Settings do
               >
                 Cancel
               </button>
-              <button type="submit" class="btn btn-primary">
+              <button
+                type="submit"
+                class="btn btn-primary"
+                onclick="regenerate_backup_codes_modal.close()"
+              >
                 <.icon name={:refresh} type={:outline} class="w-4 h-4" /> Regenerate Codes
               </button>
             </div>
@@ -412,7 +416,7 @@ defmodule LuxpkgsWeb.UserLive.Settings do
         </form>
       </dialog>
 
-      <dialog id="remove_tfa_modal" class="modal">
+      <dialog id="remove_tfa_modal" class="modal" phx-update="ignore">
         <div class="modal-box">
           <h3 class="text-lg font-bold text-base-content mb-4">Remove two-factor authentication?</h3>
           <p class="text-sm text-base-content/80 mb-6">
@@ -432,7 +436,7 @@ defmodule LuxpkgsWeb.UserLive.Settings do
               <button type="button" class="btn btn-neutral mr-3" onclick="remove_tfa_modal.close()">
                 Cancel
               </button>
-              <button type="submit" class="btn btn-error">
+              <button type="submit" class="btn btn-error" onclick="remove_tfa_modal.close()">
                 <.icon name={:trash} type={:outline} class="w-4 h-4" /> Remove
               </button>
             </div>
