@@ -5,7 +5,7 @@ let
   pass = config.env.DATABASE_PASS;
 in
 {
-    env.DATABASE_URL="postgres://${user}:${pass}@127.0.0.1/luanox";
+    env.DATABASE_URL="postgres://${user}:${pass}@127.0.0.1/luxpkgs";
     env.MIX_TAILWIND_PATH = "${pkgs.tailwindcss_4}/bin/tailwindcss";
 
     dotenv = {
@@ -34,11 +34,11 @@ in
         package = pkgs.postgresql_17;
         initialDatabases = [
           {
-            name = "luanox";
+            name = "luxpkgs";
             inherit user pass;
           }
           {
-            name = "luanox_test";
+            name = "luxpkgs_test";
             inherit user pass;
           }
         ];
@@ -47,31 +47,31 @@ in
     };
 
     tasks = {
-      "luanox:setupHex" = {
+      "luxpkgs:setupHex" = {
           exec = "mix local.hex --force --if-missing";
           before = [ "devenv:enterShell" "devenv:enterTest" ];
       };
-      "luanox:getDependencies" = {
-          exec = "cd ${config.env.DEVENV_ROOT}/luanox; mix deps.get";
-          status = "test -d ${config.env.DEVENV_ROOT}/luanox/deps";
+      "luxpkgs:getDependencies" = {
+          exec = "cd ${config.env.DEVENV_ROOT}/luxpkgs; mix deps.get";
+          status = "test -d ${config.env.DEVENV_ROOT}/luxpkgs/deps";
           before = [ "devenv:enterShell" "devenv:enterTest" ];
-          after = [ "luanox:setupHex" ];
+          after = [ "luxpkgs:setupHex" ];
       };
-      "luanox:getJSDependencies" = {
-          exec = "yarn --cwd ${config.env.DEVENV_ROOT}/luanox/assets";
-          status = "test -d ${config.env.DEVENV_ROOT}/luanox/assets/node_modules";
+      "luxpkgs:getJSDependencies" = {
+          exec = "yarn --cwd ${config.env.DEVENV_ROOT}/luxpkgs/assets";
+          status = "test -d ${config.env.DEVENV_ROOT}/luxpkgs/assets/node_modules";
           before = [ "devenv:enterShell" "devenv:enterTest" ];
       };
-      "luanox-verifier:getDependencies" = {
-          exec = "cd ${config.env.DEVENV_ROOT}/luanox-rockspec-verifier; mix deps.get";
-          status = "test -d ${config.env.DEVENV_ROOT}/luanox-rockspec-verifier/deps";
+      "luxpkgs-verifier:getDependencies" = {
+          exec = "cd ${config.env.DEVENV_ROOT}/luxpkgs-rockspec-verifier; mix deps.get";
+          status = "test -d ${config.env.DEVENV_ROOT}/luxpkgs-rockspec-verifier/deps";
           before = [ "devenv:enterShell" "devenv:enterTest" ];
-          after = [ "luanox:setupHex" ];
+          after = [ "luxpkgs:setupHex" ];
       };
     };
 
-    processes.luanox.exec = ''
-      cd ${config.env.DEVENV_ROOT}/luanox
+    processes.luxpkgs.exec = ''
+      cd ${config.env.DEVENV_ROOT}/luxpkgs
       # For some reason if there is an empty SSLKEYLOGFILE variable in the environment, Elixir's SSL breaks.
       # Unsetting it if it's empty seems to fix the issue.
       #
@@ -82,15 +82,15 @@ in
       mix phx.server
     '';
 
-    processes.luanox-rockspec-verifier.exec = ''
-      cd ${config.env.DEVENV_ROOT}/luanox-rockspec-verifier
+    processes.luxpkgs-rockspec-verifier.exec = ''
+      cd ${config.env.DEVENV_ROOT}/luxpkgs-rockspec-verifier
       mix phx.server
     '';
 
     enterTest = ''
-      cd ${config.env.DEVENV_ROOT}/luanox
+      cd ${config.env.DEVENV_ROOT}/luxpkgs
       mix test
-      #cd ${config.env.DEVENV_ROOT}/luanox-rockspec-verifier
+      #cd ${config.env.DEVENV_ROOT}/luxpkgs-rockspec-verifier
       #mix test
     '';
 }

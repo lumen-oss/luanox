@@ -1,17 +1,17 @@
 <h1 align="center">
   <br>
-  <a href="https://lumen-oss.github.io/tutorial/getting-started"><img src="./luanox-logo.svg" alt="Luanox" width="200"></a>
+  <a href="https://lumen-oss.github.io/tutorial/getting-started"><img src="./luxpkgs-logo.svg" alt="Luxpkgs" width="200"></a>
   <br>
   <br>
-  <span>Luanox</span>
+  <span>Luxpkgs</span>
 </h1>
 
 <h4 align="center">A modern, simple and fast module host for Lua packages.</h4>
 
 <p align="center">
   <!-- <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/nvim-neorocks/lux/integration-tests.yml?style=for-the-badge"> -->
-  <img alt="GitHub Top Language" src="https://img.shields.io/github/languages/top/lumen-oss/luanox?style=for-the-badge">
-  <img alt="GitHub License" src="https://img.shields.io/github/license/lumen-oss/luanox?style=for-the-badge">
+  <img alt="GitHub Top Language" src="https://img.shields.io/github/languages/top/lumen-oss/luxpkgs?style=for-the-badge">
+  <img alt="GitHub License" src="https://img.shields.io/github/license/lumen-oss/luxpkgs?style=for-the-badge">
 </p>
 
 <p align="center">
@@ -31,19 +31,19 @@
 
 > [!WARNING]
 >
-> *Luanox* is in early beta. While a lot of features are complete and function, there may be bugs! 
+> *Luxpkgs* is in early beta. While a lot of features are complete and function, there may be bugs! 
 
 ## :bulb: You may also like...
 
-- [lux](https://github.com/nvim-neorocks/lux) - The Lux package manager, built on top of Luanox.
+- [lux](https://github.com/nvim-neorocks/lux) - The Lux package manager, built on top of Luxpkgs.
 - [luarocks](https://github.com/luarocks/luarocks) - The original Lua package manager
 - [rocks.nvim](https://github.com/nvim-neorocks/rocks.nvim) - A Neovim plugin manager that uses `luarocks` under the hood, and will soon be undergoing a rewrite to use Lux instead.
 
 ## :purple_heart: Credits
 
 Credits go to the Luarocks team for maintaining [luarocks](https://github.com/luarocks/luarocks) and [luarocks.org](https://luarocks.org) for as long as they have.
-Without their prior work Luanox would not be possible.
+Without their prior work Luxpkgs would not be possible.
 
 ## :book: License
 
-- Luanox is licensed under the [AGPL-3.0](./LICENSE).
+- Luxpkgs is licensed under the [AGPL-3.0](./LICENSE).
