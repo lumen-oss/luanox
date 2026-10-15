@@ -80,6 +80,55 @@
   .page-container {
     @apply mx-auto w-full px-4 sm:px-6 lg:px-8;
   }
+
+  .panel-collapse {
+    display: grid;
+    grid-template-rows: 1fr;
+  }
+
+  .panel-collapse > * {
+    min-height: 0;
+    overflow: hidden;
+  }
+}
+
+@keyframes panel-collapse-in {
+  from {
+    grid-template-rows: 0fr;
+    opacity: 0;
+  }
+
+  to {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+}
+
+@keyframes panel-collapse-out {
+  from {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+
+  to {
+    grid-template-rows: 0fr;
+    opacity: 0;
+  }
+}
+
+.animate-panel-in {
+  animation: panel-collapse-in 200ms ease-out both;
+}
+
+.animate-panel-out {
+  animation: panel-collapse-out 200ms ease-in both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-panel-in,
+  .animate-panel-out {
+    animation: none;
+  }
 }
 
 .prose a {
