@@ -21,7 +21,7 @@ in
     languages.nix.enable = true;
 
     packages = [
-      pkgs.yarn          # Bundled JS dependencies
+      pkgs.pnpm          # Bundled JS dependencies
       pkgs.alejandra     # Nix formatter
       pkgs.tailwindcss_4 # We cannot use the bundled TailwindCSS CLI from Phoenix on NixOS
       pkgs.inotify-tools # Required for file watching on Phoenix
@@ -58,7 +58,7 @@ in
           after = [ "luxpkgs:setupHex" ];
       };
       "luxpkgs:getJSDependencies" = {
-          exec = "yarn --cwd ${config.env.DEVENV_ROOT}/luxpkgs/assets";
+          exec = "pnpm --dir ${config.env.DEVENV_ROOT}/luxpkgs/assets/ install";
           status = "test -d ${config.env.DEVENV_ROOT}/luxpkgs/assets/node_modules";
           before = [ "devenv:enterShell" "devenv:enterTest" ];
       };
