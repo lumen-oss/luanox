@@ -59,7 +59,10 @@ defmodule LuxpkgsWeb.UserLive.Keys do
             </div>
           </div>
 
-          <div :if={@generated_key} class="bg-success/5 border border-success/20 p-6 shadow-sm">
+          <div
+            :if={@generated_key}
+            class="bg-success/5 border border-success/20 rounded-box p-6 shadow-sm"
+          >
             <div class="flex items-center justify-between mb-4">
               <div class="flex items-center gap-3">
                 <.icon name={:check} type={:outline} class="w-5 h-5 text-success" />
@@ -82,7 +85,7 @@ defmodule LuxpkgsWeb.UserLive.Keys do
                 <code
                   phx-no-format
                   id="generated-key"
-                  class="flex-1 text-sm font-mono px-3 py-2 rounded-md bg-base-100 border border-success/20 break-all"
+                  class="flex-1 text-sm font-mono px-3 py-2 rounded-box bg-base-100 border border-success/20 break-all"
                 >{@generated_key}</code>
                 <button
                   class="btn btn-neutral btn-sm gap-2"

@@ -43,7 +43,7 @@
 
               <.link
                 href={~p"/api/download/#{@package.name}"}
-                class="btn bg-primary text-primary-content border-primary hover:bg-primary/90 flex items-center justify-center w-full sm:w-auto"
+                class="btn btn-primary w-full sm:w-auto"
               >
                 <.icon name={:download} type={:outline} class="w-4 h-4 mr-2" /> Download Latest
               </.link>
@@ -99,7 +99,7 @@
                       </span>
                       <.link
                         href={~p"/api/download/#{@package.name}/#{to_string(release.version)}"}
-                        class="btn btn-sm bg-primary/10 text-primary border-primary/20 hover:bg-primary/20"
+                        class="btn btn-sm btn-soft btn-primary"
                       >
                         <.icon name={:download} type={:outline} class="w-3 h-3 mr-1" /> Download
                       </.link>
@@ -195,7 +195,7 @@
                   <div class="text-sm lg:text-base text-base-content/70 mb-2 flex items-center">
                     <span class="font-medium">Via Lux</span>
                   </div>
-                  <div class="bg-base-300 border border-base-300 p-3 font-mono text-xs lg:text-sm text-base-content rounded-md overflow-x-auto">
+                  <div class="bg-base-300 p-3 font-mono text-xs lg:text-sm text-base-content rounded-box overflow-x-auto">
                     lx install {@package.name}
                   </div>
                 </div>
@@ -203,7 +203,7 @@
                   <div class="text-sm lg:text-base text-base-content/70 mb-2 flex items-center">
                     <span class="font-medium">Via LuaRocks</span>
                   </div>
-                  <div class="bg-base-300 border border-base-300 p-3 font-mono text-xs lg:text-sm text-base-content rounded-md overflow-x-auto">
+                  <div class="bg-base-300 p-3 font-mono text-xs lg:text-sm text-base-content rounded-box overflow-x-auto">
                     luarocks install {@package.name}
                   </div>
                 </div>

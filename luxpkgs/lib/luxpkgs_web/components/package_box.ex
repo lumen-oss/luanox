@@ -12,7 +12,7 @@ defmodule LuxpkgsWeb.PackageBox do
       navigate={~p"/package/#{@name}"}
       class="group h-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
     >
-      <div class="h-full flex flex-col bg-base-100 border border-base-300 hover:border-primary/40 transition-colors duration-200 p-6">
+      <div class="h-full flex flex-col bg-base-100 border border-base-300 rounded-box hover:border-primary/40 transition-colors duration-200 p-6">
         <div class="space-y-4">
           <div class="flex items-start justify-between">
             <h2 class="text-lg font-semibold text-base-content group-hover:text-primary transition-colors">
@@ -104,7 +104,7 @@ defmodule LuxpkgsWeb.PackageBox do
 
         <!-- Call to Action -->
         <div class="text-center">
-          <div class="bg-base-100 border border-base-300 py-16 px-8">
+          <div class="bg-base-100 border border-base-300 rounded-box py-16 px-8">
             <h3 class="text-2xl font-bold text-base-content mb-4">
               Ready to explore more packages?
             </h3>
@@ -113,7 +113,7 @@ defmodule LuxpkgsWeb.PackageBox do
             </p>
             <.link
               navigate={~p"/packages"}
-              class="bg-primary text-primary-content border border-primary hover:bg-primary/90 px-8 py-3 font-medium transition-colors inline-flex items-center"
+              class="btn btn-primary px-8"
             >
               <.icon name={:folder} type={:outline} class="w-5 h-5 mr-2" /> View All Packages
             </.link>
