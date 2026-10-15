@@ -6,7 +6,8 @@ defmodule LuxpkgsWeb.UserLive.Settings do
   on_mount({LuxpkgsWeb.UserAuth, :require_sudo_mode})
 
   def mount(_params, _session, socket) do
-    bio_count = (socket.assigns.current_scope.user.bio || "") |> String.length()
+    user = socket.assigns.current_scope.user
+    bio_count = (user.bio || "") |> String.length()
 
     {:ok,
      socket
@@ -15,10 +16,23 @@ defmodule LuxpkgsWeb.UserLive.Settings do
      |> assign(:bio_count, bio_count)
      |> assign(:backup_codes, nil)
      |> assign(:tfa_open, false)
-     |> assign(
-       :backup_codes_remaining,
-       TOTP.backup_codes_remaining(socket.assigns.current_scope.user)
-     )}
+     |> assign(:account_open, true)
+     |> assign(:backup_codes_remaining, TOTP.backup_codes_remaining(user))
+     |> maybe_reveal_backup_codes(user)}
+  end
+
+  defp maybe_reveal_backup_codes(socket, user) do
+    with true <- connected?(socket),
+         {:ok, codes} when is_list(codes) and codes != [] <-
+           Cachex.take(:totp_backup_codes, user.id) do
+      socket
+      |> assign(:backup_codes, codes)
+      |> assign(:tfa_open, true)
+      |> assign(:account_open, false)
+      |> push_event("scroll-to", %{id: "two-factor-auth"})
+    else
+      _ -> socket
+    end
   end
 
   def render(assigns) do
@@ -99,7 +113,12 @@ defmodule LuxpkgsWeb.UserLive.Settings do
           <div class="lg:col-span-2 space-y-4">
             <%!-- Account Section --%>
             <div class="collapse collapse-arrow bg-base-200 border border-base-300">
-              <input type="checkbox" checked />
+              <input
+                id="account-toggle"
+                type="checkbox"
+                checked={@account_open}
+                phx-click="toggle_account"
+              />
               <div class="collapse-title flex items-center gap-3 px-4 sm:px-6">
                 <.icon name={:user_circle} type={:outline} class="w-5 h-5 text-primary" />
                 <div>
@@ -239,8 +258,11 @@ defmodule LuxpkgsWeb.UserLive.Settings do
             </div>
 
             <%!-- Two-Factor Authentication Section --%>
-            <div class="collapse collapse-arrow bg-base-200 border border-base-300">
-              <input type="checkbox" checked={@tfa_open} phx-click="toggle_tfa" />
+            <div
+              id="two-factor-auth"
+              class="collapse collapse-arrow bg-base-200 border border-base-300"
+            >
+              <input id="tfa-toggle" type="checkbox" checked={@tfa_open} phx-click="toggle_tfa" />
               <div class="collapse-title flex items-center gap-3 px-4 sm:px-6">
                 <.icon name={:shield_check} type={:outline} class="w-5 h-5 text-primary" />
                 <div>
@@ -568,6 +590,10 @@ defmodule LuxpkgsWeb.UserLive.Settings do
 
   def handle_event("toggle_tfa", _params, socket) do
     {:noreply, update(socket, :tfa_open, &(not &1))}
+  end
+
+  def handle_event("toggle_account", _params, socket) do
+    {:noreply, update(socket, :account_open, &(not &1))}
   end
 
   def handle_event("copy_codes", _params, socket) do

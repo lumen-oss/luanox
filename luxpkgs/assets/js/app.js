@@ -91,6 +91,13 @@ window.addEventListener("phx:clipcopy", (event) => {
   }
 });
 
+window.addEventListener("phx:scroll-to", (event) => {
+  const el = document.getElementById(event.detail.id);
+  if (!el) return;
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  el.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+});
+
 // Loading transitions
 window.addEventListener("phx:page-loading-start", info => {
   if (info.detail.kind == "redirect") {

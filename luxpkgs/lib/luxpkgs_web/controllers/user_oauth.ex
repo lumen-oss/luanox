@@ -148,12 +148,12 @@ defmodule LuxpkgsWeb.UserOauth do
 
     if user && secret && Luxpkgs.Accounts.TOTP.valid?(secret, code) &&
          Luxpkgs.Accounts.TOTP.enable(user, secret) == :ok do
+      codes = Luxpkgs.Accounts.TOTP.generate_backup_codes(user)
+      Cachex.put(:totp_backup_codes, user.id, codes, ttl: :timer.hours(1))
+
       conn
+      |> put_session(:user_return_to, ~p"/settings")
       |> LuxpkgsWeb.UserAuth.log_in_user(user)
-      |> put_flash(
-        :info,
-        "Two-factor authentication enabled. Generate your backup codes in settings."
-      )
     else
       conn
       |> put_flash(:error, "Invalid verification code. Please try again.")
