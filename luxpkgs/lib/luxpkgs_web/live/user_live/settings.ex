@@ -419,9 +419,17 @@ defmodule LuxpkgsWeb.UserLive.Settings do
         </div>
       </div>
 
-      <dialog id="disable_account_modal" class="modal" phx-update="ignore">
+      <dialog
+        id="disable_account_modal"
+        class="modal"
+        phx-update="ignore"
+        phx-hook="Dialog"
+        aria-labelledby="disable_account_modal_title"
+      >
         <div class="modal-box">
-          <h3 class="text-lg font-bold text-base-content mb-4">Disable Account?</h3>
+          <h3 id="disable_account_modal_title" class="text-lg font-bold text-base-content mb-4">
+            Disable Account?
+          </h3>
           <p class="text-sm text-base-content/80 mb-6">
             Disabling your account prevents you from creating or updating any packages. You can re-enable it at any time.
           </p>
@@ -444,9 +452,15 @@ defmodule LuxpkgsWeb.UserLive.Settings do
         class="modal"
         phx-update="ignore"
         phx-hook="Dialog"
+        aria-labelledby="regenerate_backup_codes_modal_title"
       >
         <div class="modal-box">
-          <h3 class="text-lg font-bold text-base-content mb-4">Regenerate backup codes?</h3>
+          <h3
+            id="regenerate_backup_codes_modal_title"
+            class="text-lg font-bold text-base-content mb-4"
+          >
+            Regenerate backup codes?
+          </h3>
           <p class="text-sm text-base-content/80 mb-6">
             This invalidates every existing backup code. Enter a code from your authenticator app, or one of your current backup codes, to continue.
           </p>
@@ -488,9 +502,17 @@ defmodule LuxpkgsWeb.UserLive.Settings do
         </form>
       </dialog>
 
-      <dialog id="remove_tfa_modal" class="modal" phx-update="ignore" phx-hook="Dialog">
+      <dialog
+        id="remove_tfa_modal"
+        class="modal"
+        phx-update="ignore"
+        phx-hook="Dialog"
+        aria-labelledby="remove_tfa_modal_title"
+      >
         <div class="modal-box">
-          <h3 class="text-lg font-bold text-base-content mb-4">Remove two-factor authentication?</h3>
+          <h3 id="remove_tfa_modal_title" class="text-lg font-bold text-base-content mb-4">
+            Remove two-factor authentication?
+          </h3>
           <p class="text-sm text-base-content/80 mb-6">
             Your authenticator secret and all backup codes will be deleted, and you will be asked to set two-factor authentication up again. Enter a code from your authenticator app, or one of your backup codes, to continue.
           </p>
@@ -508,7 +530,7 @@ defmodule LuxpkgsWeb.UserLive.Settings do
               <button type="button" class="btn btn-neutral mr-3" onclick="remove_tfa_modal.close()">
                 Cancel
               </button>
-              <button type="submit" class="btn btn-error" onclick="remove_tfa_modal.close()">
+              <button type="submit" class="btn btn-error" phx-disable-with="Removing...">
                 <.icon name={:trash} type={:outline} class="w-4 h-4" /> Remove
               </button>
             </div>
@@ -608,10 +630,16 @@ defmodule LuxpkgsWeb.UserLive.Settings do
 
     cond do
       throttle_exceeded?(user) ->
-        {:noreply, put_flash(socket, :error, "Too many attempts. Please try again later.")}
+        {:noreply,
+         socket
+         |> close_modal("remove_tfa_modal")
+         |> put_flash(:error, "Too many attempts. Please try again later.")}
 
       TOTP.verify(user, code) != :ok ->
-        {:noreply, put_flash(socket, :error, "Invalid verification code.")}
+        {:noreply,
+         socket
+         |> close_modal("remove_tfa_modal")
+         |> put_flash(:error, "Invalid verification code.")}
 
       true ->
         :ok = TOTP.disable(user)
@@ -627,7 +655,10 @@ defmodule LuxpkgsWeb.UserLive.Settings do
   end
 
   def handle_event("remove_tfa", _params, socket) do
-    {:noreply, put_flash(socket, :error, "Enter a verification code to continue.")}
+    {:noreply,
+     socket
+     |> close_modal("remove_tfa_modal")
+     |> put_flash(:error, "Enter a verification code to continue.")}
   end
 
   def handle_event(_event, _params, socket), do: {:noreply, socket}

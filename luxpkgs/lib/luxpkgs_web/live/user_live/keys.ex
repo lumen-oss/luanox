@@ -127,9 +127,17 @@ defmodule LuxpkgsWeb.UserLive.Keys do
         </div>
       </div>
 
-      <dialog id="create_key_modal" class="modal" phx-update="ignore">
+      <dialog
+        id="create_key_modal"
+        class="modal"
+        phx-update="ignore"
+        phx-hook="Dialog"
+        aria-labelledby="create_key_modal_title"
+      >
         <div class="modal-box">
-          <h3 class="text-lg font-bold text-base-content mb-4">Create New API Key</h3>
+          <h3 id="create_key_modal_title" class="text-lg font-bold text-base-content mb-4">
+            Create New API Key
+          </h3>
           <p class="text-sm text-base-content/80 mb-6">
             Configure your new API key settings. Keys will expire based on the selected time period.
           </p>
@@ -199,11 +207,7 @@ defmodule LuxpkgsWeb.UserLive.Keys do
               <button type="button" class="btn btn-neutral mr-3" onclick="create_key_modal.close()">
                 Cancel
               </button>
-              <button
-                type="submit"
-                class="btn btn-primary"
-                onclick="create_key_modal.close()"
-              >
+              <button type="submit" class="btn btn-primary" phx-disable-with="Generating...">
                 <.icon name={:key} type={:outline} class="w-4 h-4" /> Generate Key
               </button>
             </div>
@@ -214,9 +218,17 @@ defmodule LuxpkgsWeb.UserLive.Keys do
         </form>
       </dialog>
 
-      <dialog id="revoke_key_modal" class="modal" phx-update="ignore">
+      <dialog
+        id="revoke_key_modal"
+        class="modal"
+        phx-update="ignore"
+        phx-hook="Dialog"
+        aria-labelledby="revoke_key_modal_title"
+      >
         <div class="modal-box">
-          <h3 class="text-lg font-bold text-base-content mb-4">Revoke API Key</h3>
+          <h3 id="revoke_key_modal_title" class="text-lg font-bold text-base-content mb-4">
+            Revoke API Key
+          </h3>
           <p class="text-sm text-base-content/80 mb-4">
             Revoked API keys have zero permissions and cannot be used again.
           </p>
@@ -234,7 +246,7 @@ defmodule LuxpkgsWeb.UserLive.Keys do
               <button type="button" class="btn btn-neutral mr-3" onclick="revoke_key_modal.close()">
                 Cancel
               </button>
-              <button type="submit" class="btn btn-error" onclick="revoke_key_modal.close()">
+              <button type="submit" class="btn btn-error" phx-disable-with="Revoking...">
                 <.icon name={:trash} type={:outline} class="w-4 h-4" /> Revoke Key
               </button>
             </div>
@@ -286,7 +298,8 @@ defmodule LuxpkgsWeb.UserLive.Keys do
      |> assign(:generated_key, token)
      |> assign(:read_only, read_only)
      |> assign(:ttl_weeks, ttl_weeks)
-     |> assign(:require_tfa, require_tfa)}
+     |> assign(:require_tfa, require_tfa)
+     |> close_modal("create_key_modal")}
   end
 
   def handle_event("revoke_key", %{"revoked_key" => revoked_key}, socket) do
@@ -297,10 +310,14 @@ defmodule LuxpkgsWeb.UserLive.Keys do
         {:noreply,
          socket
          |> put_flash(:info, "API key revoked successfully!")
-         |> assign(:generated_key, nil)}
+         |> assign(:generated_key, nil)
+         |> close_modal("revoke_key_modal")}
 
       {:error, _changeset} ->
-        {:noreply, socket |> put_flash(:error, "Failed to revoke key. Ensure it is valid.")}
+        {:noreply,
+         socket
+         |> close_modal("revoke_key_modal")
+         |> put_flash(:error, "Failed to revoke key. Ensure it is valid.")}
     end
   end
 
@@ -314,4 +331,6 @@ defmodule LuxpkgsWeb.UserLive.Keys do
     |> put_flash(:info, "API key copied to clipboard!")
     |> (&{:noreply, &1}).()
   end
+
+  defp close_modal(socket, id), do: push_event(socket, "close_dialog", %{id: id})
 end
