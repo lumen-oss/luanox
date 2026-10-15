@@ -3,6 +3,6 @@
   "packageManager": "pnpm@12.9.0",
   "dependencies": {
     "@tailwindcss/typography": "^0.5.20",
-    "typed.js": "^2.1.0"
+    "typed.js": "^3.0.0"
   }
 }
