@@ -49,8 +49,8 @@ defmodule LuxpkgsWeb.Layouts do
   def flash_group(assigns) do
     ~H"""
     <div id={@id} aria-live="polite">
-      <.flash kind={:info} flash={@flash} />
-      <.flash kind={:error} flash={@flash} />
+      <.flash kind={:info} flash={@flash} phx-mounted={show("#flash-info")} />
+      <.flash kind={:error} flash={@flash} phx-mounted={show("#flash-error")} />
 
       <.flash
         id="client-error"

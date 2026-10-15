@@ -14,6 +14,7 @@ defmodule LuxpkgsWeb.UserLive.Settings do
      |> assign(:username_form, nil)
      |> assign(:bio_count, bio_count)
      |> assign(:backup_codes, nil)
+     |> assign(:tfa_open, false)
      |> assign(
        :backup_codes_remaining,
        TOTP.backup_codes_remaining(socket.assigns.current_scope.user)
@@ -239,7 +240,7 @@ defmodule LuxpkgsWeb.UserLive.Settings do
 
             <%!-- Two-Factor Authentication Section --%>
             <div class="collapse collapse-arrow bg-base-200 border border-base-300">
-              <input type="checkbox" checked={@backup_codes != nil} />
+              <input type="checkbox" checked={@tfa_open} phx-click="toggle_tfa" />
               <div class="collapse-title flex items-center gap-3 px-4 sm:px-6">
                 <.icon name={:shield_check} type={:outline} class="w-5 h-5 text-primary" />
                 <div>
@@ -279,52 +280,60 @@ defmodule LuxpkgsWeb.UserLive.Settings do
 
                   <div
                     :if={@backup_codes}
-                    class="bg-warning/10 border border-warning/30 rounded-box p-4 space-y-4"
+                    id="backup-codes-panel"
+                    class="panel-collapse"
+                    phx-mounted={JS.transition("animate-panel-in", time: 200)}
+                    phx-remove={JS.transition("animate-panel-out", time: 200)}
                   >
-                    <div class="flex items-start gap-2">
-                      <.icon
-                        name={:alert_triangle}
-                        type={:outline}
-                        class="w-4 h-4 text-warning shrink-0 mt-0.5"
-                      />
-                      <p class="text-sm font-medium text-warning">
-                        Save these backup codes now. They are shown only once and each can be used once.
-                      </p>
-                    </div>
+                    <div class="bg-warning/10 border border-warning/30 rounded-box p-4 space-y-4">
+                      <div class="flex items-start gap-2">
+                        <.icon
+                          name={:alert_triangle}
+                          type={:outline}
+                          class="w-4 h-4 text-warning shrink-0 mt-0.5"
+                        />
+                        <p class="text-sm font-medium text-warning">
+                          Save these backup codes now. They are shown only once and each can be used once.
+                        </p>
+                      </div>
 
-                    <ul
-                      phx-no-format
-                      class="grid grid-cols-2 gap-2 font-mono text-sm select-all"
-                    >
-                      <li
-                        :for={code <- @backup_codes}
-                        class="bg-base-100 border border-warning/30 rounded-box px-3 py-2 text-center"
-                      >{TOTP.format_backup_code(code)}</li>
-                    </ul>
-
-                    <span id="backup-codes-copy" class="hidden">{Enum.map_join(
-                      @backup_codes,
-                      "\n",
-                      &TOTP.format_backup_code/1
-                    )}</span>
-
-                    <div class="flex flex-col sm:flex-row gap-2">
-                      <button
-                        id="copy-backup-codes"
-                        type="button"
-                        class="btn btn-neutral btn-sm"
-                        phx-click={JS.dispatch("phx:clipcopy", to: "#backup-codes-copy") |> JS.push("copy_codes")}
+                      <ul
+                        phx-no-format
+                        class="grid grid-cols-2 gap-2 font-mono text-sm select-all"
                       >
-                        <.icon name={:clipboard} type={:outline} class="w-4 h-4" /> Copy all
-                      </button>
-                      <button
-                        id="dismiss-backup-codes"
-                        type="button"
-                        class="btn btn-ghost btn-sm"
-                        phx-click="dismiss_backup_codes"
-                      >
-                        <.icon name={:check} type={:outline} class="w-4 h-4" /> I've saved my codes
-                      </button>
+                        <li
+                          :for={code <- @backup_codes}
+                          class="bg-base-100 border border-warning/30 rounded-box px-3 py-2 text-center"
+                        >{TOTP.format_backup_code(code)}</li>
+                      </ul>
+
+                      <span id="backup-codes-copy" class="hidden">{Enum.map_join(
+                        @backup_codes,
+                        "\n",
+                        &TOTP.format_backup_code/1
+                      )}</span>
+
+                      <div class="flex flex-col sm:flex-row gap-2">
+                        <button
+                          id="copy-backup-codes"
+                          type="button"
+                          class="btn btn-neutral btn-sm"
+                          phx-click={
+                            JS.dispatch("phx:clipcopy", to: "#backup-codes-copy")
+                            |> JS.push("copy_codes")
+                          }
+                        >
+                          <.icon name={:clipboard} type={:outline} class="w-4 h-4" /> Copy all
+                        </button>
+                        <button
+                          id="dismiss-backup-codes"
+                          type="button"
+                          class="btn btn-ghost btn-sm"
+                          phx-click="dismiss_backup_codes"
+                        >
+                          <.icon name={:check} type={:outline} class="w-4 h-4" /> I've saved my codes
+                        </button>
+                      </div>
                     </div>
                   </div>
 
@@ -408,7 +417,12 @@ defmodule LuxpkgsWeb.UserLive.Settings do
         </form>
       </dialog>
 
-      <dialog id="regenerate_backup_codes_modal" class="modal" phx-update="ignore">
+      <dialog
+        id="regenerate_backup_codes_modal"
+        class="modal"
+        phx-update="ignore"
+        phx-hook="Dialog"
+      >
         <div class="modal-box">
           <h3 class="text-lg font-bold text-base-content mb-4">Regenerate backup codes?</h3>
           <p class="text-sm text-base-content/80 mb-6">
@@ -440,7 +454,7 @@ defmodule LuxpkgsWeb.UserLive.Settings do
               <button
                 type="submit"
                 class="btn btn-primary"
-                onclick="regenerate_backup_codes_modal.close()"
+                phx-disable-with="Regenerating..."
               >
                 <.icon name={:refresh} type={:outline} class="w-4 h-4" /> Regenerate Codes
               </button>
@@ -452,7 +466,7 @@ defmodule LuxpkgsWeb.UserLive.Settings do
         </form>
       </dialog>
 
-      <dialog id="remove_tfa_modal" class="modal" phx-update="ignore">
+      <dialog id="remove_tfa_modal" class="modal" phx-update="ignore" phx-hook="Dialog">
         <div class="modal-box">
           <h3 class="text-lg font-bold text-base-content mb-4">Remove two-factor authentication?</h3>
           <p class="text-sm text-base-content/80 mb-6">
@@ -517,10 +531,16 @@ defmodule LuxpkgsWeb.UserLive.Settings do
 
     cond do
       throttle_exceeded?(user) ->
-        {:noreply, put_flash(socket, :error, "Too many attempts. Please try again later.")}
+        {:noreply,
+         socket
+         |> close_modal("regenerate_backup_codes_modal")
+         |> put_flash(:error, "Too many attempts. Please try again later.")}
 
       TOTP.verify(user, code) != :ok ->
-        {:noreply, put_flash(socket, :error, "Invalid verification code.")}
+        {:noreply,
+         socket
+         |> close_modal("regenerate_backup_codes_modal")
+         |> put_flash(:error, "Invalid verification code.")}
 
       true ->
         codes = TOTP.generate_backup_codes(user)
@@ -528,17 +548,26 @@ defmodule LuxpkgsWeb.UserLive.Settings do
         {:noreply,
          socket
          |> assign(:backup_codes, codes)
+         |> assign(:tfa_open, true)
          |> assign(:backup_codes_remaining, TOTP.backup_codes_remaining(user))
+         |> close_modal("regenerate_backup_codes_modal")
          |> put_flash(:info, "New backup codes generated. Save them now.")}
     end
   end
 
   def handle_event("regenerate_backup_codes", _params, socket) do
-    {:noreply, put_flash(socket, :error, "Enter a verification code to continue.")}
+    {:noreply,
+     socket
+     |> close_modal("regenerate_backup_codes_modal")
+     |> put_flash(:error, "Enter a verification code to continue.")}
   end
 
   def handle_event("dismiss_backup_codes", _params, socket) do
     {:noreply, assign(socket, :backup_codes, nil)}
+  end
+
+  def handle_event("toggle_tfa", _params, socket) do
+    {:noreply, update(socket, :tfa_open, &(not &1))}
   end
 
   def handle_event("copy_codes", _params, socket) do
@@ -576,6 +605,8 @@ defmodule LuxpkgsWeb.UserLive.Settings do
   end
 
   def handle_event(_event, _params, socket), do: {:noreply, socket}
+
+  defp close_modal(socket, id), do: push_event(socket, "close_dialog", %{id: id})
 
   defp member_since_date(%DateTime{} = date), do: Calendar.strftime(date, "%B %Y")
   defp member_since_date(%NaiveDateTime{} = date), do: Calendar.strftime(date, "%B %Y")

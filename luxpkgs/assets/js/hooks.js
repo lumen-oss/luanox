@@ -43,7 +43,21 @@ const Typewriter = {
   }
 };
 
+const Dialog = {
+  mounted() {
+    this.reset();
+    this.el.addEventListener("close", () => this.reset());
+    this.handleEvent("close_dialog", ({ id }) => {
+      if (id === this.el.id) this.el.close();
+    });
+  },
+  reset() {
+    this.el.querySelector(".modal-box form")?.reset();
+  },
+};
+
 export default Hooks = {
   Typewriter: Typewriter,
   CharacterCounter: CharacterCounter,
+  Dialog: Dialog,
 }

@@ -98,6 +98,7 @@ defmodule LuxpkgsWeb.UserLive.SettingsTfaTest do
     assert html =~ ~s(phx-update="ignore")
     assert TOTP.backup_codes_remaining(user) == 10
     assert TOTP.verify(user, old) == :error
+    assert_push_event(lv, "close_dialog", %{id: "regenerate_backup_codes_modal"})
   end
 
   test "an invalid code does not regenerate backup codes", %{conn: conn, user: user} do
