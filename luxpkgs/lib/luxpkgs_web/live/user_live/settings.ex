@@ -388,7 +388,7 @@ defmodule LuxpkgsWeb.UserLive.Settings do
               </div>
               <div class="collapse-content px-4 sm:px-6">
                 <div class="space-y-6 pt-2">
-                  <div class="bg-base-100 border border-base-300 rounded-md p-4 sm:p-6 space-y-4">
+                  <div class="bg-base-100 border border-base-300 rounded-box p-4 sm:p-6 space-y-4">
                     <div class="flex items-center justify-between gap-3">
                       <div class="flex items-center gap-3">
                         <.icon name={:brand_github} type={:outline} class="w-5 h-5 text-success" />

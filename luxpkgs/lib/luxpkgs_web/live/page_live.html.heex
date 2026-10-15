@@ -11,21 +11,21 @@
                 name="search"
                 type="text"
                 placeholder="Search packages..."
-                class="input border border-base-300 bg-base-100 focus:border-primary focus:outline-none w-full"
+                class="input input-bordered w-full bg-base-100 border-base-300 focus:border-primary"
               />
             </form>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 lg:gap-4">
               <.link
                 href="https://lumen-oss.github.io"
-                class="btn bg-primary text-primary-content border-primary hover:bg-primary/90 text-sm"
+                class="btn btn-primary text-sm"
               >
                 <.icon name={:book_2} type={:outline} class="w-4 h-4" /> Get Started
               </.link>
 
               <.link
                 navigate={~p"/packages"}
-                class="btn bg-base-100 text-base-content border border-base-300 hover:bg-base-200 text-sm"
+                class="btn btn-outline text-sm"
               >
                 <.icon name={:folder} type={:outline} class="w-4 h-4" /> Browse Packages
               </.link>
