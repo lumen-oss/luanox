@@ -1,0 +1,22 @@
+# pnpm will fail if a package's trust level has decreased compared to previous releases.
+# For example, if a package was previously published by a trusted publisher but now only has
+# provenance or no trust evidence, installation will fail.
+#
+# This helps prevent installing potentially compromised versions.
+trustPolicy: no-downgrade
+
+# only direct dependencies may use exotic sources (git, tarballs, etc). All transitive dependencies
+# must be resolved from a trusted source, such as the configured registry, local file paths,
+# workspace links, or trusted GitHub repositories.
+#
+# This setting helps secure the dependency supply chain by preventing transitive dependencies from
+# pulling in code from untrusted locations.
+blockExoticSubdeps: true
+
+# pnpm will not install packages that have been published less than the specified number of minutes ago.
+#
+# Default is 1440, which is 24 hours.
+# Setting this to a higher value can help protect against recently published malicious packages.
+minimumReleaseAge: 10080 # 7 days
+
+# See https://pnpm.io/settings for more options
