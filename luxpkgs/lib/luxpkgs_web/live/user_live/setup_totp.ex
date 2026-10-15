@@ -57,21 +57,21 @@ defmodule LuxpkgsWeb.UserLive.SetupTotp do
             </p>
           </div>
 
-          <div class="bg-base-100 border border-base-300 p-6 space-y-6">
+          <div class="bg-base-100 border border-base-300 rounded-box p-6 space-y-6">
             <div class="flex justify-center">
-              <div class="bg-white p-4">
+              <div class="bg-white p-4 rounded-box">
                 {EQRCode.encode(@uri) |> EQRCode.svg(width: 200) |> raw()}
               </div>
             </div>
 
             <div>
               <p class="text-xs text-base-content/60 mb-1">Or enter this secret manually:</p>
-              <code class="block text-sm font-mono bg-base-200 px-3 py-2 break-all select-all">
+              <code class="block text-sm font-mono bg-base-200 border border-base-300 px-3 py-2 break-all select-all rounded-box">
                 {@secret_base32}
               </code>
             </div>
 
-            <div class="bg-warning/10 border border-warning/30 p-3 text-sm text-warning">
+            <div class="bg-warning/10 border border-warning/30 rounded-box p-3 text-sm text-warning">
               Save this secret in a safe place. You will need it if you lose access to your authenticator app.
             </div>
 
