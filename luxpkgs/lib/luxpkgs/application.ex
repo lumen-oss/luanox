@@ -22,6 +22,10 @@ defmodule Luxpkgs.Application do
         {Cachex, name: :totp_backup_codes, limit: 1_000},
         id: :totp_backup_codes_cache
       ),
+      Supervisor.child_spec(
+        {Cachex, name: :totp_setup, limit: 1_000},
+        id: :totp_setup_cache
+      ),
       LuxpkgsWeb.Endpoint
     ]
 

@@ -24,19 +24,30 @@ defmodule LuxpkgsWeb.UserLive.SetupTotp do
       if Accounts.User.has_totp?(user) do
         {:ok, redirect(socket, to: ~p"/settings")}
       else
-        secret = NimbleTOTP.secret()
-        uri = TOTP.uri(user, secret)
-        secret_base32 = Base.encode32(secret, padding: false)
+        {secret, secret_base32} = pending_secret(user)
 
         {:ok,
          socket
          |> assign(:user, user)
          |> assign(:secret_base32, secret_base32)
-         |> assign(:uri, uri)
+         |> assign(:uri, TOTP.uri(user, secret))
          |> assign(:page_title, "Set Up Two-Factor Authentication")}
       end
     else
       {:ok, redirect(socket, to: ~p"/login")}
+    end
+  end
+
+  defp pending_secret(user) do
+    case Cachex.get(:totp_setup, user.id) do
+      {:ok, secret_base32} when is_binary(secret_base32) ->
+        {Base.decode32!(secret_base32, padding: false), secret_base32}
+
+      _ ->
+        secret = NimbleTOTP.secret()
+        secret_base32 = Base.encode32(secret, padding: false)
+        Cachex.put(:totp_setup, user.id, secret_base32, ttl: :timer.minutes(15))
+        {secret, secret_base32}
     end
   end
 
