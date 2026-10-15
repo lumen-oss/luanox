@@ -19,4 +19,9 @@ blockExoticSubdeps: true
 # Setting this to a higher value can help protect against recently published malicious packages.
 minimumReleaseAge: 10080 # 7 days
 
+# @tailwindcss/typography@0.5.20 pins postcss-selector-parser to the exact
+# vulnerable 6.0.10 (CVE-2026-104844). Force the patched 7.x line.
+overrides:
+  postcss-selector-parser: ^7.1.6
+
 # See https://pnpm.io/settings for more options
