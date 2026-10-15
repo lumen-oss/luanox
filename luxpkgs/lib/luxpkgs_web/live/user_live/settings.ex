@@ -238,7 +238,7 @@ defmodule LuxpkgsWeb.UserLive.Settings do
             </div>
 
             <%!-- Two-Factor Authentication Section --%>
-            <div class="collapse collapse-arrow bg-base-200 border border-base-300 !rounded-none">
+            <div class="collapse collapse-arrow bg-base-200 border border-base-300">
               <input type="checkbox" checked={@backup_codes != nil} />
               <div class="collapse-title flex items-center gap-3 px-4 sm:px-6">
                 <.icon name={:shield_check} type={:outline} class="w-5 h-5 text-primary" />
@@ -279,7 +279,7 @@ defmodule LuxpkgsWeb.UserLive.Settings do
 
                   <div
                     :if={@backup_codes}
-                    class="bg-warning/10 border border-warning/30 p-4 space-y-3"
+                    class="bg-warning/10 border border-warning/30 rounded-box p-4 space-y-3"
                   >
                     <p class="text-sm font-medium text-warning">
                       Save these backup codes now. They are shown only once and each can be used once.
