@@ -32,4 +32,29 @@ defmodule LuxpkgsWeb.UserLive.SetupTotpTest do
 
     assert {:error, {:redirect, %{to: "/settings"}}} = live(conn, ~p"/setup-totp")
   end
+
+  test "generates backup codes on completion and reveals them once", %{conn: conn} do
+    user = user_fixture()
+    secret = NimbleTOTP.secret()
+    code = NimbleTOTP.verification_code(secret)
+
+    conn =
+      conn
+      |> log_in_without_totp(user)
+      |> post(~p"/setup-totp/complete", %{
+        "secret" => Base.encode32(secret, padding: false),
+        "code" => code
+      })
+
+    assert redirected_to(conn) == ~p"/settings"
+    assert Luxpkgs.Accounts.TOTP.backup_codes_remaining(user) == 10
+
+    {:ok, lv, html} = live(conn, ~p"/settings")
+    assert html =~ "Save these backup codes now"
+    assert has_element?(lv, "input#tfa-toggle[checked]")
+    refute has_element?(lv, "input#account-toggle[checked]")
+
+    {:ok, _lv, html} = live(conn, ~p"/settings")
+    refute html =~ "Save these backup codes now"
+  end
 end

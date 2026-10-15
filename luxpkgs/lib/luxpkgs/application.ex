@@ -14,7 +14,14 @@ defmodule Luxpkgs.Application do
       {DNSCluster, query: Application.get_env(:luxpkgs, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Luxpkgs.PubSub},
       {LuxpkgsWeb.RateLimit, clean_period: :timer.minutes(5)},
-      {Cachex, name: :search_cache, limit: 1_000},
+      Supervisor.child_spec(
+        {Cachex, name: :search_cache, limit: 1_000},
+        id: :search_cache
+      ),
+      Supervisor.child_spec(
+        {Cachex, name: :totp_backup_codes, limit: 1_000},
+        id: :totp_backup_codes_cache
+      ),
       LuxpkgsWeb.Endpoint
     ]
 
