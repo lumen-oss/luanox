@@ -112,6 +112,22 @@ defmodule LuxpkgsWeb.UserLive.SettingsTfaTest do
     assert TOTP.backup_codes_remaining(user) == 10
   end
 
+  test "dismisses the generated backup codes", %{conn: conn} do
+    {:ok, lv, _html} = live(conn, ~p"/settings")
+
+    lv
+    |> form("#regenerate_backup_codes_form", %{"code" => totp_code()})
+    |> render_submit()
+
+    assert has_element?(lv, "#backup-codes-copy")
+
+    lv
+    |> element("#dismiss-backup-codes")
+    |> render_click()
+
+    refute has_element?(lv, "#backup-codes-copy")
+  end
+
   test "throttles repeated verification attempts", %{conn: conn, user: user} do
     {:ok, lv, _html} = live(conn, ~p"/settings")
 
