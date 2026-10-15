@@ -279,17 +279,53 @@ defmodule LuxpkgsWeb.UserLive.Settings do
 
                   <div
                     :if={@backup_codes}
-                    class="bg-warning/10 border border-warning/30 rounded-box p-4 space-y-3"
+                    class="bg-warning/10 border border-warning/30 rounded-box p-4 space-y-4"
                   >
-                    <p class="text-sm font-medium text-warning">
-                      Save these backup codes now. They are shown only once and each can be used once.
-                    </p>
+                    <div class="flex items-start gap-2">
+                      <.icon
+                        name={:alert_triangle}
+                        type={:outline}
+                        class="w-4 h-4 text-warning shrink-0 mt-0.5"
+                      />
+                      <p class="text-sm font-medium text-warning">
+                        Save these backup codes now. They are shown only once and each can be used once.
+                      </p>
+                    </div>
+
                     <ul
                       phx-no-format
-                      class="grid grid-cols-2 gap-x-4 gap-y-1 font-mono text-sm select-all"
+                      class="grid grid-cols-2 gap-2 font-mono text-sm select-all"
                     >
-                      <li :for={code <- @backup_codes}>{TOTP.format_backup_code(code)}</li>
+                      <li
+                        :for={code <- @backup_codes}
+                        class="bg-base-100 border border-warning/30 rounded-box px-3 py-2 text-center"
+                      >{TOTP.format_backup_code(code)}</li>
                     </ul>
+
+                    <span id="backup-codes-copy" class="hidden">{Enum.map_join(
+                      @backup_codes,
+                      "\n",
+                      &TOTP.format_backup_code/1
+                    )}</span>
+
+                    <div class="flex flex-col sm:flex-row gap-2">
+                      <button
+                        id="copy-backup-codes"
+                        type="button"
+                        class="btn btn-neutral btn-sm"
+                        phx-click={JS.dispatch("phx:clipcopy", to: "#backup-codes-copy") |> JS.push("copy_codes")}
+                      >
+                        <.icon name={:clipboard} type={:outline} class="w-4 h-4" /> Copy all
+                      </button>
+                      <button
+                        id="dismiss-backup-codes"
+                        type="button"
+                        class="btn btn-ghost btn-sm"
+                        phx-click="dismiss_backup_codes"
+                      >
+                        <.icon name={:check} type={:outline} class="w-4 h-4" /> I've saved my codes
+                      </button>
+                    </div>
                   </div>
 
                   <div class="flex flex-col sm:flex-row gap-2">
@@ -499,6 +535,17 @@ defmodule LuxpkgsWeb.UserLive.Settings do
 
   def handle_event("regenerate_backup_codes", _params, socket) do
     {:noreply, put_flash(socket, :error, "Enter a verification code to continue.")}
+  end
+
+  def handle_event("dismiss_backup_codes", _params, socket) do
+    {:noreply, assign(socket, :backup_codes, nil)}
+  end
+
+  def handle_event("copy_codes", _params, socket) do
+    socket
+    |> clear_flash()
+    |> put_flash(:info, "Recovery codes copied to clipboard!")
+    |> (&{:noreply, &1}).()
   end
 
   def handle_event("remove_tfa", %{"code" => code}, socket) do
