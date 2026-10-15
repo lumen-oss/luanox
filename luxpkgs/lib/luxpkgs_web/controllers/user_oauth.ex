@@ -148,6 +148,7 @@ defmodule LuxpkgsWeb.UserOauth do
 
     if user && secret && Luxpkgs.Accounts.TOTP.valid?(secret, code) &&
          Luxpkgs.Accounts.TOTP.enable(user, secret) == :ok do
+      Cachex.del(:totp_setup, user.id)
       codes = Luxpkgs.Accounts.TOTP.generate_backup_codes(user)
       Cachex.put(:totp_backup_codes, user.id, codes, ttl: :timer.hours(1))
 
@@ -155,6 +156,10 @@ defmodule LuxpkgsWeb.UserOauth do
       |> put_session(:user_return_to, ~p"/settings")
       |> LuxpkgsWeb.UserAuth.log_in_user(user)
     else
+      if user && secret do
+        Cachex.put(:totp_setup, user.id, secret_b32, ttl: :timer.minutes(15))
+      end
+
       conn
       |> put_flash(:error, "Invalid verification code. Please try again.")
       |> redirect(to: ~p"/setup-totp")

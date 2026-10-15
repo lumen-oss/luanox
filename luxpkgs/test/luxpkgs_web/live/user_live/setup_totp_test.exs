@@ -57,4 +57,25 @@ defmodule LuxpkgsWeb.UserLive.SetupTotpTest do
     {:ok, _lv, html} = live(conn, ~p"/settings")
     refute html =~ "Save these backup codes now"
   end
+
+  test "reuses the pending secret when a retry is submitted", %{conn: conn} do
+    user = user_fixture()
+    conn = log_in_without_totp(conn, user)
+
+    {:ok, _lv, html} = live(conn, ~p"/setup-totp")
+    secret = secret_from(html)
+    code = NimbleTOTP.verification_code(Base.decode32!(secret, padding: false))
+    wrong = if code == "000000", do: "111111", else: "000000"
+
+    conn = post(conn, ~p"/setup-totp/complete", %{"secret" => secret, "code" => wrong})
+    assert redirected_to(conn) == ~p"/setup-totp"
+
+    {:ok, _lv, html} = live(conn, ~p"/setup-totp")
+    assert secret_from(html) == secret
+  end
+
+  defp secret_from(html) do
+    [_, secret] = Regex.run(~r/name="secret"[^>]*value="([^"]+)"/, html)
+    secret
+  end
 end
