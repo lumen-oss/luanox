@@ -423,7 +423,7 @@ defmodule LuxpkgsWeb.CoreComponents do
     assigns =
       assign_new(assigns, :icon_contents, fn ->
         attrs =
-          [id: assigns[:id], class: assigns[:class]]
+          [id: assigns[:id], class: assigns[:class], "aria-hidden": "true", focusable: "false"]
           |> Phoenix.HTML.attributes_escape()
           |> Phoenix.HTML.safe_to_string()
 

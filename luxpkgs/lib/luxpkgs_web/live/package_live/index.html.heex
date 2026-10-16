@@ -31,6 +31,7 @@
                   <input
                     name="search"
                     type="text"
+                    aria-label="Search packages"
                     placeholder="Search packages..."
                     value={@params["search"] || ""}
                     class="input input-bordered w-full bg-base-100 border-base-300 focus:border-primary"
@@ -43,6 +44,7 @@
                 <div class="sm:w-48">
                   <select
                     name="sort"
+                    aria-label="Sort packages"
                     class="select select-bordered w-full bg-base-100 border-base-300 focus:border-primary"
                   >
                     <option value="recent" selected={(@params["sort"] || "recent") == "recent"}>

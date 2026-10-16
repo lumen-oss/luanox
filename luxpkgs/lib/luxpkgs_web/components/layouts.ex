@@ -16,11 +16,19 @@ defmodule LuxpkgsWeb.Layouts do
   def app(%{current_scope: _} = assigns) do
     ~H"""
     <div class="min-h-screen flex flex-col">
+      <a
+        href="#main"
+        class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-box focus:bg-base-100 focus:px-4 focus:py-2 focus:text-base-content focus:shadow-md"
+      >
+        Skip to content
+      </a>
       <header>
         <.navbar current_scope={@current_scope} />
       </header>
 
       <main
+        id="main"
+        tabindex="-1"
         class="grow flex flex-col transition-all duration-500 ease-in-out opacity-0 phx-page-loading:opacity-0 motion-reduce:transition-none motion-reduce:opacity-100"
         phx-mounted={JS.remove_class("opacity-0")}
       >

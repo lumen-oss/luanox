@@ -56,9 +56,9 @@ defmodule LuxpkgsWeb.NavBar do
     ~H"""
     <div class="dropdown dropdown-end w-full sm:w-auto">
       <%= if @current_scope do %>
-        <div
+        <button
+          type="button"
           tabindex="0"
-          role="button"
           class="btn btn-ghost btn-block justify-start text-grey hover:text-primary rounded-field px-1 sm:px-4"
         >
           <%= if @current_scope.user.avatar_url do %>
@@ -73,7 +73,7 @@ defmodule LuxpkgsWeb.NavBar do
           <span class="mt-px">
             {String.slice(@unique_username, 0..20)}
           </span>
-        </div>
+        </button>
       <% else %>
         <.link
           class="btn btn-ghost btn-block justify-start text-grey hover:text-primary rounded-field px-1 sm:px-4"
