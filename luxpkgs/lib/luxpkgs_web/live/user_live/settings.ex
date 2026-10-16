@@ -131,9 +131,15 @@ defmodule LuxpkgsWeb.UserLive.Settings do
                   <%!-- Bio Form --%>
                   <div>
                     <div class="flex items-center justify-between mb-2">
-                      <label class="text-sm font-medium text-base-content/80 block">Bio</label>
+                      <label
+                        for="bio-input"
+                        class="text-sm font-medium text-base-content/80 block"
+                      >
+                        Bio
+                      </label>
                       <span
                         id="bio-count"
+                        aria-live="polite"
                         class="text-xs text-base-content/50 transition-colors duration-150"
                       >
                         {@bio_count}/160
@@ -168,7 +174,10 @@ defmodule LuxpkgsWeb.UserLive.Settings do
 
                   <%!-- Email Form --%>
                   <div>
-                    <label class="text-sm font-medium text-base-content/80 mb-2 block">
+                    <label
+                      for="email-input"
+                      class="text-sm font-medium text-base-content/80 mb-2 block"
+                    >
                       Email Address
                     </label>
                     <.form
@@ -178,6 +187,7 @@ defmodule LuxpkgsWeb.UserLive.Settings do
                       class="space-y-3"
                     >
                       <input
+                        id="email-input"
                         type="email"
                         name="user-email"
                         placeholder={@current_scope.user.email}
@@ -197,7 +207,10 @@ defmodule LuxpkgsWeb.UserLive.Settings do
 
                   <%!-- Username Form --%>
                   <div>
-                    <label class="text-sm font-medium text-base-content/80 mb-2 block">
+                    <label
+                      for="username-input"
+                      class="text-sm font-medium text-base-content/80 mb-2 block"
+                    >
                       Username
                     </label>
                     <.form
@@ -207,6 +220,7 @@ defmodule LuxpkgsWeb.UserLive.Settings do
                       class="space-y-3"
                     >
                       <input
+                        id="username-input"
                         type="text"
                         name="user-name"
                         placeholder={@current_scope.user.username}
