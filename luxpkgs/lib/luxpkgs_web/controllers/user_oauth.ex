@@ -122,32 +122,15 @@ defmodule LuxpkgsWeb.UserOauth do
 
   defp refresh_avatar(user, _image), do: user
 
-  def complete_totp_setup(conn, %{"code" => code, "secret" => secret_b32}) do
-    user_id = get_session(conn, :pending_totp_user_id)
+  def complete_totp_setup(conn, %{"code" => code}) do
+    user = totp_setup_user(conn)
 
-    user =
-      cond do
-        user_id ->
-          Luxpkgs.Accounts.get_user(user_id)
-
-        token = get_session(conn, :user_token) ->
-          case Luxpkgs.Accounts.get_user_by_session_token(token) do
-            {user, _} -> user
-            _ -> nil
-          end
-
-        true ->
-          nil
-      end
-
-    secret =
-      case Base.decode32(secret_b32, padding: false) do
-        {:ok, secret} -> secret
-        :error -> nil
-      end
-
-    if user && secret && Luxpkgs.Accounts.TOTP.valid?(secret, code) &&
-         Luxpkgs.Accounts.TOTP.enable(user, secret) == :ok do
+    with %Luxpkgs.Accounts.User{} = user <- user,
+         false <- Luxpkgs.Accounts.User.has_totp?(user),
+         {:ok, secret_b32} when is_binary(secret_b32) <- Cachex.get(:totp_setup, user.id),
+         {:ok, secret} <- Base.decode32(secret_b32, padding: false),
+         true <- Luxpkgs.Accounts.TOTP.valid?(secret, code),
+         :ok <- Luxpkgs.Accounts.TOTP.enable(user, secret) do
       Cachex.del(:totp_setup, user.id)
       codes = Luxpkgs.Accounts.TOTP.generate_backup_codes(user)
       Cachex.put(:totp_backup_codes, user.id, codes, ttl: :timer.hours(1))
@@ -156,19 +139,49 @@ defmodule LuxpkgsWeb.UserOauth do
       |> put_session(:user_return_to, ~p"/settings")
       |> LuxpkgsWeb.UserAuth.log_in_user(user)
     else
-      if user && secret do
-        Cachex.put(:totp_setup, user.id, secret_b32, ttl: :timer.minutes(15))
-      end
-
-      conn
-      |> put_flash(:error, "Invalid verification code. Please try again.")
-      |> redirect(to: ~p"/setup-totp")
+      _ -> reject_totp_setup(conn, user)
     end
   end
 
   def complete_totp_setup(conn, _params) do
     conn
-    |> put_flash(:error, "Missing verification code or secret.")
+    |> put_flash(:error, "Missing verification code.")
     |> redirect(to: ~p"/setup-totp")
+  end
+
+  defp totp_setup_user(conn) do
+    case get_session(conn, :pending_totp_user_id) do
+      nil ->
+        case get_session(conn, :user_token) do
+          nil ->
+            nil
+
+          token ->
+            case Luxpkgs.Accounts.get_user_by_session_token(token) do
+              {user, _token_inserted_at} -> user
+              _ -> nil
+            end
+        end
+
+      user_id ->
+        Luxpkgs.Accounts.get_user(user_id)
+    end
+  end
+
+  defp reject_totp_setup(conn, user) do
+    if user do
+      Logger.warning("Rejected TOTP setup for user #{user.id} from #{inspect(conn.remote_ip)}")
+    end
+
+    to =
+      if user && Luxpkgs.Accounts.User.has_totp?(user) do
+        ~p"/settings"
+      else
+        ~p"/setup-totp"
+      end
+
+    conn
+    |> put_flash(:error, "Invalid verification code. Please try again.")
+    |> redirect(to: to)
   end
 end

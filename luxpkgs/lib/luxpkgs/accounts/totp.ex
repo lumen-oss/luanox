@@ -14,7 +14,7 @@ defmodule Luxpkgs.Accounts.TOTP do
   def enable(%User{} = user, secret \\ NimbleTOTP.secret()) do
     %TotpSecret{}
     |> TotpSecret.changeset(%{secret: secret, user_id: user.id})
-    |> Repo.insert(on_conflict: :replace_all, conflict_target: :user_id)
+    |> Repo.insert()
     |> case do
       {:ok, _} -> :ok
       {:error, _} = error -> error

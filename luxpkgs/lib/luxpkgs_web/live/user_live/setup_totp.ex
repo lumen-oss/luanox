@@ -41,14 +41,21 @@ defmodule LuxpkgsWeb.UserLive.SetupTotp do
   defp pending_secret(user) do
     case Cachex.get(:totp_setup, user.id) do
       {:ok, secret_base32} when is_binary(secret_base32) ->
-        {Base.decode32!(secret_base32, padding: false), secret_base32}
+        case Base.decode32(secret_base32, padding: false) do
+          {:ok, secret} -> {secret, secret_base32}
+          :error -> new_pending_secret(user)
+        end
 
       _ ->
-        secret = NimbleTOTP.secret()
-        secret_base32 = Base.encode32(secret, padding: false)
-        Cachex.put(:totp_setup, user.id, secret_base32, ttl: :timer.minutes(15))
-        {secret, secret_base32}
+        new_pending_secret(user)
     end
+  end
+
+  defp new_pending_secret(user) do
+    secret = NimbleTOTP.secret()
+    secret_base32 = Base.encode32(secret, padding: false)
+    Cachex.put(:totp_setup, user.id, secret_base32, ttl: :timer.minutes(15))
+    {secret, secret_base32}
   end
 
   def render(assigns) do
@@ -87,7 +94,6 @@ defmodule LuxpkgsWeb.UserLive.SetupTotp do
             </div>
 
             <.form for={%{}} action={~p"/setup-totp/complete"} method="post" class="space-y-4">
-              <input type="hidden" name="secret" value={@secret_base32} />
               <.input
                 name="code"
                 value=""
