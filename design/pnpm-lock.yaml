@@ -1,0 +1,22 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .:
+    dependencies:
+      '@penpot/library':
+        specifier: 1.2.0
+        version: 1.2.0
+
+packages:
+
+  '@penpot/library@1.2.0':
+    resolution: {integrity: sha512-s5re7jty/mL7cxxDHfzK5gYKyPLpVHZRr+EEaRiMHy23TC4pDXadMz+JqJzconXB1q7lly0OImu8BNs37026Sw==}
+
+snapshots:
+
+  '@penpot/library@1.2.0': {}

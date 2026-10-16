@@ -20,3 +20,8 @@ push.sh
 /.expert
 
 /prod.tar
+
+# design tooling deps and artifacts
+design/node_modules/
+design/scenes/
+design/*.penpot

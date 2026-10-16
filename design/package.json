@@ -1,0 +1,9 @@
+{
+  "name": "luxpkgs-design",
+  "private": true,
+  "type": "module",
+  "description": "Design tooling: daisyUI -> Penpot tokens + DOM scene -> .penpot converter",
+  "dependencies": {
+    "@penpot/library": "1.2.0"
+  }
+}

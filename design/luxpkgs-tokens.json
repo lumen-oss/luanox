@@ -1,0 +1,226 @@
+{
+  "core": {
+    "font": {
+      "sans": {
+        "$type": "fontFamily",
+        "$value": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\""
+      },
+      "display": {
+        "$type": "fontFamily",
+        "$value": "\"Outfit Variable\", ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\""
+      },
+      "mono": {
+        "$type": "fontFamily",
+        "$value": "\"Martian Mono Variable\", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace"
+      }
+    },
+    "radius": {
+      "selector": {
+        "$type": "borderRadius",
+        "$value": "0.25rem"
+      },
+      "field": {
+        "$type": "borderRadius",
+        "$value": "0.5rem"
+      },
+      "box": {
+        "$type": "borderRadius",
+        "$value": "0.25rem"
+      }
+    },
+    "size": {
+      "selector": {
+        "$type": "dimension",
+        "$value": "0.25rem"
+      },
+      "field": {
+        "$type": "dimension",
+        "$value": "0.25rem"
+      }
+    },
+    "border": {
+      "$type": "dimension",
+      "$value": "1px"
+    },
+    "depth": {
+      "$type": "number",
+      "$value": 0
+    },
+    "noise": {
+      "$type": "number",
+      "$value": 0
+    }
+  },
+  "light": {
+    "base-100": {
+      "$type": "color",
+      "$value": "#dddde7"
+    },
+    "base-200": {
+      "$type": "color",
+      "$value": "#ccccda"
+    },
+    "base-300": {
+      "$type": "color",
+      "$value": "#bcbccf"
+    },
+    "base-content": {
+      "$type": "color",
+      "$value": "#1f1f22"
+    },
+    "primary": {
+      "$type": "color",
+      "$value": "#0063ba"
+    },
+    "primary-content": {
+      "$type": "color",
+      "$value": "#ffffff"
+    },
+    "secondary": {
+      "$type": "color",
+      "$value": "#a10f7a"
+    },
+    "secondary-content": {
+      "$type": "color",
+      "$value": "#ffffff"
+    },
+    "accent": {
+      "$type": "color",
+      "$value": "#9437ff"
+    },
+    "accent-content": {
+      "$type": "color",
+      "$value": "#ffffff"
+    },
+    "neutral": {
+      "$type": "color",
+      "$value": "#09090b"
+    },
+    "neutral-content": {
+      "$type": "color",
+      "$value": "#ffffff"
+    },
+    "info": {
+      "$type": "color",
+      "$value": "#0c5090"
+    },
+    "info-content": {
+      "$type": "color",
+      "$value": "#ffffff"
+    },
+    "success": {
+      "$type": "color",
+      "$value": "#267e0a"
+    },
+    "success-content": {
+      "$type": "color",
+      "$value": "#ffffff"
+    },
+    "warning": {
+      "$type": "color",
+      "$value": "#957d09"
+    },
+    "warning-content": {
+      "$type": "color",
+      "$value": "#000000"
+    },
+    "error": {
+      "$type": "color",
+      "$value": "#b21818"
+    },
+    "error-content": {
+      "$type": "color",
+      "$value": "#ffffff"
+    },
+    "grey": {
+      "$type": "color",
+      "$value": "#8989a9"
+    }
+  },
+  "dark": {
+    "base-100": {
+      "$type": "color",
+      "$value": "#292939"
+    },
+    "base-200": {
+      "$type": "color",
+      "$value": "#222231"
+    },
+    "base-300": {
+      "$type": "color",
+      "$value": "#1c1c25"
+    },
+    "base-content": {
+      "$type": "color",
+      "$value": "#d3d8df"
+    },
+    "primary": {
+      "$type": "color",
+      "$value": "#71a0e5"
+    },
+    "primary-content": {
+      "$type": "color",
+      "$value": "#292939"
+    },
+    "secondary": {
+      "$type": "color",
+      "$value": "#cf86e7"
+    },
+    "secondary-content": {
+      "$type": "color",
+      "$value": "#292939"
+    },
+    "accent": {
+      "$type": "color",
+      "$value": "#b094e2"
+    },
+    "accent-content": {
+      "$type": "color",
+      "$value": "#292939"
+    },
+    "neutral": {
+      "$type": "color",
+      "$value": "#09090b"
+    },
+    "neutral-content": {
+      "$type": "color",
+      "$value": "#d3d8df"
+    },
+    "info": {
+      "$type": "color",
+      "$value": "#74a5f5"
+    },
+    "info-content": {
+      "$type": "color",
+      "$value": "#292939"
+    },
+    "success": {
+      "$type": "color",
+      "$value": "#89c252"
+    },
+    "success-content": {
+      "$type": "color",
+      "$value": "#292939"
+    },
+    "warning": {
+      "$type": "color",
+      "$value": "#e8d583"
+    },
+    "warning-content": {
+      "$type": "color",
+      "$value": "#292939"
+    },
+    "error": {
+      "$type": "color",
+      "$value": "#d75f4a"
+    },
+    "error-content": {
+      "$type": "color",
+      "$value": "#292939"
+    },
+    "grey": {
+      "$type": "color",
+      "$value": "#798399"
+    }
+  }
+}
