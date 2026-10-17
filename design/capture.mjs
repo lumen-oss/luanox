@@ -257,6 +257,14 @@ async function extract() {
       } catch {}
       return node;
     }
+    if (el.tagName === "SELECT") {
+      // A native <select> has no text node and its <option>s report as hidden,
+      // so it would render as an empty box. Show the selected option's label.
+      const opt = el.selectedOptions[0] || el.options[0];
+      node.text = (opt ? opt.text : "").trim();
+      node.textBox = placeholderBox(el);
+      return node;
+    }
     if (ownText(el)) {
       // A node with direct text is one visual text block: merge all inline
       // runs (child spans/links) into a single text shape instead of emitting

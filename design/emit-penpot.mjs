@@ -105,6 +105,9 @@ function parseColor(s) {
 
 function parseGradient(bg, w, h) {
   if (!bg || bg === "none") return null;
+  // Multiple layers (daisyUI draws the select chevron with two gradients)
+  // would garble the stop list, so skip the whole value instead.
+  if ((bg.match(/gradient\(/g) || []).length > 1) return null;
   const m = bg.match(/^(linear-gradient|radial-gradient)\(([\s\S]*)\)$/);
   if (!m) return null;
   const type = m[1] === "linear-gradient" ? "linear" : "radial";
@@ -113,12 +116,20 @@ function parseGradient(bg, w, h) {
   if (type === "linear") {
     const a = parts[0].match(/^([\d.]+)deg$/);
     if (a) angle = parseFloat(a[1]);
-    else if (/^to\s+/.test(parts[0])) angle = { top: 0, right: 90, bottom: 180, left: 270 }[parts[0].replace(/^to\s+/, "")] ?? 180;
+    else if (/^to\s+/.test(parts[0])) {
+      const dir = parts[0].replace(/^to\s+/, "").replace(/\s+in\s+\S+$/, "").trim();
+      const angles = {
+        top: 0, right: 90, bottom: 180, left: 270,
+        "right top": 45, "top right": 45, "right bottom": 135, "bottom right": 135,
+        "bottom left": 225, "left bottom": 225, "top left": 315, "left top": 315,
+      };
+      angle = angles[dir] ?? 180;
+    }
     else parts.unshift("180deg");
   }
   const stops = [];
   for (const p of parts) {
-    const cm = p.match(/^(rgba?\([^)]*\)|#[0-9a-fA-F]{3,8})/);
+    const cm = p.match(/^(oklch\([^)]*\)|oklab\([^)]*\)|color\([^)]*\)|rgba?\([^)]*\)|#[0-9a-fA-F]{3,8})/);
     if (!cm) continue;
     const c = parseColor(cm[1]);
     if (!c) continue;
@@ -129,20 +140,23 @@ function parseGradient(bg, w, h) {
   stops.forEach((s, i) => {
     if (s.offset === null) s.offset = i / (stops.length - 1);
   });
+  // Penpot stores the gradient line as fractions of the shape box (the renderer
+  // maps it back with x + width * start-x), so the pixel endpoints computed
+  // below must be divided by the box size.
   if (type === "linear") {
     const rad = (angle * Math.PI) / 180;
     const dx = Math.sin(rad), dy = -Math.cos(rad);
     const len = Math.abs(w * dx) + Math.abs(h * dy);
     const cx = w / 2, cy = h / 2;
     return {
-      type, width: len,
-      "start-x": cx - (dx * len) / 2, "start-y": cy - (dy * len) / 2,
-      "end-x": cx + (dx * len) / 2, "end-y": cy + (dy * len) / 2,
+      type, width: 1,
+      "start-x": (cx - (dx * len) / 2) / w, "start-y": (cy - (dy * len) / 2) / h,
+      "end-x": (cx + (dx * len) / 2) / w, "end-y": (cy + (dy * len) / 2) / h,
       stops,
     };
   }
   const r = Math.max(w, h) / 2;
-  return { type, width: r, "start-x": w / 2, "start-y": h / 2, "end-x": w / 2 + r, "end-y": h / 2, stops };
+  return { type, width: 1, "start-x": 0.5, "start-y": 0.5, "end-x": 0.5 + r / w, "end-y": 0.5, stops };
 }
 
 function fillsOf(node) {
@@ -200,12 +214,23 @@ function borderSidesOf(node) {
   return out;
 }
 
+// CSS blur() is a filter; Penpot's equivalent is a layer blur on the shape.
+function blurOf(node) {
+  const m = (node.style.filter || "").match(/blur\(([\d.]+)px\)/);
+  return m ? parseFloat(m[1]) : 0;
+}
+
 function radiusOf(node) {
   const p = (node.style.borderRadius || "").trim().split(/\s+/).map((v) => parseFloat(v) || 0);
-  if (p.length === 1) return [p[0], p[0], p[0], p[0]];
-  if (p.length === 2) return [p[0], p[1], p[0], p[1]];
-  if (p.length === 3) return [p[0], p[1], p[2], p[1]];
-  return [p[0], p[1], p[2], p[3]];
+  let r;
+  if (p.length === 1) r = [p[0], p[0], p[0], p[0]];
+  else if (p.length === 2) r = [p[0], p[1], p[0], p[1]];
+  else if (p.length === 3) r = [p[0], p[1], p[2], p[1]];
+  else r = [p[0] || 0, p[1] || 0, p[2] || 0, p[3] || 0];
+  // Firefox reports an oversized border-radius (a pill's 9999px, a 50% circle)
+  // as Float32 max, which Penpot rejects; cap at half the box like the browser.
+  const max = Math.min(node.rect.w, node.rect.h) / 2;
+  return r.map((v) => Math.min(Math.max(v, 0), max));
 }
 
 function shadowOf(node) {
@@ -267,16 +292,19 @@ function fontAttrsOf(st) {
   return attrs;
 }
 
-function textContentOf(node) {
+function textContentOf(node, nodeFills) {
   const c = parseColor(node.style.color);
-  const fill = { "fill-color": c ? c.hex : "#000000", "fill-opacity": c ? c.alpha : 1 };
+  // A gradient-clipped heading has a transparent color; Penpot resolves the
+  // fill per text node, so carry the shape gradient down instead of black.
+  const fill =
+    nodeFills || [{ "fill-color": c ? c.hex : "#000000", "fill-opacity": c ? c.alpha : 1 }];
   const font = fontAttrsOf(node.style);
   // One paragraph per captured visual line (Penpot's canonical line model).
   const paragraphs = String(node.text).split("\n").map((line) => ({
     type: "paragraph",
     ...font,
-    fills: [fill],
-    children: [{ text: line, ...font, fills: [fill] }],
+    fills: fill,
+    children: [{ text: line, ...font, fills: fill }],
   }));
   return { type: "root", children: [{ type: "paragraph-set", children: paragraphs }] };
 }
@@ -288,11 +316,24 @@ const OVERLAY_IDS = new Map();
 const OVERLAY_X = -2600;
 const OVERLAY_Y = 0;
 let BASE = "";
+let CURRENT_SCREEN = "";
+let CURRENT_THEME = "";
+const PATH_TO_SCREEN = new Map();
 
 function resolveUrl(href) {
   if (href.startsWith("#")) return null;
   try {
     return new URL(href, BASE).href;
+  } catch {
+    return null;
+  }
+}
+
+function resolvePath(href) {
+  const url = resolveUrl(href);
+  if (!url) return null;
+  try {
+    return new URL(url).pathname;
   } catch {
     return null;
   }
@@ -319,12 +360,19 @@ function firstOverlay(node) {
 function interactionsOf(node, inOverlay) {
   const out = [];
   if (node.href) {
-    const url = resolveUrl(node.href);
-    if (url) out.push({ "event-type": "click", "action-type": "open-url", url });
+    // A link to another captured route becomes in-file navigation; anything
+    // else (Docs, GitHub, ...) opens in the browser.
+    const screen = PATH_TO_SCREEN.get(resolvePath(node.href));
+    const dest = screen && BOARD_IDS.get(`${screen}.${CURRENT_THEME}`);
+    if (dest) out.push({ "event-type": "click", "action-type": "navigate", destination: dest });
+    else {
+      const url = resolveUrl(node.href);
+      if (url) out.push({ "event-type": "click", "action-type": "open-url", url });
+    }
   }
   if (inOverlay && node.text) {
     const theme = node.text.trim().toLowerCase() === "light" ? "light" : "dark";
-    const dest = BOARD_IDS.get(`${SCREENS[0].name}.${theme}`);
+    const dest = BOARD_IDS.get(`${CURRENT_SCREEN}.${theme}`);
     if (dest) out.push({ "event-type": "click", "action-type": "navigate", destination: dest });
   }
   if (node.class && /(^|\s)dropdown(\s|$)/.test(node.class)) {
@@ -362,7 +410,12 @@ function emitNode(context, node, bx, by, inOverlay) {
   const borders = sized ? borderSidesOf(node) : [];
   const [r1, r2, r3, r4] = sized ? radiusOf(node) : [0, 0, 0, 0];
   const opacity = parseFloat(node.style.opacity);
-  const box = fills.length || strokes.length || r1 || r2 || r3 || r4;
+  // CSS clips a gradient to its own text (bg-clip-text + a transparent color),
+  // which Penpot expresses as a gradient fill on the text shape, not a rect
+  // sitting behind a solid-colored text.
+  const clipText = !!(sized && node.text && fills.some((f) => f["fill-color-gradient"]) &&
+    !parseColor(node.style.color));
+  const box = !clipText && (fills.length || strokes.length || r1 || r2 || r3 || r4);
   const hasBox = box || borders.length;
   const interactions = interactionsOf(node, inOverlay);
   const draws = hasBox || (sized && (node.img || node.text)) || !!interactions;
@@ -379,6 +432,12 @@ function emitNode(context, node, bx, by, inOverlay) {
     if (r1 || r2 || r3 || r4) Object.assign(shape, { r1, r2, r3, r4 });
     const shadow = shadowOf(node);
     if (shadow.length) shape.shadow = shadow;
+    // Blur only compact round blobs: a layer blur on a large overlay layer
+    // (the donation card's glow divs) hazes the card content underneath.
+    const blur = blurOf(node);
+    if (blur > 0 && r1 >= Math.min(w, h) / 2) {
+      shape.blur = { id: crypto.randomUUID(), type: "layer-blur", value: blur, hidden: false };
+    }
     if (!Number.isNaN(opacity) && opacity < 1) shape.opacity = opacity;
     context.addRect(shape);
   }
@@ -392,7 +451,7 @@ function emitNode(context, node, bx, by, inOverlay) {
       { name: mediaName, width: w, height: h },
       new Blob([bytes], { type: "image/png" }),
     );
-    context.addRect({
+    const imgShape = {
       name: nameOf(node),
       x: X,
       y: Y,
@@ -410,7 +469,10 @@ function emitNode(context, node, bx, by, inOverlay) {
           },
         },
       ],
-    });
+    };
+    if (r1 || r2 || r3 || r4) Object.assign(imgShape, { r1, r2, r3, r4 });
+    if (!Number.isNaN(opacity) && opacity < 1) imgShape.opacity = opacity;
+    context.addRect(imgShape);
   }
 
   if (sized && node.text) {
@@ -424,7 +486,8 @@ function emitNode(context, node, bx, by, inOverlay) {
       width: tb.w,
       height: tb.h,
       "grow-type": "auto-width",
-      content: textContentOf(node),
+      ...(clipText ? { fills } : {}),
+      content: textContentOf(node, clipText ? fills : undefined),
     });
   }
 
@@ -436,7 +499,12 @@ function emitNode(context, node, bx, by, inOverlay) {
   if (draws) context.closeGroup();
 }
 
-function emitOverlays(context, root) {
+function emitOverlays(context, root, themeIndex) {
+  // Park each overlay off-canvas: one column per theme, stacked vertically, so
+  // the editor does not draw the dark and light overlays on top of each other.
+  // The viewer ignores a manual overlay frame's own x/y anyway.
+  const ox = OVERLAY_X - themeIndex * 320;
+  let oy = OVERLAY_Y;
   for (const ov of collectOverlays(root)) {
     const { x, y, w, h } = ov.rect;
     const fills = fillsOf(ov);
@@ -445,16 +513,17 @@ function emitOverlays(context, root) {
     context.addBoard({
       id: OVERLAY_IDS.get(ov),
       name: nameOf(ov) + " (overlay)",
-      x: OVERLAY_X,
-      y: OVERLAY_Y,
+      x: ox,
+      y: oy,
       width: w,
       height: h,
       fills,
       ...(strokes.length ? { strokes } : {}),
       ...(r1 || r2 || r3 || r4 ? { r1, r2, r3, r4 } : {}),
     });
-    for (const c of ov.children || []) emitNode(context, c, OVERLAY_X - x, OVERLAY_Y - y, true);
+    for (const c of ov.children || []) emitNode(context, c, ox - x, oy - y, true);
     context.closeBoard();
+    oy += h + 40;
   }
 }
 
@@ -464,16 +533,28 @@ context.addFile({ name: "Luxpkgs" });
 for (const screen of SCREENS)
   for (const theme of THEMES) BOARD_IDS.set(`${screen.name}.${theme}`, context.genId());
 
-for (const theme of THEMES) {
-  context.addPage({ name: `Landing (${theme})`, background: theme === "dark" ? "#dddde7" : "#2a2a3a" });
-  let oy = 0;
-  for (const screen of SCREENS) {
-    const file = join(SCENES, `${screen.name}.${theme}.json`);
-    const scene = JSON.parse(readFileSync(file, "utf8"));
+const scenes = new Map();
+for (const screen of SCREENS)
+  for (const theme of THEMES)
+    scenes.set(`${screen.name}.${theme}`, JSON.parse(readFileSync(join(SCENES, `${screen.name}.${theme}.json`), "utf8")));
+
+for (const screen of SCREENS)
+  for (const theme of THEMES) {
+    const scene = scenes.get(`${screen.name}.${theme}`);
+    if (scene.route) PATH_TO_SCREEN.set(scene.route, screen.name);
+  }
+
+for (const screen of SCREENS) {
+  context.addPage({ name: screen.label, background: "#1b1b26" });
+  for (const theme of THEMES) {
+    const scene = scenes.get(`${screen.name}.${theme}`);
     BASE = scene.base || "";
+    CURRENT_SCREEN = screen.name;
+    CURRENT_THEME = theme;
     OVERLAY_IDS.clear();
     for (const ov of collectOverlays(scene.root)) OVERLAY_IDS.set(ov, context.genId());
-    const boardX = 0, boardY = oy;
+    const boardX = theme === "dark" ? 0 : scene.width + GAP;
+    const boardY = 0;
     context.addBoard({
       id: BOARD_IDS.get(`${screen.name}.${theme}`),
       name: `${screen.label} / ${theme}`,
@@ -485,8 +566,7 @@ for (const theme of THEMES) {
     });
     emitNode(context, scene.root, boardX, boardY, false);
     context.closeBoard();
-    emitOverlays(context, scene.root);
-    oy += scene.height + GAP;
+    emitOverlays(context, scene.root, THEMES.indexOf(theme));
   }
   context.closePage();
 }
