@@ -85,6 +85,10 @@ config :luxpkgs,
 # Enable dev routes for dashboard and mailbox
 config :luxpkgs, dev_routes: true
 
+config :luxpkgs,
+       :dev_totp_secret,
+       System.get_env("DEV_TOTP_SECRET", "MFRGGZDFMZTWQ2LKNNWG23TPOBYXE43U")
+
 # Do not include metadata nor timestamps in development logs
 config :logger, :default_formatter, format: "[$level] $message\n"
 

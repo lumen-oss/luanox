@@ -52,7 +52,7 @@ defmodule LuxpkgsWeb.UserLive.SetupTotp do
   end
 
   defp new_pending_secret(user) do
-    secret = NimbleTOTP.secret()
+    secret = TOTP.dev_secret() || NimbleTOTP.secret()
     secret_base32 = Base.encode32(secret, padding: false)
     Cachex.put(:totp_setup, user.id, secret_base32, ttl: :timer.minutes(15))
     {secret, secret_base32}

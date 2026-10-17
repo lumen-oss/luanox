@@ -11,6 +11,22 @@ defmodule Luxpkgs.Accounts.TOTP do
   @backup_code_length 10
   @backup_code_alphabet "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
 
+  @dev_totp_secret if Mix.env() == :dev,
+                     do: Application.compile_env(:luxpkgs, :dev_totp_secret, nil)
+
+  @doc """
+  Returns the configured development TOTP secret as raw bytes, or `nil` when
+  unset or when this is not a dev build.
+  """
+  def dev_secret do
+    with b32 when is_binary(b32) <- @dev_totp_secret,
+         {:ok, secret} <- Base.decode32(b32, padding: false) do
+      secret
+    else
+      _ -> nil
+    end
+  end
+
   def enable(%User{} = user, secret \\ NimbleTOTP.secret()) do
     %TotpSecret{}
     |> TotpSecret.changeset(%{secret: secret, user_id: user.id})
