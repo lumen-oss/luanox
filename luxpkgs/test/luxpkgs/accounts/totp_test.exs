@@ -40,4 +40,8 @@ defmodule Luxpkgs.Accounts.TOTPTest do
   test "rejects codes outside the drift window" do
     assert TOTP.verify(enabled_user(), code(@now - 60), time: @now) == :error
   end
+
+  test "the fixed dev secret is disabled outside dev builds" do
+    assert TOTP.dev_secret() == nil
+  end
 end
