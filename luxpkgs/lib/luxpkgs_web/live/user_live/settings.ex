@@ -421,9 +421,9 @@ defmodule LuxpkgsWeb.UserLive.Settings do
                     </.link>
                     <button
                       class="btn btn-error"
-                      onclick="disable_account_modal.showModal()"
+                      onclick="delete_account_modal.showModal()"
                     >
-                      <.icon name={:trash} type={:outline} class="w-4 h-4" /> Disable Account
+                      <.icon name={:trash} type={:outline} class="w-4 h-4" /> Delete Account
                     </button>
                   </div>
                 </div>
@@ -434,27 +434,42 @@ defmodule LuxpkgsWeb.UserLive.Settings do
       </div>
 
       <dialog
-        id="disable_account_modal"
+        id="delete_account_modal"
         class="modal"
         phx-update="ignore"
         phx-hook="Dialog"
-        aria-labelledby="disable_account_modal_title"
+        aria-labelledby="delete_account_modal_title"
       >
         <div class="modal-box">
-          <h3 id="disable_account_modal_title" class="text-lg font-bold text-base-content mb-4">
-            Disable Account?
+          <h3 id="delete_account_modal_title" class="text-lg font-bold text-base-content mb-4">
+            Delete Account?
           </h3>
-          <p class="text-sm text-base-content/80 mb-6">
-            Disabling your account prevents you from creating or updating any packages. You can re-enable it at any time.
+          <p class="text-sm text-base-content/80 mb-4">
+            This permanently deletes your account and revokes all API keys and sessions. Your packages will remain available and be owned by a deleted user. This cannot be undone.
           </p>
-          <div class="modal-action">
-            <form method="dialog">
-              <button class="btn btn-neutral btn-sm mr-3">Cancel</button>
-            </form>
-            <button class="btn btn-error btn-sm" phx-click="disable_account">
-              <.icon name={:trash} type={:outline} class="w-4 h-4" /> Disable Account
-            </button>
-          </div>
+          <.form for={%{}} id="delete_account_form" phx-submit="delete_account" class="space-y-4">
+            <.input
+              name="confirm"
+              type="text"
+              label={"Type #{@current_scope.user.username} to confirm"}
+              value=""
+              placeholder={@current_scope.user.username}
+              required
+              autocomplete="off"
+            />
+            <div class="modal-action">
+              <button
+                type="button"
+                class="btn btn-neutral mr-3"
+                onclick="delete_account_modal.close()"
+              >
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-error" phx-disable-with="Deleting...">
+                <.icon name={:trash} type={:outline} class="w-4 h-4" /> Delete Account
+              </button>
+            </div>
+          </.form>
         </div>
         <form method="dialog" class="modal-backdrop">
           <button>close</button>
@@ -673,6 +688,26 @@ defmodule LuxpkgsWeb.UserLive.Settings do
      socket
      |> close_modal("remove_tfa_modal")
      |> put_flash(:error, "Enter a verification code to continue.")}
+  end
+
+  def handle_event("delete_account", %{"confirm" => confirm}, socket) do
+    user = socket.assigns.current_scope.user
+
+    if confirm == user.username do
+      {:ok, tokens} = Luxpkgs.Accounts.delete_user(user)
+      LuxpkgsWeb.UserAuth.disconnect_sessions(tokens)
+
+      {:noreply,
+       socket
+       |> close_modal("delete_account_modal")
+       |> put_flash(:info, "Your account has been deleted.")
+       |> redirect(to: ~p"/")}
+    else
+      {:noreply,
+       socket
+       |> close_modal("delete_account_modal")
+       |> put_flash(:error, "Username does not match. Your account was not deleted.")}
+    end
   end
 
   def handle_event(_event, _params, socket), do: {:noreply, socket}
