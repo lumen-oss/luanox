@@ -25,6 +25,8 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends build-essential git npm \
   && rm -rf /var/lib/apt/lists/*
 
+RUN npm install -g pnpm@12.9.0
+
 # prepare build dir
 WORKDIR /app
 
@@ -58,7 +60,7 @@ RUN mix compile
 COPY assets assets
 
 WORKDIR /app/assets
-RUN npm ci --only=prod
+RUN pnpm install --frozen-lockfile --prod
 
 WORKDIR /app
 # compile assets
