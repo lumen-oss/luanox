@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.5.0](https://github.com/lumen-oss/luxpkgs/compare/v0.4.0...v0.5.0) (2026-10-17)
+
+
+### Features
+
+* implement user deletion ([#133](https://github.com/lumen-oss/luxpkgs/issues/133)) ([a79ee2d](https://github.com/lumen-oss/luxpkgs/commit/a79ee2dedf9d312bdd1611269ea195caf7562e48))
+* use static TOTP secret in dev builds ([372ead1](https://github.com/lumen-oss/luxpkgs/commit/372ead1e6cdc76b2d7cacb5975d211b118405eb8))
+
+
+### Bug Fixes
+
+* **Dockerfile:** use pnpm ([0889323](https://github.com/lumen-oss/luxpkgs/commit/088932305915c8aa17079142373e16c6863bce73))
+* **keys:** properly colour toggles in API creation menu ([4d9c7d5](https://github.com/lumen-oss/luxpkgs/commit/4d9c7d59dd55c13ae57af56531172533b840a6e0))
+
 ## [0.4.0](https://github.com/lumen-oss/luxpkgs/compare/v0.3.0...v0.4.0) (2026-10-17)
 
 
