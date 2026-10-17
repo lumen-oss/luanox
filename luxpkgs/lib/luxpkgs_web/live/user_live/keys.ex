@@ -160,7 +160,7 @@ defmodule LuxpkgsWeb.UserLive.Keys do
                   <.input
                     type="checkbox"
                     name="read_only"
-                    class="toggle toggle-primary"
+                    class="toggle toggle-warning"
                     checked={@read_only}
                     phx-click={JS.toggle_class("text-warning", to: "#read_only_label")}
                   />
@@ -185,7 +185,13 @@ defmodule LuxpkgsWeb.UserLive.Keys do
               </div>
 
               <div class="form-control">
-                <label class="label min-w-full justify-between cursor-pointer">
+                <label
+                  id="require_tfa_label"
+                  class={[
+                    "label min-w-full justify-between cursor-pointer transition-colors",
+                    @require_tfa && "text-primary"
+                  ]}
+                >
                   <span class="label-text">
                     <div class="flex items-center gap-2">
                       <.icon name={:shield_check} type={:outline} class="w-4 h-4" /> Require 2FA
@@ -198,6 +204,7 @@ defmodule LuxpkgsWeb.UserLive.Keys do
                     value="true"
                     class="toggle toggle-primary"
                     checked={@require_tfa}
+                    phx-click={JS.toggle_class("text-primary", to: "#require_tfa_label")}
                   />
                 </label>
               </div>
