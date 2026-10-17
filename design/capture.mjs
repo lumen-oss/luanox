@@ -6,7 +6,8 @@
 //
 // Env: BASE_URL (default http://localhost:4000),
 //      ROUTES ("name=path,...") to override the default landing-only set,
-//      THEMES (default "dark,light"), HEADFUL=1 for a visible browser.
+//      THEMES (default "dark,light"), HEADFUL=1 for a visible browser,
+//      SESSION_COOKIE (a _luxpkgs_key value) to capture pages behind login.
 import { firefox } from "playwright-core";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -24,6 +25,7 @@ const ROUTES = (process.env.ROUTES || "landing=/")
     return { name: name.trim(), path: (path ?? "/").trim() };
   });
 const THEMES = (process.env.THEMES || "dark,light").split(",").map((s) => s.trim());
+const SESSION_COOKIE = process.env.SESSION_COOKIE || "";
 
 // Runs inside the page: serialize the visible DOM into a scene tree.
 async function extract() {
@@ -167,6 +169,12 @@ async function extract() {
   };
 
   const isOverlayRoot = (el) => el.classList && el.classList.contains("dropdown-content");
+  // The account menu lives in a plain div.dropdown (daisyUI hides it with
+  // display:none, so it must be revealed at capture time); the theme menu sits
+  // in a <details> and is caught by isVisible instead.
+  const isPlainDropdownMenu = (el) =>
+    el.classList && el.classList.contains("dropdown-content") &&
+    !!el.closest("div.dropdown") && !el.closest("details");
 
   const visibleKids = (el, force) => {
     const out = [];
@@ -241,11 +249,17 @@ async function extract() {
     }
     // A menu hidden by a closed <details> is still laid out; capture it anyway
     // (flagged) so the emitter can turn it into a toggled overlay.
-    if (isOverlayRoot(el) && !isVisible(el)) node.overlay = true;
+    if ((isOverlayRoot(el) && !isVisible(el)) || isPlainDropdownMenu(el)) node.overlay = true;
     if (el.tagName === "svg" || el.tagName === "IMG") {
       try {
         node.img = await rasterize(el);
       } catch {}
+    }
+    if (el.tagName === "INPUT") {
+      // A toggle's knob is a pseudo-element and its state is nowhere in the
+      // geometry, so record both for the emitter to redraw.
+      node.inputType = el.type;
+      node.checked = el.checked;
     }
     const ph = el.tagName === "INPUT" || el.tagName === "TEXTAREA" ? el.placeholder : "";
     if (ph) {
@@ -306,12 +320,49 @@ for (const route of ROUTES) {
         localStorage.setItem("phx:theme", t);
       } catch {}
     }, theme);
+    if (SESSION_COOKIE) {
+      await context.addCookies([{ name: "_luxpkgs_key", value: SESSION_COOKIE, url: BASE }]);
+    }
     const page = await context.newPage();
     await page.goto(BASE + route.path, { waitUntil: "networkidle" });
     await page.evaluate(() => document.fonts.ready);
+
+    // Remote images (GitHub avatars) taint the capture canvas, which silently
+    // kills toDataURL. Fetch them through the browser context and inline them.
+    const remote = await page.evaluate(() =>
+      [...document.querySelectorAll("img")]
+        .map((i) => i.currentSrc || i.src)
+        .filter((s) => s && !s.startsWith("data:")),
+    );
+    for (const src of new Set(remote)) {
+      try {
+        const res = await page.request.get(src);
+        if (!res.ok()) continue;
+        const type = res.headers()["content-type"] || "image/png";
+        const dataUrl = `data:${type};base64,${(await res.body()).toString("base64")}`;
+        await page.evaluate(
+          ([from, to]) => {
+            for (const img of document.querySelectorAll("img")) {
+              if ((img.currentSrc || img.src) === from) img.src = to;
+            }
+          },
+          [src, dataUrl],
+        );
+      } catch {}
+    }
+    await page.evaluate(() =>
+      Promise.all([...document.querySelectorAll("img")].map((i) => i.decode().catch(() => {}))),
+    );
     await page.addStyleTag({
       content:
-        "*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important}",
+        "*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important}" +
+        // Accordions: capture every section expanded, or the hidden bodies are lost.
+        ".collapse{grid-template-rows:max-content 1fr!important}" +
+        ".collapse-content{content-visibility:visible!important;visibility:visible!important;min-height:fit-content!important;overflow:revert-layer!important;padding-bottom:1rem!important}" +
+        // A plain div.dropdown hides its menu with display:none, so give it
+        // layout. It stays a toggled overlay: the walker spots it structurally
+        // (isPlainDropdownMenu), not by visibility, which would hide its text.
+        ".dropdown:not(details) .dropdown-content{display:block!important;opacity:1!important;scale:100%!important}",
     });
     await page.waitForTimeout(400);
 

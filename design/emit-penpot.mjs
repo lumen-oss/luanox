@@ -360,10 +360,11 @@ function firstOverlay(node) {
 function interactionsOf(node, inOverlay) {
   const out = [];
   if (node.href) {
-    // A link to another captured route becomes in-file navigation; anything
-    // else (Docs, GitHub, ...) opens in the browser.
+    // A link to a board on this same Penpot page becomes in-file navigation
+    // (Penpot only resolves a destination within the current page); anything
+    // else, including another captured route, opens in the browser.
     const screen = PATH_TO_SCREEN.get(resolvePath(node.href));
-    const dest = screen && BOARD_IDS.get(`${screen}.${CURRENT_THEME}`);
+    const dest = screen === CURRENT_SCREEN && BOARD_IDS.get(`${screen}.${CURRENT_THEME}`);
     if (dest) out.push({ "event-type": "click", "action-type": "navigate", destination: dest });
     else {
       const url = resolveUrl(node.href);
@@ -399,26 +400,86 @@ function nameOf(node) {
   return node.tag + (cls ? "." + cls : "");
 }
 
-// --- emit -----------------------------------------------------------------
-function emitNode(context, node, bx, by, inOverlay) {
+// daisyUI draws both the select caret and the collapse arrow in CSS (stacked
+// gradients and an ::after pseudo-element), which a capture cannot see, so
+// redraw them as a stroked chevron on the right edge.
+function chevronOf(node, bx, by) {
+  const isSelect = node.tag === "select";
+  const isArrow = node.class && /(^|\s)collapse-title(\s|$)/.test(node.class);
+  if (!isSelect && !isArrow) return null;
   const { x, y, w, h } = node.rect;
-  const X = x + bx, Y = y + by;
-  const sized = w >= 1 && h >= 1;
+  const cw = 10, ch = 6;
+  const X = x + bx + w - (isSelect ? 14 : 24) - cw;
+  const Y = y + by + (h - ch) / 2;
+  const color = parseColor(node.style.color) || { hex: "#000000", alpha: 1 };
+  return {
+    name: isSelect ? "select chevron" : "collapse arrow",
+    x: X,
+    y: Y,
+    width: cw,
+    height: ch,
+    content: `M${X} ${Y} L${X + cw / 2} ${Y + ch} L${X + cw} ${Y}`,
+    strokes: [{
+      "stroke-color": color.hex,
+      "stroke-opacity": color.alpha,
+      "stroke-style": "solid",
+      "stroke-width": 2,
+      "stroke-alignment": "center",
+    }],
+  };
+}
 
+// --- emit -----------------------------------------------------------------
+// The shapes a node draws on its own, ignoring its children. Shared with
+// willEmit so the group decision cannot drift from what actually gets emitted.
+function nodeParts(node) {
+  const { w, h } = node.rect;
+  const sized = w >= 1 && h >= 1;
   const fills = sized ? fillsOf(node) : [];
   const strokes = sized ? strokesOf(node) : [];
   const borders = sized ? borderSidesOf(node) : [];
   const [r1, r2, r3, r4] = sized ? radiusOf(node) : [0, 0, 0, 0];
-  const opacity = parseFloat(node.style.opacity);
   // CSS clips a gradient to its own text (bg-clip-text + a transparent color),
   // which Penpot expresses as a gradient fill on the text shape, not a rect
   // sitting behind a solid-colored text.
   const clipText = !!(sized && node.text && fills.some((f) => f["fill-color-gradient"]) &&
     !parseColor(node.style.color));
-  const box = !clipText && (fills.length || strokes.length || r1 || r2 || r3 || r4);
-  const hasBox = box || borders.length;
+  // daisyUI paints the divider with ::before/::after, so the node itself has
+  // neither border nor background and would otherwise emit nothing.
+  const divider = !!(sized && node.class && /(^|\s)divider(\s|$)/.test(node.class));
+  // A radius alone draws nothing (daisyUI ghost buttons are transparent
+  // rounded boxes), so only open a rect for an actual fill, stroke or shadow.
+  const box = !clipText &&
+    (fills.length || strokes.length || shadowOf(node).length);
+  return {
+    sized, fills, strokes, borders, r1, r2, r3, r4, clipText, divider, box,
+    hasBox: box || borders.length || divider,
+  };
+}
+
+const willEmitCache = new WeakMap();
+
+// A group with no children has no geometry and Penpot rejects it on import,
+// so only open a group when the subtree actually draws something. A node that
+// merely carries a link (an sr-only skip link, an empty anchor) is not enough.
+function willEmit(node) {
+  const cached = willEmitCache.get(node);
+  if (cached !== undefined) return cached;
+  const parts = nodeParts(node);
+  const result = parts.hasBox || (parts.sized && (node.img || node.text)) ||
+    (node.children || []).some((c) => !c.overlay && willEmit(c));
+  willEmitCache.set(node, result);
+  return result;
+}
+
+function emitNode(context, node, bx, by, inOverlay, clip = [0, 0, 0, 0]) {
+  const { x, y, w, h } = node.rect;
+  const X = x + bx, Y = y + by;
+  const { sized, fills, strokes, borders, r1, r2, r3, r4, clipText, divider, box } =
+    nodeParts(node);
+  const opacity = parseFloat(node.style.opacity);
   const interactions = interactionsOf(node, inOverlay);
-  const draws = hasBox || (sized && (node.img || node.text)) || !!interactions;
+  const draws = willEmit(node);
 
   // Mirror the DOM: wrap this element's shapes (and its children) in a group.
   if (draws) context.addGroup({ name: nameOf(node), ...(interactions ? { interactions } : {}) });
@@ -443,6 +504,41 @@ function emitNode(context, node, bx, by, inOverlay) {
   }
 
   for (const b of borders) context.addRect({ ...b, x: b.x + bx, y: b.y + by });
+
+  if (divider) {
+    // A hairline of base-content at 10% (daisyUI --divider-color), centred.
+    const line = parseColor(node.style.color) || { hex: "#000000", alpha: 1 };
+    context.addRect({
+      name: nameOf(node),
+      x: X,
+      y: Y + (h - 2) / 2,
+      width: w,
+      height: 2,
+      fills: [{ "fill-color": line.hex, "fill-opacity": line.alpha * 0.1 }],
+    });
+  }
+
+  if (sized && node.tag === "input" && /(^|\s)toggle(\s|$)/.test(node.class || "")) {
+    // daisyUI draws the toggle knob with a pseudo-element: a square at the
+    // inset padding, pushed to the right column when checked.
+    const k = h - 8;
+    const track = parseColor((node.style.borderColor || [])[0]);
+    context.addRect({
+      name: nameOf(node) + " knob",
+      x: node.checked ? X + w - 4 - k : X + 4,
+      y: Y + 4,
+      width: k,
+      height: k,
+      r1: 4,
+      r2: 4,
+      r3: 4,
+      r4: 4,
+      fills: [{
+        "fill-color": track ? track.hex : "#000000",
+        "fill-opacity": track ? track.alpha : 1,
+      }],
+    });
+  }
 
   if (sized && node.img) {
     const bytes = Buffer.from(node.img.split(",")[1], "base64");
@@ -470,7 +566,10 @@ function emitNode(context, node, bx, by, inOverlay) {
         },
       ],
     };
-    if (r1 || r2 || r3 || r4) Object.assign(imgShape, { r1, r2, r3, r4 });
+    // The circle usually sits on an overflow-hidden wrapper while the img
+    // itself reports radius 0, so fall back to the clipping radius above.
+    const [ir1, ir2, ir3, ir4] = (r1 || r2 || r3 || r4) ? [r1, r2, r3, r4] : clip;
+    if (ir1 || ir2 || ir3 || ir4) Object.assign(imgShape, { r1: ir1, r2: ir2, r3: ir3, r4: ir4 });
     if (!Number.isNaN(opacity) && opacity < 1) imgShape.opacity = opacity;
     context.addRect(imgShape);
   }
@@ -491,9 +590,17 @@ function emitNode(context, node, bx, by, inOverlay) {
     });
   }
 
+  const chevron = chevronOf(node, bx, by);
+  if (chevron) context.addPath(chevron);
+
+  // CSS clips children to a rounded overflow-hidden box; carry that radius
+  // down so nested media is rounded the same way.
+  const childClip = node.style.overflow === "hidden" && (r1 || r2 || r3 || r4)
+    ? [r1, r2, r3, r4]
+    : clip;
   for (const c of node.children || []) {
     if (c.overlay) continue;
-    emitNode(context, c, bx, by, inOverlay);
+    emitNode(context, c, bx, by, inOverlay, childClip);
   }
 
   if (draws) context.closeGroup();
