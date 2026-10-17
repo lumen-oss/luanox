@@ -1,5 +1,42 @@
 # Changelog
 
+## [0.4.0](https://github.com/lumen-oss/luxpkgs/compare/v0.3.0...v0.4.0) (2026-10-17)
+
+
+### ⚠ BREAKING CHANGES
+
+* rename project to `luxpkgs`
+
+### Features
+
+* **settings/2fa:** rework the backup codes display ([f5d24ae](https://github.com/lumen-oss/luxpkgs/commit/f5d24aeea0ec12d7c072b4b12c73c755c99ab7c5))
+* **setup_totp:** slightly improve UI consistency ([990ab4e](https://github.com/lumen-oss/luxpkgs/commit/990ab4ebf9945350b53b4c3941e7aefb72a1b639))
+
+
+### Bug Fixes
+
+* **2fa:** make token validation entirely server-side to plug all security holes ([912c313](https://github.com/lumen-oss/luxpkgs/commit/912c313e7f54377832dc240c06884b9189da2a2a))
+* **a11y:** icon hiding, label association, keyboard nav, skip link ([ccaa32b](https://github.com/lumen-oss/luxpkgs/commit/ccaa32bd2ca0f32b2804ad8c7b6a2d970c0a189b))
+* **home:** balance the hero tagline text wrap ([bfeb9ba](https://github.com/lumen-oss/luxpkgs/commit/bfeb9ba76a62b0e754a46c8f7445ae93fed6ac45))
+* **luxpkgs:** improve light theme contrast ([4b05ac1](https://github.com/lumen-oss/luxpkgs/commit/4b05ac1f1e0dec152a6c551347ef678f94ef0383))
+* **luxpkgs:** proper yellow color for light theme ([3ef55a6](https://github.com/lumen-oss/luxpkgs/commit/3ef55a67ab5c68d95b09397ebf6c1c3043d3daf2))
+* **settings/2fa:** generate backup codes when two-factor authentication is set up ([fa94d98](https://github.com/lumen-oss/luxpkgs/commit/fa94d9815f86eec8e3560a7a4de13f82b98e5617))
+* **settings/2fa:** modal behaviour ([a98bb3a](https://github.com/lumen-oss/luxpkgs/commit/a98bb3ade9dae8245bdefe56bccd94eef038a50a))
+* **settings/2fa:** polish backup codes panel and modals ([ad886e8](https://github.com/lumen-oss/luxpkgs/commit/ad886e817324a13408053b1bd28e28d09c05d6ba))
+* **settings/2fa:** round the 2FA and backup-codes panels ([5135445](https://github.com/lumen-oss/luxpkgs/commit/513544543a4d96f533821953dba08d834344e506))
+* **totp/setup:** reuse the pending secret when a retry is submitted ([1a0bc73](https://github.com/lumen-oss/luxpkgs/commit/1a0bc73a26512d9df679d761f7585c65997dc3f4))
+* **ui:** harden modal reset and close behavior ([9f74e8a](https://github.com/lumen-oss/luxpkgs/commit/9f74e8a888295cd9a7de5270ab407ef150f429de))
+
+
+### Miscellaneous Chores
+
+* release 0.4.0 ([bfc6dde](https://github.com/lumen-oss/luxpkgs/commit/bfc6ddedf0d79fb935dc394f0517b79db2ee222a))
+
+
+### Code Refactoring
+
+* rename project to `luxpkgs` ([1262e57](https://github.com/lumen-oss/luxpkgs/commit/1262e579b8920bf5f307c2c1f5eed58f681ab3d7))
+
 ## [0.3.0](https://github.com/lumen-oss/luxpkgs/compare/v0.2.0...v0.3.0) (2026-07-01)
 
 
