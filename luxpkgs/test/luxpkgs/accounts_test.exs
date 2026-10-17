@@ -217,4 +217,47 @@ defmodule Luxpkgs.AccountsTest do
                )
     end
   end
+
+  describe "delete_user/1" do
+    import Luxpkgs.PackagesFixtures
+
+    alias Luxpkgs.Accounts.{TOTP, TotpBackupCode, TotpSecret}
+
+    test "deletes the user and their session tokens" do
+      user = user_fixture()
+      token = Accounts.generate_user_session_token(user)
+
+      assert {:ok, [%UserToken{token: ^token}]} = Accounts.delete_user(user)
+      refute Accounts.get_user(user.id)
+      refute Repo.get_by(UserToken, token: token)
+    end
+
+    test "removes two-factor authentication data" do
+      user = user_fixture()
+      :ok = TOTP.enable(user)
+      _codes = TOTP.generate_backup_codes(user)
+
+      assert {:ok, _tokens} = Accounts.delete_user(user)
+
+      refute Repo.exists?(from t in TotpSecret, where: t.user_id == ^user.id)
+      refute Repo.exists?(from c in TotpBackupCode, where: c.user_id == ^user.id)
+    end
+
+    test "reassigns packages to the deleted user without deleting releases" do
+      user = user_fixture()
+      scope = Luxpkgs.Accounts.Scope.for_user(user)
+      package = package_fixture(scope)
+      release = release_fixture(scope, package)
+
+      assert {:ok, _tokens} = Accounts.delete_user(user)
+
+      assert %{user_id: owner_id} = Repo.get!(Luxpkgs.Packages.Package, package.id)
+      assert owner_id == Accounts.deleted_user().id
+      assert Repo.get!(Luxpkgs.Packages.Release, release.id).package_id == package.id
+    end
+
+    test "the deleted user is created only once" do
+      assert Accounts.deleted_user().id == Accounts.deleted_user().id
+    end
+  end
 end

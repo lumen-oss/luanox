@@ -81,4 +81,39 @@ defmodule LuxpkgsWeb.UserLive.SettingsTest do
       assert conn.resp_body =~ "You must re-authenticate to access this page."
     end
   end
+
+  describe "delete account" do
+    test "deletes the account and redirects home", %{conn: conn} do
+      user = user_fixture()
+
+      {:ok, lv, _html} =
+        conn
+        |> log_in_user(user)
+        |> live(~p"/settings")
+
+      lv
+      |> form("#delete_account_form", confirm: user.username)
+      |> render_submit()
+
+      assert_redirect(lv, ~p"/")
+      refute Luxpkgs.Accounts.get_user(user.id)
+    end
+
+    test "rejects a mismatched confirmation", %{conn: conn} do
+      user = user_fixture()
+
+      {:ok, lv, _html} =
+        conn
+        |> log_in_user(user)
+        |> live(~p"/settings")
+
+      html =
+        lv
+        |> form("#delete_account_form", confirm: "not-the-username")
+        |> render_submit()
+
+      assert html =~ "Username does not match. Your account was not deleted."
+      assert Luxpkgs.Accounts.get_user(user.id)
+    end
+  end
 end

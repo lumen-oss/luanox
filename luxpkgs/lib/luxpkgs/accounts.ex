@@ -4,9 +4,11 @@ defmodule Luxpkgs.Accounts do
   """
 
   import Ecto.Query, warn: false
+  alias Ecto.Multi
   alias Luxpkgs.Repo
 
   alias Luxpkgs.Accounts.{User, UserToken}
+  alias Luxpkgs.Packages.Package
 
   ## Database getters
 
@@ -153,5 +155,55 @@ defmodule Luxpkgs.Accounts do
   def delete_user_session_token(token) do
     Repo.delete_all(UserToken.by_token_and_context_query(token, "session"))
     :ok
+  end
+
+  ## Account deletion
+
+  @deleted_user_attrs %{
+    provider: "deleted",
+    username: "deleted",
+    aka: "Deleted User",
+    email: "deleted@luxpkgs.org"
+  }
+
+  @doc """
+  Returns the sentinel user that owns packages left behind by deleted accounts.
+  """
+  def deleted_user do
+    Repo.get_by(User, provider: "deleted", username: "deleted") ||
+      %User{}
+      |> Ecto.Changeset.change(@deleted_user_attrs)
+      |> Repo.insert!(on_conflict: :nothing, conflict_target: [:provider, :username])
+      |> case do
+        %User{id: nil} -> Repo.get_by!(User, provider: "deleted", username: "deleted")
+        user -> user
+      end
+  end
+
+  @doc """
+  Returns all tokens belonging to the user.
+  """
+  def list_user_tokens(%User{} = user) do
+    Repo.all(UserToken.by_user_and_contexts_query(user, :all))
+  end
+
+  @doc """
+  Deletes the user, reassigning their packages to the sentinel account.
+  """
+  def delete_user(%User{} = user) do
+    tokens = list_user_tokens(user)
+
+    Multi.new()
+    |> Multi.update_all(
+      :reassign_packages,
+      from(p in Package, where: p.user_id == ^user.id),
+      set: [user_id: deleted_user().id]
+    )
+    |> Multi.delete(:user, user)
+    |> Repo.transaction()
+    |> case do
+      {:ok, _changes} -> {:ok, tokens}
+      {:error, _step, reason, _changes} -> {:error, reason}
+    end
   end
 end
