@@ -281,6 +281,70 @@ function textContentOf(node) {
   return { type: "root", children: [{ type: "paragraph-set", children: paragraphs }] };
 }
 
+const BOARD_IDS = new Map();
+const OVERLAY_IDS = new Map();
+// Overlay frames are parked off-canvas; the viewer ignores a manual overlay's
+// own x/y and uses the interaction's "overlay-position" instead.
+const OVERLAY_X = -2600;
+const OVERLAY_Y = 0;
+let BASE = "";
+
+function resolveUrl(href) {
+  if (href.startsWith("#")) return null;
+  try {
+    return new URL(href, BASE).href;
+  } catch {
+    return null;
+  }
+}
+
+function collectOverlays(node, out = []) {
+  if (node.overlay) {
+    out.push(node);
+    return out;
+  }
+  for (const c of node.children || []) collectOverlays(c, out);
+  return out;
+}
+
+function firstOverlay(node) {
+  for (const c of node.children || []) {
+    if (c.overlay) return c;
+    const nested = firstOverlay(c);
+    if (nested) return nested;
+  }
+  return null;
+}
+
+function interactionsOf(node, inOverlay) {
+  const out = [];
+  if (node.href) {
+    const url = resolveUrl(node.href);
+    if (url) out.push({ "event-type": "click", "action-type": "open-url", url });
+  }
+  if (inOverlay && node.text) {
+    const theme = node.text.trim().toLowerCase() === "light" ? "light" : "dark";
+    const dest = BOARD_IDS.get(`${SCREENS[0].name}.${theme}`);
+    if (dest) out.push({ "event-type": "click", "action-type": "navigate", destination: dest });
+  }
+  if (node.class && /(^|\s)dropdown(\s|$)/.test(node.class)) {
+    const ov = firstOverlay(node);
+    if (ov)
+      out.push({
+        "event-type": "click",
+        "action-type": "toggle-overlay",
+        destination: OVERLAY_IDS.get(ov),
+        // Manual overlays render at this point relative to the base frame; the
+        // overlay frame's own x/y is ignored by the viewer.
+        "overlay-position": { x: ov.rect.x, y: ov.rect.y },
+        "overlay-pos-type": "manual",
+        "close-click-outside": true,
+        animation: { "animation-type": "dissolve", duration: 200, easing: "ease" },
+      });
+  }
+  return out.length ? out : null;
+}
+
 function nameOf(node) {
   const cls = (node.class || "").split(/\s+/).filter(Boolean).slice(0, 2).join(".");
   if (node.text) return node.text.split("\n")[0].slice(0, 40);
@@ -288,7 +352,7 @@ function nameOf(node) {
 }
 
 // --- emit -----------------------------------------------------------------
-function emitNode(context, node, bx, by) {
+function emitNode(context, node, bx, by, inOverlay) {
   const { x, y, w, h } = node.rect;
   const X = x + bx, Y = y + by;
   const sized = w >= 1 && h >= 1;
@@ -300,10 +364,11 @@ function emitNode(context, node, bx, by) {
   const opacity = parseFloat(node.style.opacity);
   const box = fills.length || strokes.length || r1 || r2 || r3 || r4;
   const hasBox = box || borders.length;
-  const draws = hasBox || (sized && (node.img || node.text));
+  const interactions = interactionsOf(node, inOverlay);
+  const draws = hasBox || (sized && (node.img || node.text)) || !!interactions;
 
   // Mirror the DOM: wrap this element's shapes (and its children) in a group.
-  if (draws) context.addGroup({ name: nameOf(node) });
+  if (draws) context.addGroup({ name: nameOf(node), ...(interactions ? { interactions } : {}) });
 
   if (box) {
     const shape = { name: nameOf(node), x: X, y: Y, width: w, height: h };
@@ -363,13 +428,41 @@ function emitNode(context, node, bx, by) {
     });
   }
 
-  for (const c of node.children || []) emitNode(context, c, bx, by);
+  for (const c of node.children || []) {
+    if (c.overlay) continue;
+    emitNode(context, c, bx, by, inOverlay);
+  }
 
   if (draws) context.closeGroup();
 }
 
+function emitOverlays(context, root) {
+  for (const ov of collectOverlays(root)) {
+    const { x, y, w, h } = ov.rect;
+    const fills = fillsOf(ov);
+    const strokes = strokesOf(ov);
+    const [r1, r2, r3, r4] = radiusOf(ov);
+    context.addBoard({
+      id: OVERLAY_IDS.get(ov),
+      name: nameOf(ov) + " (overlay)",
+      x: OVERLAY_X,
+      y: OVERLAY_Y,
+      width: w,
+      height: h,
+      fills,
+      ...(strokes.length ? { strokes } : {}),
+      ...(r1 || r2 || r3 || r4 ? { r1, r2, r3, r4 } : {}),
+    });
+    for (const c of ov.children || []) emitNode(context, c, OVERLAY_X - x, OVERLAY_Y - y, true);
+    context.closeBoard();
+  }
+}
+
 const context = penpot.createBuildContext({ referer: "luxpkgs-design/emit-penpot" });
 context.addFile({ name: "Luxpkgs" });
+
+for (const screen of SCREENS)
+  for (const theme of THEMES) BOARD_IDS.set(`${screen.name}.${theme}`, context.genId());
 
 for (const theme of THEMES) {
   context.addPage({ name: `Landing (${theme})`, background: theme === "dark" ? "#dddde7" : "#2a2a3a" });
@@ -377,8 +470,12 @@ for (const theme of THEMES) {
   for (const screen of SCREENS) {
     const file = join(SCENES, `${screen.name}.${theme}.json`);
     const scene = JSON.parse(readFileSync(file, "utf8"));
+    BASE = scene.base || "";
+    OVERLAY_IDS.clear();
+    for (const ov of collectOverlays(scene.root)) OVERLAY_IDS.set(ov, context.genId());
     const boardX = 0, boardY = oy;
     context.addBoard({
+      id: BOARD_IDS.get(`${screen.name}.${theme}`),
       name: `${screen.label} / ${theme}`,
       x: boardX,
       y: boardY,
@@ -386,8 +483,9 @@ for (const theme of THEMES) {
       height: scene.height,
       fills: [{ "fill-color": theme === "dark" ? "#292939" : "#dddde7", "fill-opacity": 1 }],
     });
-    emitNode(context, scene.root, boardX, boardY);
+    emitNode(context, scene.root, boardX, boardY, false);
     context.closeBoard();
+    emitOverlays(context, scene.root);
     oy += scene.height + GAP;
   }
   context.closePage();

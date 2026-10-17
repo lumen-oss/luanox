@@ -29,14 +29,16 @@ const THEMES = (process.env.THEMES || "dark,light").split(",").map((s) => s.trim
 async function extract() {
   const isVisible = (el) => {
     const r = el.getBoundingClientRect();
+    if (r.width <= 0 || r.height <= 0) return false;
     const s = getComputedStyle(el);
-    return (
-      r.width > 0 &&
-      r.height > 0 &&
-      s.display !== "none" &&
-      s.visibility !== "hidden" &&
-      parseFloat(s.opacity) > 0
-    );
+    if (s.display === "none" || s.visibility === "hidden" || parseFloat(s.opacity) <= 0) return false;
+    // content-visibility:hidden (e.g. a closed <details> menu) keeps a
+    // non-zero layout rect, so the checks above miss it; checkVisibility sees it.
+    return el.checkVisibility({
+      contentVisibilityAuto: true,
+      opacityProperty: true,
+      visibilityProperty: true,
+    });
   };
 
   const styleOf = (el) => {
@@ -164,11 +166,13 @@ async function extract() {
     return { x: Math.round(left), y: Math.round(y), w: Math.round(w), h: Math.round(lh) };
   };
 
-  const visibleKids = (el) => {
+  const isOverlayRoot = (el) => el.classList && el.classList.contains("dropdown-content");
+
+  const visibleKids = (el, force) => {
     const out = [];
     for (const c of el.children) {
-      if (getComputedStyle(c).display === "contents") out.push(...visibleKids(c));
-      else if (isVisible(c)) out.push(c);
+      if (getComputedStyle(c).display === "contents") out.push(...visibleKids(c, force));
+      else if (force || isVisible(c) || isOverlayRoot(c)) out.push(c);
     }
     return out;
   };
@@ -205,8 +209,8 @@ async function extract() {
 
   // Media-only subtree scan: keeps svg/img descendants (as rasterized shapes)
   // without re-emitting overlapping text nodes for their ancestors.
-  const collectMedia = async (el, out) => {
-    for (const c of visibleKids(el)) {
+  const collectMedia = async (el, out, force) => {
+    for (const c of visibleKids(el, force)) {
       if (c.tagName === "svg" || c.tagName === "IMG") {
         const node = { tag: c.tagName.toLowerCase(), rect: rectOf(c), style: styleOf(c), text: "", children: [] };
         try {
@@ -214,13 +218,13 @@ async function extract() {
         } catch {}
         out.push(node);
       } else {
-        await collectMedia(c, out);
+        await collectMedia(c, out, force);
       }
     }
     return out;
   };
 
-  const walk = async (el) => {
+  const walk = async (el, force) => {
     const node = {
       tag: el.tagName.toLowerCase(),
       rect: rectOf(el),
@@ -231,6 +235,13 @@ async function extract() {
     if (el.id) node.id = el.id;
     const cls = (el.getAttribute("class") || "").trim();
     if (cls) node.class = cls;
+    if (el.tagName === "A") {
+      const href = el.getAttribute("href");
+      if (href) node.href = href;
+    }
+    // A menu hidden by a closed <details> is still laid out; capture it anyway
+    // (flagged) so the emitter can turn it into a toggled overlay.
+    if (isOverlayRoot(el) && !isVisible(el)) node.overlay = true;
     if (el.tagName === "svg" || el.tagName === "IMG") {
       try {
         node.img = await rasterize(el);
@@ -255,10 +266,11 @@ async function extract() {
         node.text = t.text;
         node.textBox = t.box;
       }
-      node.children = await collectMedia(el, []);
+      node.children = await collectMedia(el, [], force);
       return node;
     }
-    for (const c of visibleKids(el)) node.children.push(await walk(c));
+    const kids = visibleKids(el, force || node.overlay);
+    for (const c of kids) node.children.push(await walk(c, force || node.overlay));
     return node;
   };
 
