@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Parses the daisyUI light/dark themes in app.css and emits Penpot-importable
-// DTCG tokens (first-level keys = token sets). oklch() is converted to hex
-// because Penpot's token import rejects oklch.
+// multi-set DTCG tokens ($themes + $metadata + the `luxpkgs` set). oklch() is
+// converted to hex because Penpot's token import rejects oklch.
 //
 // Usage: node design/generate_tokens.mjs
 import { readFileSync, writeFileSync } from "node:fs";
@@ -11,7 +11,6 @@ import { fileURLToPath } from "node:url";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const APP_CSS = join(__dirname, "..", "luxpkgs", "assets", "css", "app.css");
 const OUT = join(__dirname, "luxpkgs-tokens.json");
-const OUT_THEMES = join(__dirname, "luxpkgs-tokens.$themes.json");
 
 // --- oklch -> hex ---------------------------------------------------------
 function oklchToHex(l, c, h) {
@@ -75,49 +74,75 @@ const COLOR_KEYS = [
   "grey",
 ];
 
+// One set with unique names: Penpot merges every active set into a single
+// namespace, so a light and a dark "primary" would otherwise shadow each other.
 const sets = {};
 
-sets.core = {
-  font: {
-    sans: { $type: "fontFamily", $value: parseThemeVar("font-sans") },
-    display: { $type: "fontFamily", $value: parseThemeVar("font-display") },
-    mono: { $type: "fontFamily", $value: parseThemeVar("font-mono") },
-  },
-  radius: {
-    selector: { $type: "borderRadius", $value: themes.dark["radius-selector"] },
-    field: { $type: "borderRadius", $value: themes.dark["radius-field"] },
-    box: { $type: "borderRadius", $value: themes.dark["radius-box"] },
-  },
-  size: {
-    selector: { $type: "dimension", $value: themes.dark["size-selector"] },
-    field: { $type: "dimension", $value: themes.dark["size-field"] },
-  },
-  border: { $type: "dimension", $value: themes.dark["border"] },
-  depth: { $type: "number", $value: Number(themes.dark["depth"]) },
-  noise: { $type: "number", $value: Number(themes.dark["noise"]) },
-};
+const token = (type, value) => ({ $type: type, $value: value });
 
-function colorSet(themeName) {
+function colorGroup(themeName) {
   const src = themes[themeName];
-  const set = {};
+  const group = {};
   for (const key of COLOR_KEYS) {
     const raw = src[`color-${key}`];
     if (!raw) continue;
     const hex = parseOklch(raw);
     if (!hex) throw new Error(`Could not parse oklch for ${themeName}/${key}: ${raw}`);
-    set[key] = { $type: "color", $value: hex };
+    group[key] = token("color", hex);
   }
-  return set;
+  return group;
 }
 
-sets.light = colorSet("light");
-sets.dark = colorSet("dark");
+sets.luxpkgs = {
+  color: { light: colorGroup("light"), dark: colorGroup("dark") },
+  radius: {
+    selector: token("borderRadius", themes.dark["radius-selector"]),
+    field: token("borderRadius", themes.dark["radius-field"]),
+    box: token("borderRadius", themes.dark["radius-box"]),
+  },
+  size: {
+    selector: token("dimension", themes.dark["size-selector"]),
+    field: token("dimension", themes.dark["size-field"]),
+  },
+  border: token("dimension", themes.dark["border"]),
+  depth: token("number", Number(themes.dark["depth"])),
+  noise: token("number", Number(themes.dark["noise"])),
+  font: {
+    sans: token("fontFamily", parseThemeVar("font-sans")),
+    display: token("fontFamily", parseThemeVar("font-display")),
+    mono: token("fontFamily", parseThemeVar("font-mono")),
+  },
+};
 
-// Tokens-Studio style theme groups (best-effort; Penpot may ignore this file).
-const themeGroups = [
-  { id: "mode-light", name: "Light", selectedTokenSets: { core: "enabled", light: "enabled", dark: "disabled" } },
-  { id: "mode-dark", name: "Dark", selectedTokenSets: { core: "enabled", light: "disabled", dark: "enabled" } },
+// Without `$themes`/`$metadata` Penpot reads the file as one anonymous set
+// named after the file and leaves it out of every active theme; the multi-set
+// shape keeps the `luxpkgs` name and activates it through a theme.
+const themesMeta = [
+  {
+    id: "mode-dark",
+    name: "Dark",
+    description: "",
+    isSource: true,
+    selectedTokenSets: { luxpkgs: "enabled" },
+  },
+  {
+    id: "mode-light",
+    name: "Light",
+    description: "",
+    isSource: false,
+    selectedTokenSets: { luxpkgs: "enabled" },
+  },
 ];
+
+const doc = {
+  $themes: themesMeta,
+  $metadata: {
+    tokenSetOrder: ["luxpkgs"],
+    activeThemes: ["Dark"],
+    activeSets: ["luxpkgs"],
+  },
+  luxpkgs: sets.luxpkgs,
+};
 
 // --- self-check -----------------------------------------------------------
 function assert(cond, msg) {
@@ -126,13 +151,13 @@ function assert(cond, msg) {
 assert(oklchToHex(1, 0, 0) === "#ffffff", "white");
 assert(oklchToHex(0, 0, 0) === "#000000", "black");
 assert(parseOklch("oklch(0.29 0.029 284.46)")?.length === 7, "parse dark base-100");
+assert(Object.keys(sets.luxpkgs.color.light).length === 21, "21 light colors");
+assert(Object.keys(sets.luxpkgs.color.dark).length === 21, "21 dark colors");
 
 // --- write ----------------------------------------------------------------
-writeFileSync(OUT, JSON.stringify(sets, null, 2) + "\n");
-writeFileSync(OUT_THEMES, JSON.stringify(themeGroups, null, 2) + "\n");
+writeFileSync(OUT, JSON.stringify(doc, null, 2) + "\n");
 
 const count = (o) => JSON.stringify(o).match(/"\$value"/g)?.length ?? 0;
 process.stdout.write(
-  `Wrote ${OUT} (core=${count(sets.core)}, light=${count(sets.light)}, dark=${count(sets.dark)})\n`,
+  `Wrote ${OUT} (luxpkgs=${count(doc.luxpkgs)})\n`,
 );
-process.stdout.write(`Wrote ${OUT_THEMES}\n`);
